@@ -1,0 +1,3 @@
+<x-layout.link>
+    <x-halaman-admin.research-team-admin></x-halaman-admin.research-team-admin>
+</x-layout.link>
