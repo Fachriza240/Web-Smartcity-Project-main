@@ -1,3 +1,3 @@
-<x-layout.link>
+﻿<x-layout.admin>
     <x-halaman-admin.beranda-admin></x-halaman-admin.beranda-admin>
-</x-layout.link>
+</x-layout.admin>

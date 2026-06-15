@@ -382,8 +382,8 @@
     <div class="container">
 
         <!-- Brand / Logo -->
-        <a class="navbar-brand" href="index.php">
-            <img src="img/logosc.png" alt="Smart City Logo">
+        <a class="navbar-brand" href="/">
+            <img src="{{ asset('img/logosc.png') }}" alt="Smart City Logo">
         </a>
 
         <!-- Mobile Toggle -->
@@ -411,10 +411,13 @@
                     <a class="nav-link" href="/news-user">Berita</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{{ route('publications.index') }}">Publication</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="/team-user">Tim</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/team-user">Mitra</a>
+                    <a class="nav-link" href="{{ route('about.user') }}">Mitra</a>
                 </li>
             </ul>
 

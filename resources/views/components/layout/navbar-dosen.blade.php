@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container">
         <a class="navbar-brand" href="#">
-            <img src="img/logosc.png" alt="Smart City Logo">
+            <img src="{{ asset('img/logosc.png') }}" alt="Smart City Logo">
         </a>
 
         <!-- User avatar for mobile (visible only on small screens) -->
@@ -35,6 +35,7 @@
                     <li class="nav-item"><a class="nav-link" href="/program-dosen">Program</a></li>
                     <li class="nav-item"><a class="nav-link" href="/project-dosen">Project</a></li>
                     <li class="nav-item"><a class="nav-link" href="/news-dosen">News</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('publications.index') }}">Publication</a></li>
                     <li class="nav-item"><a class="nav-link" href="/team-dosen">Team</a></li>
                 </ul>
                 <div class="d-flex align-items-center">

@@ -1,62 +1,64 @@
+@php
+    // Ambil 4 program terbaru yang publish, urutkan by urutan
+    $cardPrograms = \App\Models\Program::published()
+        ->orderBy('urutan')
+        ->limit(4)
+        ->get();
+
+    // Warna gradient untuk 4 card berurutan
+    $gradients = ['blue-gradient', 'purple-gradient', 'cyan-gradient', 'orange-gradient'];
+@endphp
+
 <!-- Card Section -->
 <section class="cards-section">
     <div class="container">
         <div class="row g-4">
-            <!-- Card 1 - Blue Theme -->
-            <div class="col-lg-3 col-md-6" data-aos="fade-up">
-                <div class="program-card">
-                    <div class="card-image">
-                        <img src="img/card1.jpg" alt="Smart City Program">
-                    </div>
-                    <div class="card-content blue-gradient">
-                        <h3>Smart City Program</h3>
-                        <p>Program ini bertujuan untuk mengintegrasikan berbagai metode guna meningkatkan kualitas
-                            hidup di kota-kota modern.</p>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Card 2 - Purple Theme -->
-            <div class="col-lg-3 col-md-6" data-aos="fade-up">
-                <div class="program-card">
-                    <div class="card-image">
-                        <img src="img/card2.jpg" alt="Innovation for Future">
-                    </div>
-                    <div class="card-content purple-gradient">
-                        <h3>Innovation for Future</h3>
-                        <p>Kami mengembangkan solusi inovatif untuk meningkatkan kualitas hidup melalui teknologi
-                            dan sistem pintar di kota.</p>
+            @forelse($cardPrograms as $index => $program)
+                <div class="col-lg-3 col-md-6" data-aos="fade-up">
+                    <div class="program-card">
+                        <div class="card-image">
+                            @if($program->thumbnail_path)
+                                <img src="{{ asset('storage/' . $program->thumbnail_path) }}"
+                                     alt="{{ $program->judul }}">
+                            @else
+                                <div class="d-flex align-items-center justify-content-center bg-light"
+                                     style="height:200px;">
+                                    <i class="bi bi-layers text-secondary" style="font-size:3rem;"></i>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="card-content {{ $gradients[$index % 4] }}">
+                            <h3>{{ $program->judul }}</h3>
+                            <p>{{ \Illuminate\Support\Str::limit($program->deskripsi, 120) }}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            @empty
+                {{-- Fallback: tampilkan placeholder kalau belum ada data --}}
+                @foreach(['Smart City Program', 'Innovation for Future', 'Smart Infrastructure', 'Sustainable Cities'] as $index => $title)
+                    <div class="col-lg-3 col-md-6" data-aos="fade-up">
+                        <div class="program-card">
+                            <div class="card-image">
+                                <img src="img/card{{ $index + 1 }}.jpg" alt="{{ $title }}">
+                            </div>
+                            <div class="card-content {{ $gradients[$index] }}">
+                                <h3>{{ $title }}</h3>
+                                <p>Program unggulan COE Smart City Universitas Telkom dalam pengembangan teknologi kota cerdas.</p>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            @endforelse
 
-            <!-- Card 3 - Cyan Theme -->
-            <div class="col-lg-3 col-md-6" data-aos="fade-up">
-                <div class="program-card">
-                    <div class="card-image">
-                        <img src="img/card3.jpg" alt="Smart Infrastructure">
-                    </div>
-                    <div class="card-content cyan-gradient">
-                        <h3>Smart Infrastructure</h3>
-                        <p>Kami fokus pada pembangunan infrastruktur pintar yang menghubungkan berbagai elemen kota
-                            untuk menciptakan solusi yang lebih efisien.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 4 - Orange Theme -->
-            <div class="col-lg-3 col-md-6" data-aos="fade-up">
-                <div class="program-card">
-                    <div class="card-image">
-                        <img src="img/card4.jpg" alt="Sustainable Cities">
-                    </div>
-                    <div class="card-content orange-gradient">
-                        <h3>Sustainable Cities</h3>
-                        <p>Inisiatif kami untuk menciptakan kota yang lebih berkelanjutan dengan pemanfaatan
-                            teknologi hijau dan solusi ramah lingkungan.</p>
-                    </div>
-                </div>
-            </div>
         </div>
+
+        @if($cardPrograms->isNotEmpty())
+            <div class="text-center mt-4" data-aos="fade-up">
+                <a href="{{ route('programs.frontend.index') }}" class="btn btn-outline-primary px-4">
+                    Lihat Semua Program <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        @endif
     </div>
 </section>

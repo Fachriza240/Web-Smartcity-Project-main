@@ -1,164 +1,129 @@
-<div class="dashboard-container">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="brand">
-            <div class="brand-logo">A</div>
-            <h4 class="mb-0">Admin Panel</h4>
-        </div>
+{{-- Konten ini dirender di dalam <x-layout.admin> --}}
 
-        <ul class="nav-menu">
-            <li class="menu-category">Main Menu</li>
-            <li class="nav-item">
-                <a href="/beranda-admin" class="nav-link active">
-                    <i class="bi bi-speedometer2"></i>
-                    Dashboard
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="bi bi-layout-text-window-reverse"></i>
-                    Konten Website
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="bi bi-people"></i>
-                    Manajemen User
-                </a>
-            </li>
+{{-- Header --}}
+<div class="content-header">
+    <div>
+        <h2 class="mb-1">Dashboard Admin</h2>
+        <p class="mb-0">Selamat datang di panel admin COE Smart City.</p>
+    </div>
+    <div class="header-actions">
+        <a href="{{ route('admin.settings') }}" class="btn btn-light btn-sm">
+            <i class="bi bi-gear me-1"></i> Pengaturan
+        </a>
+    </div>
+</div>
 
-            <li class="menu-category">Content Management</li>
-            <li class="nav-item">
-                <a href="/program-admin" class="nav-link">
-                    <i class="bi bi-layers"></i> <!-- Program -->
-                    Program
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/research-team-admin" class="nav-link">
-                    <i class="bi bi-people-fill"></i> <!-- Research Team -->
-                    Research Team
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/project-admin" class="nav-link">
-                    <i class="bi bi-kanban"></i> <!-- Project -->
-                    Project
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/news-admin" class="nav-link">
-                    <i class="bi bi-newspaper"></i> <!-- News -->
-                    News
-                </a>
-            </li>
-
-            <li class="menu-category">Settings</li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="bi bi-gear"></i>
-                    Pengaturan
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" 
-                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="bi bi-box-arrow-right"></i>
-                    Logout
-                </a>
-
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                    @csrf
-                </form>
-            </li>
-        </ul>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="content-header">
-            <h2 class="mb-0">Content Management</h2>
-            <div class="header-actions">
-                <button class="btn btn-primary">
-                    <i class="bi bi-plus-lg me-2"></i>
-                    Tambah Konten Baru
-                </button>
-            </div>
-        </div>
-
-        <div class="content-editor mb-4">
-            <h4>Edit Konten</h4>
-            <div class="editor-toolbar">
-                <button class="btn btn-light"><i class="bi bi-type-bold"></i></button>
-                <button class="btn btn-light"><i class="bi bi-type-italic"></i></button>
-                <button class="btn btn-light"><i class="bi bi-list"></i></button>
-                <button class="btn btn-light"><i class="bi bi-link"></i></button>
-                <button class="btn btn-light"><i class="bi bi-image"></i></button>
-            </div>
-            <div class="mb-3">
-                <input type="text" class="form-control mb-3" placeholder="Judul Konten">
-                <textarea class="form-control" rows="5" placeholder="Isi konten..."></textarea>
-            </div>
-            <button class="btn btn-primary">Simpan Perubahan</button>
-        </div>
-
-        <div class="card-admin">
-            <div class="card-body">
-                <h5 class="card-title mb-4">Daftar Konten</h5>
-                <div class="table-responsive">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Judul</th>
-                                <th>Kategori</th>
-                                <th>Status</th>
-                                <th>Terakhir Diubah</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Halaman Utama</td>
-                                <td>Website</td>
-                                <td><span class="badge bg-success">Published</span></td>
-                                <td>2024-02-17</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn-icon" title="Edit">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <button class="btn-icon" title="Preview">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-                                        <button class="btn-icon" title="Delete">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>About Us</td>
-                                <td>Website</td>
-                                <td><span class="badge bg-warning">Draft</span></td>
-                                <td>2024-02-16</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn-icon" title="Edit">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <button class="btn-icon" title="Preview">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-                                        <button class="btn-icon" title="Delete">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+{{-- Stats Cards --}}
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="adm-stat">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="adm-stat__label">Program</div>
+                    <div class="adm-stat__num mt-1">{{ \App\Models\Program::where('status','Publish')->count() }}</div>
                 </div>
+                <div class="adm-stat__icon icon-bg-blue"><i class="bi bi-layers"></i></div>
             </div>
+            <a href="{{ route('admin.programs.index') }}" class="adm-stat__link">Kelola <i class="bi bi-arrow-right"></i></a>
         </div>
-    </main>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="adm-stat">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="adm-stat__label">Project</div>
+                    <div class="adm-stat__num mt-1">{{ \App\Models\Project::where('status','Publish')->count() }}</div>
+                </div>
+                <div class="adm-stat__icon icon-bg-green"><i class="bi bi-kanban"></i></div>
+            </div>
+            <a href="{{ route('admin.projects.index') }}" class="adm-stat__link">Kelola <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="adm-stat">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="adm-stat__label">Berita</div>
+                    <div class="adm-stat__num mt-1">{{ \App\Models\News::where('status','Publish')->count() }}</div>
+                </div>
+                <div class="adm-stat__icon icon-bg-yellow"><i class="bi bi-newspaper"></i></div>
+            </div>
+            <a href="{{ route('admin.news.index') }}" class="adm-stat__link">Kelola <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="adm-stat">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="adm-stat__label">Publication</div>
+                    <div class="adm-stat__num mt-1">{{ \App\Models\Publication::where('status','Publish')->count() }}</div>
+                </div>
+                <div class="adm-stat__icon icon-bg-cyan"><i class="bi bi-journal-text"></i></div>
+            </div>
+            <a href="{{ route('admin.publications.index') }}" class="adm-stat__link">Kelola <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="adm-stat">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="adm-stat__label">Tim</div>
+                    <div class="adm-stat__num mt-1">{{ \App\Models\Team::where('status','Publish')->count() }}</div>
+                </div>
+                <div class="adm-stat__icon icon-bg-blue"><i class="bi bi-people-fill"></i></div>
+            </div>
+            <a href="{{ route('admin.teams.index') }}" class="adm-stat__link">Kelola <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="adm-stat">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="adm-stat__label">Mitra</div>
+                    <div class="adm-stat__num mt-1">{{ \App\Models\Partner::where('status','Publish')->count() }}</div>
+                </div>
+                <div class="adm-stat__icon icon-bg-gray"><i class="bi bi-handshake"></i></div>
+            </div>
+            <a href="{{ route('admin.partners.index') }}" class="adm-stat__link">Kelola <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="adm-stat">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="adm-stat__label">Registrasi Pending</div>
+                    <div class="adm-stat__num mt-1">{{ \App\Models\User::where('registration_status','pending')->count() }}</div>
+                </div>
+                <div class="adm-stat__icon icon-bg-red"><i class="bi bi-person-check"></i></div>
+            </div>
+            <a href="{{ route('admin.validasi.index') }}" class="adm-stat__link">Validasi <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+</div>
+
+{{-- Quick Access --}}
+<div class="card-admin">
+    <div class="card-body">
+        <h5 class="card-title mb-3">Quick Access</h5>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ route('admin.programs.create') }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-plus me-1"></i>Program
+            </a>
+            <a href="{{ route('admin.projects.create') }}" class="btn btn-sm btn-outline-success">
+                <i class="bi bi-plus me-1"></i>Project
+            </a>
+            <a href="{{ route('admin.news.create') }}" class="btn btn-sm btn-outline-warning">
+                <i class="bi bi-plus me-1"></i>Berita
+            </a>
+            <a href="{{ route('admin.publications.create') }}" class="btn btn-sm btn-outline-info">
+                <i class="bi bi-plus me-1"></i>Publication
+            </a>
+            <a href="{{ route('admin.teams.create') }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-plus me-1"></i>Tim
+            </a>
+            <a href="{{ route('admin.partners.create') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-plus me-1"></i>Mitra
+            </a>
+        </div>
+    </div>
 </div>

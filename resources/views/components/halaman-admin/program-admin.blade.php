@@ -1,4 +1,4 @@
-<div class="dashboard-container">
+﻿<div class="dashboard-container">
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="brand">
@@ -29,25 +29,25 @@
 
             <li class="menu-category">Content Management</li>
             <li class="nav-item">
-                <a href="/program-admin" class="nav-link active">
+                <a href="{{ route('admin.programs.index') }}" class="nav-link active">
                     <i class="bi bi-layers"></i> <!-- Program -->
                     Program
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/research-team-admin" class="nav-link">
-                    <i class="bi bi-people-fill"></i> <!-- Research Team -->
-                    Research Team
+                <a href="{{ route('admin.teams.index') }}" class="nav-link">
+                    <i class="bi bi-people-fill"></i>
+                    Tim
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/project-admin" class="nav-link">
+                <a href="{{ route('admin.projects.index') }}" class="nav-link">
                     <i class="bi bi-kanban"></i> <!-- Project -->
                     Project
                 </a>
             </li>
             <li class="nav-item">
-                <a href="/news-admin" class="nav-link">
+                <a href="{{ route('admin.news.index') }}" class="nav-link">
                     <i class="bi bi-newspaper"></i> <!-- News -->
                     News
                 </a>
