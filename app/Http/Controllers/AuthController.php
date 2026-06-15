@@ -13,7 +13,7 @@ class AuthController extends Controller
     }
 
     public function register(Request $request){
-        $request->validate([
+        $data = $request->validate([
             'fullname'=>'required|string|max:255',
             'email'=>'required|email|unique:users,email',
             'nip'=>'required|numeric|unique:users,nip',
@@ -21,17 +21,16 @@ class AuthController extends Controller
             'foto'=>'nullable|image|max:2048',
         ]);
 
-        $data = $request->all();
+        $data['role'] = 'dosen';
+        $data['registration_status'] = User::STATUS_PENDING;
 
         if($request->hasFile('foto')){
             $data['foto'] = $request->file('foto')->store('foto-users', 'public');
         }
 
-        $user = User::create($data);
+        User::create($data);
 
-        Auth::login($user);
-
-        return $user->role === 'admin' ? redirect('/login') : redirect('/login');
+        return redirect('/login')->with('success', 'Registrasi berhasil. Akun dosen Anda menunggu validasi admin.');
     }
 
     public function showLogin(){
@@ -46,7 +45,25 @@ class AuthController extends Controller
 
         if(Auth::attempt($credentials)){
             $request->session()->regenerate();
-            return Auth::user()->role==='admin'? redirect('/beranda-admin') : redirect('/beranda-dosen');
+
+            if (Auth::user()->role === 'dosen' && Auth::user()->registration_status !== User::STATUS_APPROVED) {
+                $status = Auth::user()->registration_status;
+
+                Auth::logout();
+                $request->session()->regenerateToken();
+
+                $message = $status === User::STATUS_REJECTED
+                    ? 'Registrasi Anda ditolak. Silakan hubungi admin.'
+                    : 'Akun Anda masih menunggu validasi admin.';
+
+                return back()->withErrors(['email' => $message]);
+            }
+
+            $role = Auth::user()->role;
+            if($role === 'admin') return redirect('/beranda-admin');
+            if($role === 'dosen') return redirect('/beranda-dosen');
+            if($role === 'content_creator') return redirect('/beranda-creator');
+            return redirect('/');
         }
 
         return back()->withErrors(['email'=>'Email atau password salah']);

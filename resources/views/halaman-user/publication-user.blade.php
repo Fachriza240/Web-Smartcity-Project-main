@@ -1,0 +1,9 @@
+<x-layout.link>
+    <x-layout.navbar></x-layout.navbar>
+    <x-halaman-user.publication-user
+        :publications="$publications"
+        :categories="$categories"
+        :years="$years"
+    ></x-halaman-user.publication-user>
+    <x-layout.footer></x-layout.footer>
+</x-layout.link>

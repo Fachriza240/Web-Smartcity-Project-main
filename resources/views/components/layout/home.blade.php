@@ -881,7 +881,7 @@
             <div class="sc-hero__info-card">
                 <div class="info-card__icon"><i class="bi bi-people-fill"></i></div>
                 <div>
-                    <div class="info-card__num">59+</div>
+                    <div class="info-card__num">{{ \App\Models\Team::published()->count() ?: '59' }}+</div>
                     <div class="info-card__lbl">Anggota Aktif</div>
                 </div>
             </div>
@@ -890,7 +890,7 @@
             <div class="sc-hero__info-card-2">
                 <div class="info-card__icon"><i class="bi bi-journal-richtext"></i></div>
                 <div>
-                    <div class="info-card__num">63+</div>
+                    <div class="info-card__num">{{ \App\Models\Publication::where('status','Publish')->count() ?: '63' }}+</div>
                     <div class="info-card__lbl">Publikasi</div>
                 </div>
             </div>
@@ -991,41 +991,48 @@
         </div>
 
         {{-- Grid angka statistik --}}
+        @php
+            $statAnggota    = \App\Models\Team::published()->count();
+            $statProject    = \App\Models\Project::published()->count();
+            $statPublication = \App\Models\Publication::where('status','Publish')->count();
+            $statProgram    = \App\Models\Program::published()->count();
+            $statMitra      = \App\Models\Partner::published()->count();
+        @endphp
         <div class="sc-fakta__stats" data-aos="fade-up" data-aos-delay="100">
 
             <div>
                 <div class="sc-fakta__num">
-                    <span class="js-counter" data-target="59">0</span><span class="plus">+</span>
+                    <span class="js-counter" data-target="{{ max($statAnggota, 59) }}">0</span><span class="plus">+</span>
                 </div>
                 <div class="sc-fakta__lbl">Jumlah Anggota</div>
             </div>
 
             <div>
                 <div class="sc-fakta__num">
-                    <span class="js-counter" data-target="14">0</span><span class="plus">+</span>
+                    <span class="js-counter" data-target="{{ max($statProject, 14) }}">0</span><span class="plus">+</span>
                 </div>
-                <div class="sc-fakta__lbl">Jumlah Proyek Nasional</div>
+                <div class="sc-fakta__lbl">Jumlah Proyek</div>
             </div>
 
             <div>
                 <div class="sc-fakta__num">
-                    <span class="js-counter" data-target="63">0</span><span class="plus">+</span>
+                    <span class="js-counter" data-target="{{ max($statPublication, 63) }}">0</span><span class="plus">+</span>
                 </div>
                 <div class="sc-fakta__lbl">Jumlah Publikasi</div>
             </div>
 
             <div>
                 <div class="sc-fakta__num">
-                    <span class="js-counter" data-target="7">0</span><span class="plus">+</span>
+                    <span class="js-counter" data-target="{{ max($statProgram, 7) }}">0</span><span class="plus">+</span>
                 </div>
-                <div class="sc-fakta__lbl">Jumlah Proyek Internasional</div>
+                <div class="sc-fakta__lbl">Jumlah Program</div>
             </div>
 
             <div>
                 <div class="sc-fakta__num">
-                    <span class="js-counter" data-target="4">0</span><span class="plus">+</span>
+                    <span class="js-counter" data-target="{{ max($statMitra, 4) }}">0</span><span class="plus">+</span>
                 </div>
-                <div class="sc-fakta__lbl">Jumlah Proyek Unggulan</div>
+                <div class="sc-fakta__lbl">Jumlah Mitra</div>
             </div>
 
         </div>
@@ -1128,67 +1135,67 @@
 
 
 {{-- ============================================================
-     [SECTION 5 — CARDS] Asli dipertahankan
+     [SECTION 5 — CARDS] Program dari Database
      ============================================================ --}}
+@php
+    $homePrograms = \App\Models\Program::published()->orderBy('urutan')->limit(4)->get();
+    $homeGradients = ['blue-gradient', 'purple-gradient', 'cyan-gradient', 'orange-gradient'];
+    $homeFallbacks = [
+        ['img' => 'card1.jpg', 'title' => 'Smart City Program',    'desc' => 'Program ini bertujuan untuk mengintegrasikan berbagai metode guna meningkatkan kualitas hidup di kota-kota modern.'],
+        ['img' => 'card2.jpg', 'title' => 'Innovation for Future', 'desc' => 'Kami mengembangkan solusi inovatif untuk meningkatkan kualitas hidup melalui teknologi dan sistem pintar di kota.'],
+        ['img' => 'card3.jpg', 'title' => 'Smart Infrastructure',  'desc' => 'Kami fokus pada pembangunan infrastruktur pintar yang menghubungkan berbagai elemen kota untuk menciptakan solusi yang lebih efisien.'],
+        ['img' => 'card4.jpg', 'title' => 'Sustainable Cities',    'desc' => 'Inisiatif kami untuk menciptakan kota yang lebih berkelanjutan dengan pemanfaatan teknologi hijau dan solusi ramah lingkungan.'],
+    ];
+@endphp
 <section class="cards-section">
     <div class="container">
         <div class="row g-4">
-            <div class="col-lg-3 col-md-6" data-aos="fade-up">
-                <div class="program-card">
-                    <div class="card-image">
-                        <img src="img/card1.jpg" alt="Smart City Program">
+            @if($homePrograms->isNotEmpty())
+                @foreach($homePrograms as $i => $prog)
+                    <div class="col-lg-3 col-md-6" data-aos="fade-up">
+                        <div class="program-card">
+                            <div class="card-image">
+                                @if($prog->thumbnail_path)
+                                    <img src="{{ asset('storage/'.$prog->thumbnail_path) }}" alt="{{ $prog->judul }}">
+                                @else
+                                    <div class="d-flex align-items-center justify-content-center bg-light" style="height:200px;">
+                                        <i class="bi bi-layers text-secondary" style="font-size:3rem;"></i>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="card-content {{ $homeGradients[$i % 4] }}">
+                                <h3>{{ $prog->judul }}</h3>
+                                <p>{{ \Illuminate\Support\Str::limit($prog->deskripsi, 100) }}</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-content blue-gradient">
-                        <h3>Smart City Program</h3>
-                        <p>Program ini bertujuan untuk mengintegrasikan berbagai metode guna meningkatkan kualitas
-                            hidup di kota-kota modern.</p>
+                @endforeach
+            @else
+                @foreach($homeFallbacks as $i => $fb)
+                    <div class="col-lg-3 col-md-6" data-aos="fade-up">
+                        <div class="program-card">
+                            <div class="card-image">
+                                <img src="img/{{ $fb['img'] }}" alt="{{ $fb['title'] }}">
+                            </div>
+                            <div class="card-content {{ $homeGradients[$i] }}">
+                                <h3>{{ $fb['title'] }}</h3>
+                                <p>{{ $fb['desc'] }}</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6" data-aos="fade-up">
-                <div class="program-card">
-                    <div class="card-image">
-                        <img src="img/card2.jpg" alt="Innovation for Future">
-                    </div>
-                    <div class="card-content purple-gradient">
-                        <h3>Innovation for Future</h3>
-                        <p>Kami mengembangkan solusi inovatif untuk meningkatkan kualitas hidup melalui teknologi
-                            dan sistem pintar di kota.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6" data-aos="fade-up">
-                <div class="program-card">
-                    <div class="card-image">
-                        <img src="img/card3.jpg" alt="Smart Infrastructure">
-                    </div>
-                    <div class="card-content cyan-gradient">
-                        <h3>Smart Infrastructure</h3>
-                        <p>Kami fokus pada pembangunan infrastruktur pintar yang menghubungkan berbagai elemen kota
-                            untuk menciptakan solusi yang lebih efisien.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6" data-aos="fade-up">
-                <div class="program-card">
-                    <div class="card-image">
-                        <img src="img/card4.jpg" alt="Sustainable Cities">
-                    </div>
-                    <div class="card-content orange-gradient">
-                        <h3>Sustainable Cities</h3>
-                        <p>Inisiatif kami untuk menciptakan kota yang lebih berkelanjutan dengan pemanfaatan
-                            teknologi hijau dan solusi ramah lingkungan.</p>
-                    </div>
-                </div>
-            </div>
+                @endforeach
+            @endif
         </div>
     </div>
 </section>
 
 
 {{-- ============================================================
-     [SECTION 6 — GALLERY] Asli dipertahankan
+     [SECTION 6 — GALLERY] Project dari Database
      ============================================================ --}}
+@php
+    $homeProjects = \App\Models\Project::published()->orderByDesc('tahun')->limit(5)->get();
+@endphp
 <section class="gallery-section" id="gallery">
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
@@ -1200,52 +1207,88 @@
         <div class="gallery-carousel" data-aos="fade-up">
             <div id="galleryCarousel" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-inner">
-                    <div class="carousel-item active">
-                        <div class="carousel-image-container">
-                            <img src="img/card1.jpg" class="d-block w-100" alt="Project 1">
-                            <div class="carousel-caption">
-                                <h5>Smart City Research Lab</h5>
-                                <p>Kolaborasi tim peneliti dalam mengembangkan solusi teknologi smart city untuk
-                                    transportasi publik.</p>
+                    @if($homeProjects->isNotEmpty())
+                        @foreach($homeProjects as $idx => $proj)
+                            @php
+                                // Pakai gallery foto pertama, atau thumbnail
+                                $imgSrc = null;
+                                if (!empty($proj->gallery_paths) && count($proj->gallery_paths) > 0) {
+                                    $imgSrc = asset('storage/' . $proj->gallery_paths[0]);
+                                } elseif ($proj->thumbnail_path) {
+                                    $imgSrc = asset('storage/' . $proj->thumbnail_path);
+                                }
+                            @endphp
+                            <div class="carousel-item {{ $idx === 0 ? 'active' : '' }}">
+                                <div class="carousel-image-container">
+                                    @if($imgSrc)
+                                        <img src="{{ $imgSrc }}" class="d-block w-100" alt="{{ $proj->judul }}">
+                                    @else
+                                        <div class="d-flex align-items-center justify-content-center bg-light"
+                                             style="height:400px;">
+                                            <i class="bi bi-kanban text-secondary" style="font-size:4rem;"></i>
+                                        </div>
+                                    @endif
+                                    <div class="carousel-caption">
+                                        <h5>{{ $proj->judul }}</h5>
+                                        <p>{{ \Illuminate\Support\Str::limit($proj->deskripsi, 100) }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        <div class="carousel-item active">
+                            <div class="carousel-image-container">
+                                <img src="img/card1.jpg" class="d-block w-100" alt="Project">
+                                <div class="carousel-caption">
+                                    <h5>Smart City Research Lab</h5>
+                                    <p>Kolaborasi tim peneliti dalam mengembangkan solusi teknologi smart city.</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="carousel-image-container">
-                            <img src="img/card2.jpg" class="d-block w-100" alt="Project 2">
-                            <div class="carousel-caption">
-                                <h5>Innovation Workshop</h5>
-                                <p>Workshop pengembangan sistem monitoring berbasis IoT untuk infrastruktur kota pintar.
-                                </p>
+                        <div class="carousel-item">
+                            <div class="carousel-image-container">
+                                <img src="img/card2.jpg" class="d-block w-100" alt="Project">
+                                <div class="carousel-caption">
+                                    <h5>Innovation Workshop</h5>
+                                    <p>Workshop pengembangan sistem monitoring berbasis IoT.</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="carousel-image-container">
-                            <img src="img/card3.jpg" class="d-block w-100" alt="Project 3">
-                            <div class="carousel-caption">
-                                <h5>Smart City Development</h5>
-                                <p>Presentasi implementasi teknologi AI dalam manajemen lalu lintas kota.</p>
+                        <div class="carousel-item">
+                            <div class="carousel-image-container">
+                                <img src="img/card3.jpg" class="d-block w-100" alt="Project">
+                                <div class="carousel-caption">
+                                    <h5>Smart City Development</h5>
+                                    <p>Implementasi teknologi AI dalam manajemen lalu lintas kota.</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel"
-                    data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon"></span>
-                    <span class="visually-hidden">Sebelumnya</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#galleryCarousel"
-                    data-bs-slide="next">
-                    <span class="carousel-control-next-icon"></span>
-                    <span class="visually-hidden">Berikutnya</span>
-                </button>
-                <div class="carousel-indicators">
-                    <button type="button" data-bs-target="#galleryCarousel" data-bs-slide-to="0"
-                        class="active"></button>
-                    <button type="button" data-bs-target="#galleryCarousel" data-bs-slide-to="1"></button>
-                    <button type="button" data-bs-target="#galleryCarousel" data-bs-slide-to="2"></button>
-                </div>
+
+                @if($homeProjects->count() > 1 || $homeProjects->isEmpty())
+                    <button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                        <span class="visually-hidden">Sebelumnya</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#galleryCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                        <span class="visually-hidden">Berikutnya</span>
+                    </button>
+                    <div class="carousel-indicators">
+                        @if($homeProjects->isNotEmpty())
+                            @foreach($homeProjects as $idx => $proj)
+                                <button type="button" data-bs-target="#galleryCarousel"
+                                        data-bs-slide-to="{{ $idx }}"
+                                        class="{{ $idx === 0 ? 'active' : '' }}"></button>
+                            @endforeach
+                        @else
+                            <button type="button" data-bs-target="#galleryCarousel" data-bs-slide-to="0" class="active"></button>
+                            <button type="button" data-bs-target="#galleryCarousel" data-bs-slide-to="1"></button>
+                            <button type="button" data-bs-target="#galleryCarousel" data-bs-slide-to="2"></button>
+                        @endif
+                    </div>
+                @endif
             </div>
         </div>
     </div>

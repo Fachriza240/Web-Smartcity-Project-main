@@ -1,3 +1,3 @@
-<x-layout.link>
+﻿<x-layout.admin>
     <x-halaman-admin.research-team-admin></x-halaman-admin.research-team-admin>
-</x-layout.link>
+</x-layout.admin>

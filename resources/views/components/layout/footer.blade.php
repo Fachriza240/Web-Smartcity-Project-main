@@ -19,7 +19,7 @@
 
     <!-- Footer Logo -->
     <div class="footer-logo">
-        <img src="img/logosc.png" alt="Smart City Logo">
+        <img src="{{ asset('img/logosc.png') }}" alt="Smart City Logo">
     </div>
 
     <!-- Copyright Text -->
