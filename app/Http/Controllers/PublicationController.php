@@ -22,8 +22,8 @@ class PublicationController extends Controller
                         ->orWhere('doi', 'like', "%{$search}%");
                 });
             })
-            ->when($request->filled('kategori'), fn ($query) => $query->where('kategori', $request->kategori))
-            ->when($request->filled('tahun'), fn ($query) => $query->where('tahun', $request->tahun))
+            ->when($request->filled('kategori'), fn($query) => $query->where('kategori', $request->kategori))
+            ->when($request->filled('tahun'), fn($query) => $query->where('tahun', $request->tahun))
             ->orderByDesc('tahun')
             ->latest();
 
@@ -35,10 +35,14 @@ class PublicationController extends Controller
             ->orderByDesc('tahun')
             ->pluck('tahun');
 
+        // Cek apakah user adalah dosen yang sudah login
+        $isDosen = auth()->check() && auth()->user()->role === 'dosen';
+
         return view('halaman-user.publication-user', [
             'publications' => $publications,
             'categories' => Publication::categories(),
             'years' => $years,
+            'isDosen' => $isDosen,
         ]);
     }
 
