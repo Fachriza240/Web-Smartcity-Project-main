@@ -13,11 +13,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Membuat akun Admin bawaan
+        User::create([
+            'fullname' => 'Administrator SmartCity',
+            'email' => 'admin@gmail.com',
+            'nip' => '000000000',
+            'password' => 'password',
+            'role' => 'admin',
+            'registration_status' => 'approved',
+        ]);
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // User::factory()->create([
+        //     'name' => 'Test User',
+        //     'email' => 'test@example.com',
+        // ]);
     }
 }

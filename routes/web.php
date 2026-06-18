@@ -26,6 +26,8 @@ Route::get('/team-user', [TeamController::class, 'index'])->name('teams.frontend
 
 Route::get('/about-user', [AboutController::class, 'userIndex'])->name('about.user');
 
+Route::get('/mitra-user', [AboutController::class, 'partnersIndex'])->name('partners.user');
+
 Route::get('/program-user', [ProgramController::class, 'index'])->name('programs.frontend.index');
 
 Route::get('/project-user', [ProjectController::class, 'index'])->name('projects.frontend.index');
@@ -49,6 +51,10 @@ Route::get('/team-dosen', [TeamController::class, 'dosenIndex'])
 Route::get('/about-dosen', [AboutController::class, 'dosenIndex'])
     ->middleware(\App\Http\Middleware\EnsureUserApproved::class)
     ->name('about.dosen');
+
+Route::get('/mitra-dosen', [AboutController::class, 'partnersDosenIndex'])
+    ->middleware(\App\Http\Middleware\EnsureUserApproved::class)
+    ->name('partners.dosen');
 
 Route::get('/program-dosen', [ProgramController::class, 'dosenIndex'])
     ->middleware(\App\Http\Middleware\EnsureUserApproved::class);

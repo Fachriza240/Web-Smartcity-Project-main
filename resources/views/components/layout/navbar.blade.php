@@ -306,6 +306,46 @@
         margin: 0 6px;
     }
 
+    /* FORCE: Mitra Active State */
+    .sc-navbar .nav-link[href*="mitra"]:not(.active),
+    .sc-navbar .nav-link[href*="partners"]:not(.active) {
+        color: #2c3e55;
+        background: transparent;
+    }
+
+    .sc-navbar .nav-link[href*="mitra"].active,
+    .sc-navbar .nav-link[href*="partners"].active {
+        color: var(--sc-accent) !important;
+        background: #edf4fc !important;
+    }
+
+    .sc-navbar .nav-link[href*="mitra"].active::after,
+    .sc-navbar .nav-link[href*="partners"].active::after {
+        content: '' !important;
+        position: absolute !important;
+        bottom: -3px !important;
+        left: 13px !important;
+        right: 13px !important;
+        height: 3px !important;
+        background: #4c8dc9 !important;
+        border-radius: 2px !important;
+        display: block !important;
+        z-index: 10 !important;
+    }
+
+    /* Manual underline untuk Mitra */
+    .mitra-active-line {
+        position: absolute !important;
+        bottom: -3px !important;
+        left: 13px !important;
+        right: 13px !important;
+        height: 3px !important;
+        background: #4c8dc9 !important;
+        border-radius: 2px !important;
+        pointer-events: none !important;
+        z-index: 10 !important;
+    }
+
     /* ────────── RESPONSIVE ────────── */
     @media (max-width: 991px) {
         .sc-topbar-left {
@@ -396,7 +436,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto">
                 <li class="nav-item">
-                    <a class="nav-link active" href="/">Beranda</a>
+                    <a class="nav-link" href="/">Beranda</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/about-user">Tentang Kami</a>
@@ -411,13 +451,14 @@
                     <a class="nav-link" href="/news-user">Berita</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('publications.index') }}">Publication</a>
+                    <a class="nav-link" href="/publication-user">Publikasi</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/team-user">Tim</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('about.user') }}">Mitra</a>
+                    <a class="nav-link" href="{{ route('partners.user') }}"
+                        data-debug-href="{{ route('partners.user') }}">Mitra</a>
                 </li>
             </ul>
 
@@ -426,7 +467,7 @@
                 <!-- Search Box -->
                 <div class="sc-search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search...">
+                    <input type="text" placeholder="Cari...">
                 </div>
 
                 <div class="sc-nav-divider"></div>
@@ -458,11 +499,142 @@
 
     // Set active link berdasarkan URL saat ini
     const currentPath = window.location.pathname;
+    let activeSet = false;
+
+    console.log('Current path (User):', currentPath);
+
     document.querySelectorAll('.sc-navbar .nav-link').forEach(link => {
         const href = link.getAttribute('href');
-        if (href === currentPath || (href !== '/' && currentPath.startsWith(href))) {
-            document.querySelectorAll('.sc-navbar .nav-link').forEach(l => l.classList.remove('active'));
+
+        // Hapus active dari semua link terlebih dahulu
+        link.classList.remove('active');
+
+        // DEBUG: Log semua link dan href
+        console.log('Link text:', link.textContent.trim(), 'href:', href, 'data-debug-href:', link.getAttribute(
+            'data-debug-href'));
+
+        // Pencocokan sederhana - exact match first
+        if (href === currentPath) {
             link.classList.add('active');
+            activeSet = true;
+            console.log('Active set by exact match:', href);
+        }
+    });
+
+    // FORCE: Jika di halaman publikasi, pastikan active state
+    if (currentPath === '/publication-user') {
+        const publikasiLink = document.querySelector('.sc-navbar .nav-link[href="/publication-user"]');
+        if (publikasiLink) {
+            publikasiLink.classList.add('active');
+            activeSet = true;
+            console.log('Force active: Publikasi');
+        }
+    }
+
+    // FORCE: Jika di halaman mitra, pastikan active state
+    if (currentPath === '/mitra-user' || currentPath.includes('partners')) {
+        // Cari link dengan teks "Mitra"
+        const mitraLink = Array.from(document.querySelectorAll('.sc-navbar .nav-link'))
+            .find(link => link.textContent.trim() === 'Mitra');
+        if (mitraLink) {
+            mitraLink.classList.add('active');
+            activeSet = true;
+            console.log('Force active: Mitra');
+        }
+    }
+
+    // Jika tidak ada yang cocok dan di halaman root, set beranda sebagai active
+    if (!activeSet && (currentPath === '/' || currentPath === '/beranda-dosen')) {
+        const berandaLink = document.querySelector(
+            '.sc-navbar .nav-link[href="/"], .sc-navbar .nav-link[href="/beranda-dosen"]');
+        if (berandaLink) {
+            berandaLink.classList.add('active');
+        }
+    }
+</script>
+
+<!-- ===== ENHANCED MITRA ACTIVE STATE FIX ===== -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentPath = window.location.pathname;
+        console.log('🔧 ENHANCED MITRA FIX - Current path:', currentPath);
+
+        // Khusus untuk halaman mitra user
+        if (currentPath === '/mitra-user') {
+            console.log('🎯 Detected mitra-user page');
+
+            // Hapus semua active terlebih dahulu
+            document.querySelectorAll('.sc-navbar .nav-link').forEach(link => {
+                link.classList.remove('active');
+                console.log('Removed active from:', link.textContent.trim());
+            });
+
+            // Cari dan aktifkan menu Mitra dengan berbagai cara
+            let mitraActivated = false;
+
+            // Metode 1: Cari berdasarkan teks "Mitra"
+            const mitraByText = Array.from(document.querySelectorAll('.sc-navbar .nav-link'))
+                .find(link => link.textContent.trim() === 'Mitra');
+
+            if (mitraByText) {
+                mitraByText.classList.add('active');
+                // Force inline styles untuk memastikan terlihat
+                mitraByText.style.setProperty('color', 'var(--sc-accent)', 'important');
+                mitraByText.style.setProperty('background', '#edf4fc', 'important');
+                mitraByText.style.setProperty('position', 'relative', 'important');
+
+                // Tambahkan garis biru dibawah secara manual
+                const existingLine = mitraByText.querySelector('.mitra-active-line');
+                if (!existingLine) {
+                    const activeLine = document.createElement('div');
+                    activeLine.className = 'mitra-active-line';
+                    activeLine.style.cssText = `
+                        position: absolute !important;
+                        bottom: -3px !important;
+                        left: 13px !important;
+                        right: 13px !important;
+                        height: 3px !important;
+                        background: var(--sc-accent) !important;
+                        border-radius: 2px !important;
+                        pointer-events: none !important;
+                    `;
+                    mitraByText.appendChild(activeLine);
+                }
+
+                mitraActivated = true;
+                console.log('✅ MITRA ACTIVATED by text with forced styles and underline!');
+            }
+
+            // Metode 2: Cari berdasarkan href yang mengandung 'partners' atau 'mitra'
+            if (!mitraActivated) {
+                const mitraByHref = Array.from(document.querySelectorAll('.sc-navbar .nav-link'))
+                    .find(link => {
+                        const href = link.getAttribute('href') || '';
+                        return href.includes('partners') || href.includes('mitra');
+                    });
+
+                if (mitraByHref) {
+                    mitraByHref.classList.add('active');
+                    mitraActivated = true;
+                    console.log('✅ MITRA ACTIVATED by href!');
+                }
+            }
+
+            // Metode 3: Force activation jika masih belum berhasil
+            if (!mitraActivated) {
+                setTimeout(() => {
+                    const allLinks = document.querySelectorAll('.sc-navbar .nav-link');
+                    console.log('Available links:', Array.from(allLinks).map(l => l.textContent
+                        .trim()));
+
+                    // Cari link terakhir (biasanya Mitra)
+                    const lastLink = allLinks[allLinks.length - 1];
+                    if (lastLink && lastLink.textContent.trim() === 'Mitra') {
+                        lastLink.classList.add('active');
+                        console.log('✅ MITRA ACTIVATED by last link!');
+                    }
+                }, 100);
+            }
         }
     });
 </script>
