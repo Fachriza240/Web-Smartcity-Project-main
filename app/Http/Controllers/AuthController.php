@@ -13,24 +13,44 @@ class AuthController extends Controller
     }
 
     public function register(Request $request){
-        $data = $request->validate([
-            'fullname'=>'required|string|max:255',
-            'email'=>'required|email|unique:users,email',
-            'nip'=>'required|numeric|unique:users,nip',
-            'password'=>'required|confirmed|min:6',
-            'foto'=>'nullable|image|max:2048',
-        ]);
+        $role = $request->input('role', 'dosen');
 
-        $data['role'] = 'dosen';
-        $data['registration_status'] = User::STATUS_PENDING;
+        // Validasi berbeda berdasarkan role
+        $rules = [
+            'fullname' => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|confirmed|min:6',
+            'role'     => 'required|in:dosen,content_creator',
+            'foto'     => 'nullable|image|max:2048',
+        ];
 
-        if($request->hasFile('foto')){
+        // NIP hanya wajib untuk dosen
+        if ($role === 'dosen') {
+            $rules['nip'] = 'required|numeric|unique:users,nip';
+        } else {
+            $rules['nip'] = 'nullable|numeric|unique:users,nip';
+        }
+
+        $data = $request->validate($rules);
+
+        $data['role'] = $role;
+
+        // Dosen butuh validasi admin, content_creator langsung approved
+        $data['registration_status'] = ($role === 'dosen')
+            ? User::STATUS_PENDING
+            : User::STATUS_APPROVED;
+
+        if ($request->hasFile('foto')) {
             $data['foto'] = $request->file('foto')->store('foto-users', 'public');
         }
 
         User::create($data);
 
-        return redirect('/login')->with('success', 'Registrasi berhasil. Akun dosen Anda menunggu validasi admin.');
+        $message = ($role === 'dosen')
+            ? 'Registrasi berhasil. Akun dosen Anda menunggu validasi admin.'
+            : 'Registrasi berhasil. Silakan login dengan akun Anda.';
+
+        return redirect('/login')->with('success', $message);
     }
 
     public function showLogin(){
@@ -39,34 +59,30 @@ class AuthController extends Controller
 
     public function login(Request $request){
         $credentials = $request->validate([
-            'email'=>'required|email',
-            'password'=>'required',
+            'email'    => 'required|email',
+            'password' => 'required',
         ]);
 
-        if(Auth::attempt($credentials)){
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            if (Auth::user()->role === 'dosen' && Auth::user()->registration_status !== User::STATUS_APPROVED) {
-                $status = Auth::user()->registration_status;
+            $user = Auth::user();
 
-                Auth::logout();
-                $request->session()->regenerateToken();
-
-                $message = $status === User::STATUS_REJECTED
-                    ? 'Registrasi Anda ditolak. Silakan hubungi admin.'
-                    : 'Akun Anda masih menunggu validasi admin.';
-
-                return back()->withErrors(['email' => $message]);
+            // Dosen belum approved → redirect ke halaman status
+            if ($user->role === 'dosen' && $user->registration_status !== User::STATUS_APPROVED) {
+                return redirect()->route('dosen.status');
             }
 
-            $role = Auth::user()->role;
-            if($role === 'admin') return redirect('/beranda-admin');
-            if($role === 'dosen') return redirect('/beranda-dosen');
-            if($role === 'content_creator') return redirect('/beranda-creator');
-            return redirect('/');
+            // Redirect berdasarkan role
+            return match ($user->role) {
+                'admin'           => redirect('/beranda-admin'),
+                'dosen'           => redirect('/beranda-dosen'),
+                'content_creator' => redirect('/beranda-creator'),
+                default           => redirect('/'),
+            };
         }
 
-        return back()->withErrors(['email'=>'Email atau password salah']);
+        return back()->withErrors(['email' => 'Email atau password salah.'])->withInput($request->only('email'));
     }
 
     public function logout(Request $request){
