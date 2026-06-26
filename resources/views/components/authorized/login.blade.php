@@ -1,108 +1,115 @@
-<div class="container-fluid p-0">
-    <div class="row g-0 login-container">
-        <!-- Left side - City Background with Circuit Pattern Overlay -->
-        <div class="col-md-6 login-bg">
-            <div class="circuit-overlay"></div>
-        </div>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — COE Smart City</title>
+  <link rel="icon" href="{{ asset('img/favicon.png') }}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="{{ asset('css/auth.css') }}" rel="stylesheet">
+</head>
+<body class="auth-body">
 
-        <!-- Right side - Login Form -->
-        <div class="col-md-6 login-form-container">
-            <!-- Back Button -->
-            <a href="/" class="back-btn">
-                <i class="fas fa-arrow-left me-2"></i> Back
-            </a>
+<div class="auth-card">
 
-            <div class="login-form">
-                <!-- Logo -->
-                <div class="text-center mb-4">
-                    <img src="img/logosc.png" alt="Smart City Logo" style="max-width: 200px;">
-                </div>
+  {{-- ── Kiri: Form ──────────────────────────────────────── --}}
+  <div class="auth-left">
 
-                <!-- Login Header -->
-                <h2 class="text-center login-header">Login</h2>
+    <a href="/" class="auth-back">
+      <i class="bi bi-arrow-left"></i> Kembali ke Beranda
+    </a>
 
-                @if(session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
-
-                @if($errors->any())
-                    <div class="alert alert-danger">
-                        {{ $errors->first() }}
-                    </div>
-                @endif
-
-                <!-- Login Form -->
-                <form action="{{ route('login.masuk') }}" method="POST">
-                    @csrf
-                    <div class="mb-3">
-                        <input type="email" id="email" name="email" class="form-control" placeholder="Email" required>
-                    </div>
-                    <div class="mb-3 position-relative password-field">
-                        <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
-                        <span class="password-toggle position-absolute" style="top:50%; right:10px; transform:translateY(-50%); cursor:pointer;">
-                            <i class="far fa-eye-slash"></i>
-                        </span>
-                    </div>
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Login</button>
-                    </div>
-                    <!-- Register link -->
-                    <div class="text-center mt-3">
-                        <p class="mb-0">
-                            Don't have an account? 
-                            <a href="/registrasi" class="text-decoration-none fw-medium" style="color: #0d6efd;">
-                                Register
-                            </a>
-                        </p>
-                    </div>
-                </form>
-
-
-                <!-- Partner Logos -->
-                <div class="text-center partner-logos">
-                    <div class="row">
-                        <div class="col-6">
-                            <img src="img/logotelkom2.png" alt="Telkom University" class="img-fluid">
-                        </div>
-                        <div class="col-6">
-                            <img src="img/logofit.png" alt="Fakultas Ilmu Terapan" class="img-fluid">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="auth-logo">
+      <img src="{{ asset('img/logosc.png') }}" alt="COE Smart City">
     </div>
+
+    <h1 class="auth-heading">Login</h1>
+    <p class="auth-sub">Masuk ke panel COE Smart City Universitas Telkom.</p>
+
+    @if(session('success'))
+      <div class="auth-alert auth-alert-success">
+        <i class="bi bi-check-circle-fill"></i>
+        {{ session('success') }}
+      </div>
+    @endif
+
+    @if($errors->any())
+      <div class="auth-alert auth-alert-error">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        {{ $errors->first() }}
+      </div>
+    @endif
+
+    <form action="{{ route('login.masuk') }}" method="POST" novalidate>
+      @csrf
+
+      <div class="auth-field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email"
+               value="{{ old('email') }}"
+               placeholder="nama@example.com"
+               autocomplete="email"
+               class="{{ $errors->has('email') ? 'is-error' : '' }}"
+               required>
+      </div>
+
+      <div class="auth-field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password"
+               placeholder="••••••••••••"
+               autocomplete="current-password"
+               required>
+        <span class="auth-eye" id="togglePwd" title="Tampilkan password">
+          <i class="bi bi-eye-slash" id="eyeIcon"></i>
+        </span>
+      </div>
+
+      <div class="auth-meta">
+        <label class="auth-meta-left">
+          <input type="checkbox" name="remember"> Remember me
+        </label>
+        <a href="#">Forgot Password?</a>
+      </div>
+
+      <button type="submit" class="auth-btn">Login</button>
+    </form>
+
+    <p class="auth-bottom">
+      Don't have an account? <a href="{{ route('registrasi') }}">Sign Up</a>
+    </p>
+
+  </div>
+
+  {{-- ── Kanan: Gambar ───────────────────────────────────── --}}
+  <div class="auth-right">
+    <img src="{{ asset('img/bglogin.jpg') }}" alt="Smart City" loading="eager">
+    <div class="auth-caption">
+      Inovasi teknologi untuk<br>kota-kota cerdas Indonesia.
+    </div>
+    <div class="auth-badges">
+      <span class="auth-badge"><i class="bi bi-mortarboard-fill"></i> Universitas Telkom</span>
+      <span class="auth-badge"><i class="bi bi-building"></i> COE Smart City</span>
+    </div>
+  </div>
+
 </div>
 
-<!-- JavaScript for password visibility toggle -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const togglePassword = document.querySelector('.password-toggle');
-        const password = document.querySelector('#password');
-
-        // Toggle password visibility
-        togglePassword.addEventListener('click', function () {
-            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-            password.setAttribute('type', type);
-            this.querySelector('i').classList.toggle('fa-eye');
-            this.querySelector('i').classList.toggle('fa-eye-slash');
-        });
-
-        // Validasi login
-        const loginForm = document.getElementById('loginForm');
-        loginForm.addEventListener('submit', function (e) {
-            e.preventDefault(); // stop submit langsung
-
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-
-            if (username === "" || password === "") {
-                alert("Harap isi Username dan Password sebelum login!");
-                return;
-            }
-
-            // Kalau valid → redirect ke halaman admin
-            window.location.href = "/beranda-admin";
-        });
-    });
+  (function () {
+    var btn  = document.getElementById('togglePwd');
+    var inp  = document.getElementById('password');
+    var icon = document.getElementById('eyeIcon');
+    if (btn) {
+      btn.addEventListener('click', function () {
+        var show = inp.type === 'password';
+        inp.type = show ? 'text' : 'password';
+        icon.className = show ? 'bi bi-eye' : 'bi bi-eye-slash';
+      });
+    }
+  })();
 </script>
+
+</body>
+</html>
