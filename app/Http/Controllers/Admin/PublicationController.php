@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Publication;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -15,27 +16,32 @@ class PublicationController extends Controller
     {
         $this->authorizeContentManager();
 
-        $query = Publication::query()
-            ->when($request->filled('search'), function ($query) use ($request) {
+        $publications = Publication::query()
+            ->with('recommender')
+            ->when($request->filled('search'), function ($q) use ($request) {
                 $search = $request->search;
-
-                $query->where(function ($query) use ($search) {
-                    $query->where('judul', 'like', "%{$search}%")
-                        ->orWhere('penulis', 'like', "%{$search}%")
-                        ->orWhere('penerbit', 'like', "%{$search}%")
-                        ->orWhere('doi', 'like', "%{$search}%");
+                $q->where(function ($q) use ($search) {
+                    $q->where('judul', 'like', "%{$search}%")
+                      ->orWhere('penulis', 'like', "%{$search}%")
+                      ->orWhere('penerbit', 'like', "%{$search}%")
+                      ->orWhere('doi', 'like', "%{$search}%");
                 });
             })
-            ->when($request->filled('kategori'), fn ($query) => $query->where('kategori', $request->kategori))
-            ->when($request->filled('status'), fn ($query) => $query->where('status', $request->status))
-            ->latest();
+            ->when($request->filled('kategori'), fn ($q) => $q->where('kategori', $request->kategori))
+            ->when($request->filled('status'),   fn ($q) => $q->where('status', $request->status))
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
 
-        $publications = $query->paginate(10)->withQueryString();
+        $dosens = User::where('role', 'dosen')
+            ->where('registration_status', 'approved')
+            ->orderBy('fullname')->get(['id', 'fullname', 'nip']);
 
         return view('admin.publications.index', [
             'publications' => $publications,
-            'categories' => Publication::categories(),
-            'statuses' => Publication::statuses(),
+            'categories'   => Publication::categories(),
+            'statuses'     => Publication::statuses(),
+            'dosens'       => $dosens,
         ]);
     }
 
@@ -43,10 +49,15 @@ class PublicationController extends Controller
     {
         $this->authorizeContentManager();
 
+        $dosens = User::where('role', 'dosen')
+            ->where('registration_status', 'approved')
+            ->orderBy('fullname')->get(['id', 'fullname', 'nip']);
+
         return view('admin.publications.create', [
-            'publication' => new Publication(['status' => Publication::STATUS_DRAFT]),
-            'categories' => Publication::categories(),
-            'statuses' => Publication::statuses(),
+            'publication'   => new Publication(['status' => Publication::STATUS_DRAFT, 'submission_type' => 'non_member']),
+            'categories'    => Publication::categories(),
+            'statuses'      => Publication::statuses(),
+            'dosens'        => $dosens,
         ]);
     }
 
@@ -55,6 +66,11 @@ class PublicationController extends Controller
         $this->authorizeContentManager();
 
         $data = $this->validatedData($request);
+
+        if (!$request->hasFile('pdf')) {
+            return back()->withErrors(['pdf' => 'File PDF wajib diupload.'])->withInput();
+        }
+
         $data['pdf_path'] = $request->file('pdf')->store('publications/pdf', 'public');
         unset($data['pdf']);
 
@@ -72,10 +88,15 @@ class PublicationController extends Controller
     {
         $this->authorizeContentManager();
 
+        $dosens = User::where('role', 'dosen')
+            ->where('registration_status', 'approved')
+            ->orderBy('fullname')->get(['id', 'fullname', 'nip']);
+
         return view('admin.publications.edit', [
             'publication' => $publication,
-            'categories' => Publication::categories(),
-            'statuses' => Publication::statuses(),
+            'categories'  => Publication::categories(),
+            'statuses'    => Publication::statuses(),
+            'dosens'      => $dosens,
         ]);
     }
 
@@ -115,23 +136,35 @@ class PublicationController extends Controller
 
     private function validatedData(Request $request, ?Publication $publication = null): array
     {
-        return $request->validate([
-            'judul' => ['required', 'string', 'max:255'],
-            'penulis' => ['required', 'string', 'max:255'],
-            'tahun' => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
-            'abstrak' => ['required', 'string'],
-            'kategori' => ['required', Rule::in(Publication::categories())],
-            'penerbit' => ['nullable', 'string', 'max:255'],
-            'doi' => ['nullable', 'string', 'max:255'],
-            'pdf' => [$publication ? 'nullable' : 'required', 'file', 'mimes:pdf', 'max:20480'],
-            'thumbnail' => ['nullable', 'image', 'max:4096'],
-            'status' => ['required', Rule::in(Publication::statuses())],
+        $data = $request->validate([
+            'submission_type' => ['required', 'in:member,non_member'],
+            'user_id'         => ['nullable', 'exists:users,id'],
+            'recommended_by'  => ['nullable', 'string', 'max:255'],
+            'judul'           => ['required', 'string', 'max:255'],
+            'penulis'         => ['required', 'string', 'max:255'],
+            'tahun'           => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
+            'abstrak'         => ['required', 'string'],
+            'kategori'        => ['required', Rule::in(Publication::categories())],
+            'penerbit'        => ['nullable', 'string', 'max:255'],
+            'doi'             => ['nullable', 'string', 'max:255'],
+            'pdf'             => [$publication ? 'nullable' : 'required', 'file', 'mimes:pdf', 'max:20480'],
+            'thumbnail'       => ['nullable', 'image', 'max:4096'],
+            'status'          => ['required', Rule::in(Publication::statuses())],
         ]);
+
+        // Bersihkan field yang tidak relevan berdasarkan submission_type
+        if ($data['submission_type'] === 'non_member') {
+            $data['user_id'] = null;
+        } else {
+            $data['recommended_by'] = null;
+        }
+
+        return $data;
     }
 
     private function authorizeContentManager(): void
     {
-        if (!Auth::check() || !in_array(Auth::user()->role, ['admin', 'content_creator'], true)) {
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
             abort(403);
         }
     }

@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class EnsureUserApproved
 {
@@ -24,21 +23,24 @@ class EnsureUserApproved
             return redirect('/login');
         }
 
-        // Admin & content_creator selalu approved — langsung lolos
-        if (in_array($user->role, ['admin', 'content_creator'], true)) {
+        // Admin selalu lolos
+        if ($user->role === 'admin') {
+            return $next($request);
+        }
+
+        // Content creator: cek status
+        if ($user->role === 'content_creator') {
+            if (($user->registration_status ?? null) !== User::STATUS_APPROVED) {
+                return redirect()->route('dosen.status');
+            }
             return $next($request);
         }
 
         // Dosen: cek status registrasi
         if ($user->role === 'dosen') {
             if (($user->registration_status ?? null) !== User::STATUS_APPROVED) {
-                // Jika masih pending/rejected, arahkan ke halaman status
-                Auth::logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
                 return redirect()->route('dosen.status');
             }
-
             return $next($request);
         }
 

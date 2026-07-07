@@ -1,44 +1,51 @@
 <?php
 
-// namespace App\Http\Controllers;
+namespace App\Http\Controllers;
 
-// use Illuminate\Http\Request;
-// use Illuminate\Support\Facades\Auth;
-// use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
-// class ProfileController extends Controller
-// {
-//     public function showProfile()
-//     {
-//         $user = Auth::user(); // ambil user yang sedang login
-//         return view('halaman-dosen.profil-dosen', compact('user'));
-//     }
+class ProfileController extends Controller
+{
+    public function show()
+    {
+        $user = Auth::user();
+        return view('halaman-dosen.profil-dosen', compact('user'));
+    }
 
-//     public function updateProfile(Request $request)
-//     {
-//         $user = Auth::user();
-        
-//         $request->validate([
-//             'fullname' => 'required|string|max:255',
-//             'email' => 'required|email|unique:users,email,' . $user->id,
-//             'nip' => 'required|numeric|unique:users,nip,' . $user->id,
-//             'foto' => 'nullable|image|max:2048',
-//         ]);
+    public function update(Request $request)
+    {
+        $user = Auth::user();
 
-//         $data = $request->only(['fullname', 'email', 'nip']);
+        $request->validate([
+            'fullname'          => 'required|string|max:255',
+            'email'             => 'required|email|unique:users,email,' . $user->id,
+            'nip'               => 'nullable|string|max:50|unique:users,nip,' . $user->id,
+            'prodi'             => 'nullable|string|max:255',
+            'fakultas'          => 'nullable|string|max:255',
+            'bio'               => 'nullable|string',
+            'bidang_penelitian' => 'nullable|string',
+            'foto'              => 'nullable|image|max:4096',
+        ]);
 
-//         // Handle foto upload
-//         if ($request->hasFile('foto')) {
-//             // Delete old photo if exists
-//             if ($user->foto && Storage::disk('public')->exists($user->foto)) {
-//                 Storage::disk('public')->delete($user->foto);
-//             }
-            
-//             $data['foto'] = $request->file('foto')->store('foto-users', 'public');
-//         }
+        $data = $request->only([
+            'fullname', 'email', 'nip',
+            'prodi', 'fakultas',
+            'bio', 'bidang_penelitian',
+        ]);
 
-//         $user->update($data);
+        // Jangan bcrypt — password tidak diubah di sini
+        if ($request->hasFile('foto')) {
+            if ($user->foto && Storage::disk('public')->exists($user->foto)) {
+                Storage::disk('public')->delete($user->foto);
+            }
+            $data['foto'] = $request->file('foto')->store('foto-users', 'public');
+        }
 
-//         return redirect()->back()->with('success', 'Profil berhasil diperbarui');
-//     }
-// }
+        // Update tanpa trigger password mutator
+        $user->forceFill($data)->save();
+
+        return redirect()->route('profil.dosen')->with('success', 'Profil berhasil diperbarui.');
+    }
+}

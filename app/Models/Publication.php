@@ -17,6 +17,9 @@ class Publication extends Model
     public const STATUS_PUBLISH = 'Publish';
 
     protected $fillable = [
+        'user_id',
+        'recommended_by',
+        'submission_type',
         'judul',
         'penulis',
         'tahun',
@@ -28,6 +31,24 @@ class Publication extends Model
         'thumbnail_path',
         'status',
     ];
+
+    public function recommender()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function getRecommenderNameAttribute(): string
+    {
+        if ($this->submission_type === 'member' && $this->recommender) {
+            return $this->recommender->fullname;
+        }
+        return $this->recommended_by ?? '-';
+    }
+
+    public static function submissionTypes(): array
+    {
+        return ['member', 'non_member'];
+    }
 
     public static function categories(): array
     {

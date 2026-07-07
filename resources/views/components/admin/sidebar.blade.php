@@ -48,6 +48,7 @@
                     <i class="bi bi-kanban"></i> Project
                 </a>
             </li>
+            @if($isAdmin)
             <li class="nav-item">
                 <a href="{{ route('admin.publications.index') }}"
                    class="nav-link {{ request()->routeIs('admin.publications.*') ? 'active' : '' }}">
@@ -55,12 +56,18 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a href="{{ route('admin.hki.index') }}"
+                   class="nav-link {{ request()->routeIs('admin.hki.*') ? 'active' : '' }}">
+                    <i class="bi bi-award"></i> HKI
+                </a>
+            </li>
+            @endif
+            <li class="nav-item">
                 <a href="{{ route('admin.news.index') }}"
                    class="nav-link {{ request()->routeIs('admin.news.*') ? 'active' : '' }}">
                     <i class="bi bi-newspaper"></i> Berita
                 </a>
-            </li>
-            @if($isAdmin)
+            </li>            @if($isAdmin)
                 <li class="nav-item">
                     <a href="{{ route('admin.teams.index') }}"
                        class="nav-link {{ request()->routeIs('admin.teams.*') ? 'active' : '' }}">
