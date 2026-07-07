@@ -88,7 +88,11 @@
       </div>
       <h2 class="status-title">Menunggu Verifikasi</h2>
       <p class="status-desc">
-        Akun dosen Anda sudah terdaftar dan sedang dalam proses verifikasi oleh admin.
+        @if($user?->role === 'content_creator')
+          Akun Content Creator Anda sudah terdaftar dan sedang menunggu persetujuan admin.
+        @else
+          Akun dosen Anda sudah terdaftar dan sedang dalam proses verifikasi oleh admin.
+        @endif
       </p>
       <span class="status-badge badge-pending">
         <i class="bi bi-clock-fill"></i> Pending
@@ -106,7 +110,7 @@
       </div>
       <h2 class="status-title">Registrasi Ditolak</h2>
       <p class="status-desc">
-        Maaf, registrasi akun dosen Anda tidak disetujui.<br>
+        Maaf, registrasi akun Anda tidak disetujui.<br>
         Silakan hubungi admin untuk informasi lebih lanjut.
       </p>
       <span class="status-badge badge-rejected">

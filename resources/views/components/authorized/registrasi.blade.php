@@ -93,11 +93,31 @@
         </div>
       </div>
 
-      {{-- Catatan dosen --}}
-      <div class="auth-note-wrap {{ old('role','dosen') === 'content_creator' ? 'hidden' : '' }}" id="dosenNoteWrap">
+      {{-- Prodi & Fakultas — hanya dosen --}}
+      <div class="auth-nip-wrap {{ old('role','dosen') === 'content_creator' ? 'hidden' : '' }}" id="prodiFakultasWrap">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:0;">
+          <div class="auth-field" style="margin-bottom:0;">
+            <label for="prodi">Program Studi</label>
+            <input type="text" id="prodi" name="prodi"
+                   value="{{ old('prodi') }}"
+                   placeholder="Contoh: Teknik Informatika"
+                   class="{{ $errors->has('prodi') ? 'is-error' : '' }}">
+          </div>
+          <div class="auth-field" style="margin-bottom:0;">
+            <label for="fakultas">Fakultas</label>
+            <input type="text" id="fakultas" name="fakultas"
+                   value="{{ old('fakultas') }}"
+                   placeholder="Contoh: Fakultas Informatika"
+                   class="{{ $errors->has('fakultas') ? 'is-error' : '' }}">
+          </div>
+        </div>
+      </div>
+
+      {{-- Catatan pending — tampil untuk semua role --}}
+      <div class="auth-note-wrap" id="dosenNoteWrap">
         <div class="auth-note">
           <i class="bi bi-info-circle-fill"></i>
-          Akun dosen akan diverifikasi oleh admin sebelum bisa digunakan.
+          <span id="dosenNoteText">Akun Anda akan diverifikasi oleh admin sebelum bisa digunakan.</span>
         </div>
       </div>
 
@@ -164,7 +184,20 @@
     lblCreator.classList.toggle('active', !isDosen);
 
     nipWrap.classList.toggle('hidden', !isDosen);
-    dosenNote.classList.toggle('hidden', !isDosen);
+
+    // Toggle prodi & fakultas
+    var prodiFakultasWrap = document.getElementById('prodiFakultasWrap');
+    if (prodiFakultasWrap) {
+      prodiFakultasWrap.classList.toggle('hidden', !isDosen);
+    }
+
+    // Note selalu tampil untuk semua role — teks berbeda
+    var noteText = document.getElementById('dosenNoteText');
+    if (noteText) {
+      noteText.textContent = isDosen
+        ? 'Akun dosen akan diverifikasi oleh admin sebelum bisa digunakan.'
+        : 'Akun Content Creator akan diverifikasi oleh admin sebelum bisa digunakan.';
+    }
 
     nipInput.required = isDosen;
     if (!isDosen) nipInput.value = '';

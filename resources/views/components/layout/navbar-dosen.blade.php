@@ -443,13 +443,30 @@
 
                 <!-- User Profile Dropdown -->
                 <div class="sc-user-dropdown dropdown">
-                    <img src="{{ asset('img/rayyan.jpg') }}" class="sc-user-avatar dropdown-toggle" id="userDropdown"
-                        data-bs-toggle="dropdown" aria-expanded="false" alt="User Avatar">
+                    @if(auth()->user()?->foto)
+                        <img src="{{ asset('storage/'.auth()->user()->foto) }}"
+                             class="sc-user-avatar dropdown-toggle" id="userDropdown"
+                             data-bs-toggle="dropdown" aria-expanded="false"
+                             alt="{{ auth()->user()->fullname }}">
+                    @else
+                        <div class="sc-user-avatar dropdown-toggle d-flex align-items-center justify-content-center"
+                             id="userDropdown"
+                             data-bs-toggle="dropdown" aria-expanded="false"
+                             style="background:#4c8dc9;color:#fff;font-size:15px;font-weight:700;cursor:pointer;">
+                            {{ strtoupper(substr(auth()->user()?->fullname ?? 'D', 0, 1)) }}
+                        </div>
+                    @endif
                     <ul class="dropdown-menu sc-dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                         <li>
                             <a class="dropdown-item" href="/profil-dosen">
                                 <i class="fas fa-user"></i>
                                 Profil
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('dosen.publikasi.index') }}">
+                                <i class="fas fa-journal-whills"></i>
+                                Konten Saya
                             </a>
                         </li>
                         <li>

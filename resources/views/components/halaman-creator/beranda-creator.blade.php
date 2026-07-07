@@ -4,7 +4,7 @@
 <div class="content-header">
     <div>
         <h2 class="mb-1">Content Creator Dashboard</h2>
-        <p class="mb-0">Kelola konten — Program, Project, Publication, Berita, dan Mitra.</p>
+        <p class="mb-0">Kelola konten — Program, Project, Berita, dan Mitra.</p>
     </div>
     <div class="header-actions">
         <a href="{{ route('admin.news.create') }}" class="btn btn-warning btn-sm">
@@ -46,18 +46,6 @@
         <div class="adm-stat">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <div class="adm-stat__label">Publication</div>
-                    <div class="adm-stat__num mt-1">{{ \App\Models\Publication::where('status','Publish')->count() }}</div>
-                </div>
-                <div class="adm-stat__icon icon-bg-cyan"><i class="bi bi-journal-text"></i></div>
-            </div>
-            <a href="{{ route('admin.publications.index') }}" class="adm-stat__link">Kelola <i class="bi bi-arrow-right"></i></a>
-        </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="adm-stat">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
                     <div class="adm-stat__label">Berita</div>
                     <div class="adm-stat__num mt-1">{{ \App\Models\News::where('status','Publish')->count() }}</div>
                 </div>
@@ -90,9 +78,6 @@
             </a>
             <a href="{{ route('admin.projects.create') }}" class="btn btn-sm btn-outline-success">
                 <i class="bi bi-plus me-1"></i>Project
-            </a>
-            <a href="{{ route('admin.publications.create') }}" class="btn btn-sm btn-outline-info">
-                <i class="bi bi-plus me-1"></i>Publication
             </a>
             <a href="{{ route('admin.news.create') }}" class="btn btn-sm btn-outline-warning">
                 <i class="bi bi-plus me-1"></i>Berita

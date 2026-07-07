@@ -26,7 +26,9 @@ class AuthController extends Controller
 
         // NIP hanya wajib untuk dosen
         if ($role === 'dosen') {
-            $rules['nip'] = 'required|numeric|unique:users,nip';
+            $rules['nip']      = 'required|numeric|unique:users,nip';
+            $rules['prodi']    = 'nullable|string|max:255';
+            $rules['fakultas'] = 'nullable|string|max:255';
         } else {
             $rules['nip'] = 'nullable|numeric|unique:users,nip';
         }
@@ -35,10 +37,8 @@ class AuthController extends Controller
 
         $data['role'] = $role;
 
-        // Dosen butuh validasi admin, content_creator langsung approved
-        $data['registration_status'] = ($role === 'dosen')
-            ? User::STATUS_PENDING
-            : User::STATUS_APPROVED;
+        // Semua role baru harus menunggu validasi admin
+        $data['registration_status'] = User::STATUS_PENDING;
 
         if ($request->hasFile('foto')) {
             $data['foto'] = $request->file('foto')->store('foto-users', 'public');
@@ -48,7 +48,7 @@ class AuthController extends Controller
 
         $message = ($role === 'dosen')
             ? 'Registrasi berhasil. Akun dosen Anda menunggu validasi admin.'
-            : 'Registrasi berhasil. Silakan login dengan akun Anda.';
+            : 'Registrasi berhasil. Akun Anda menunggu persetujuan admin sebelum bisa digunakan.';
 
         return redirect('/login')->with('success', $message);
     }
@@ -68,8 +68,9 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
-            // Dosen belum approved → redirect ke halaman status
-            if ($user->role === 'dosen' && $user->registration_status !== User::STATUS_APPROVED) {
+            // Dosen atau content_creator belum approved → redirect ke halaman status
+            if (in_array($user->role, ['dosen', 'content_creator'])
+                && $user->registration_status !== User::STATUS_APPROVED) {
                 return redirect()->route('dosen.status');
             }
 

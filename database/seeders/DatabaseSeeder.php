@@ -18,13 +18,13 @@ class DatabaseSeeder extends Seeder
             'registration_status' => 'approved',
         ]);
 
-        // Content Creator
+        // Content Creator — approved langsung hanya via seeder (bukan registrasi publik)
         User::firstOrCreate(['email' => 'creator@smartcity.ac.id'], [
             'fullname'            => 'Content Creator',
             'nip'                 => null,
             'password'            => 'password',
             'role'                => 'content_creator',
-            'registration_status' => 'approved',
+            'registration_status' => 'approved', // dibuat manual oleh admin
         ]);
 
         // Dosen (contoh, pending)

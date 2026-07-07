@@ -66,9 +66,32 @@ Route::get('/news-dosen', [NewsController::class, 'dosenIndex'])
     ->middleware(\App\Http\Middleware\EnsureUserApproved::class)
     ->name('news.dosen');
 
-Route::get('/profil-dosen', function () {
-    return view('halaman-dosen.profil-dosen');
-})->middleware(\App\Http\Middleware\EnsureUserApproved::class);
+Route::get('/profil-dosen', [App\Http\Controllers\ProfileController::class, 'show'])
+    ->middleware(\App\Http\Middleware\EnsureUserApproved::class)
+    ->name('profil.dosen');
+
+Route::put('/profil-dosen', [App\Http\Controllers\ProfileController::class, 'update'])
+    ->middleware(\App\Http\Middleware\EnsureUserApproved::class)
+    ->name('profil.dosen.update');
+
+// Dosen — kelola konten pribadi
+Route::middleware(\App\Http\Middleware\EnsureUserApproved::class)->group(function () {
+    // Publikasi dosen
+    Route::get('/dosen/publikasi',         [App\Http\Controllers\DosenKontenController::class, 'publikasiIndex'])->name('dosen.publikasi.index');
+    Route::get('/dosen/publikasi/create',  [App\Http\Controllers\DosenKontenController::class, 'publikasiCreate'])->name('dosen.publikasi.create');
+    Route::post('/dosen/publikasi',        [App\Http\Controllers\DosenKontenController::class, 'publikasiStore'])->name('dosen.publikasi.store');
+    Route::get('/dosen/publikasi/{p}/edit',[App\Http\Controllers\DosenKontenController::class, 'publikasiEdit'])->name('dosen.publikasi.edit');
+    Route::put('/dosen/publikasi/{p}',     [App\Http\Controllers\DosenKontenController::class, 'publikasiUpdate'])->name('dosen.publikasi.update');
+    Route::delete('/dosen/publikasi/{p}',  [App\Http\Controllers\DosenKontenController::class, 'publikasiDestroy'])->name('dosen.publikasi.destroy');
+
+    // HKI dosen
+    Route::get('/dosen/hki',               [App\Http\Controllers\DosenKontenController::class, 'hkiIndex'])->name('dosen.hki.index');
+    Route::get('/dosen/hki/create',        [App\Http\Controllers\DosenKontenController::class, 'hkiCreate'])->name('dosen.hki.create');
+    Route::post('/dosen/hki',              [App\Http\Controllers\DosenKontenController::class, 'hkiStore'])->name('dosen.hki.store');
+    Route::get('/dosen/hki/{h}/edit',      [App\Http\Controllers\DosenKontenController::class, 'hkiEdit'])->name('dosen.hki.edit');
+    Route::put('/dosen/hki/{h}',           [App\Http\Controllers\DosenKontenController::class, 'hkiUpdate'])->name('dosen.hki.update');
+    Route::delete('/dosen/hki/{h}',        [App\Http\Controllers\DosenKontenController::class, 'hkiDestroy'])->name('dosen.hki.destroy');
+});
 
 Route::get('/biografi-dosen', function () {
     return view('halaman-dosen.biografi-dosen');
@@ -114,7 +137,7 @@ Route::get('/beranda-dosen', function () {
 Route::get('/dosen/status', function () {
     if (!Auth::check()) return redirect('/login');
     return view('halaman-dosen.status-pending');
-})->name('dosen.status');
+})->name('dosen.status')->middleware('auth');
 
 Route::get('/beranda-creator', function () {
     if (!Auth::check() || Auth::user()->role !== 'content_creator') abort(403);
@@ -172,6 +195,14 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/partners/{partner}/edit', [AdminPartnerController::class, 'edit'])->name('partners.edit');
     Route::put('/partners/{partner}', [AdminPartnerController::class, 'update'])->name('partners.update');
     Route::delete('/partners/{partner}', [AdminPartnerController::class, 'destroy'])->name('partners.destroy');
+
+    // HKI
+    Route::get('/hki', [\App\Http\Controllers\Admin\HkiController::class, 'index'])->name('hki.index');
+    Route::get('/hki/create', [\App\Http\Controllers\Admin\HkiController::class, 'create'])->name('hki.create');
+    Route::post('/hki', [\App\Http\Controllers\Admin\HkiController::class, 'store'])->name('hki.store');
+    Route::get('/hki/{hki}/edit', [\App\Http\Controllers\Admin\HkiController::class, 'edit'])->name('hki.edit');
+    Route::put('/hki/{hki}', [\App\Http\Controllers\Admin\HkiController::class, 'update'])->name('hki.update');
+    Route::delete('/hki/{hki}', [\App\Http\Controllers\Admin\HkiController::class, 'destroy'])->name('hki.destroy');
 
     // Settings
     Route::get('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings');
