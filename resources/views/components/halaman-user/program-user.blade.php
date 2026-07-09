@@ -273,19 +273,20 @@
         flex: 1;
         display: flex;
         flex-direction: column;
+        background: linear-gradient(135deg, var(--primary-blue) 0%, #3a7ab3 100%);
     }
 
     .prog-card__title {
         font-size: 1.15rem;
         font-weight: 700;
-        color: var(--text-black);
+        color: #ffffff;
         margin-bottom: 0.6rem;
         font-family: "Spline Sans", sans-serif;
     }
 
     .prog-card__desc {
         font-size: 14.5px;
-        color: var(--text-gray);
+        color: rgba(255, 255, 255, 0.85);
         line-height: 1.7;
         font-family: "Lato", sans-serif;
         flex: 1;

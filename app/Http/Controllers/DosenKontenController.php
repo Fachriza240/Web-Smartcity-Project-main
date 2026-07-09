@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Hki;
 use App\Models\Publication;
+use App\Models\User;
+use App\Notifications\HkiAddedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -128,6 +130,11 @@ class DosenKontenController extends Controller
 
     public function hkiCreate()
     {
+        $dosens = User::where('role', 'dosen')
+            ->where('registration_status', 'approved')
+            ->orderBy('fullname')
+            ->get(['id', 'fullname', 'nip', 'prodi', 'fakultas']);
+
         return view('halaman-dosen.konten.hki-form', [
             'hki'      => new Hki([
                 'status'          => Hki::STATUS_DRAFT,
@@ -137,6 +144,7 @@ class DosenKontenController extends Controller
             'jenis'    => Hki::JENIS,
             'statuses' => Hki::statuses(),
             'mode'     => 'create',
+            'dosens'   => $dosens,
         ]);
     }
 
@@ -152,7 +160,8 @@ class DosenKontenController extends Controller
                 ->store('hki/sertifikat', 'public');
         }
 
-        Hki::create($data);
+        $hki = Hki::create($data);
+        $this->sendHkiNotifications($hki);
 
         return redirect()->route('dosen.hki.index')
             ->with('success', 'HKI berhasil ditambahkan. Menunggu review admin untuk dipublikasikan.');
@@ -162,11 +171,17 @@ class DosenKontenController extends Controller
     {
         $this->authorizeOwnerHki($h);
 
+        $dosens = User::where('role', 'dosen')
+            ->where('registration_status', 'approved')
+            ->orderBy('fullname')
+            ->get(['id', 'fullname', 'nip', 'prodi', 'fakultas']);
+
         return view('halaman-dosen.konten.hki-form', [
             'hki'      => $h,
             'jenis'    => Hki::JENIS,
             'statuses' => Hki::statuses(),
             'mode'     => 'edit',
+            'dosens'   => $dosens,
         ]);
     }
 
@@ -183,6 +198,7 @@ class DosenKontenController extends Controller
         }
 
         $h->update($data);
+        $this->sendHkiNotifications($h);
 
         return redirect()->route('dosen.hki.index')
             ->with('success', 'HKI berhasil diperbarui.');
@@ -250,5 +266,47 @@ class DosenKontenController extends Controller
         if ($path && Storage::disk('public')->exists($path)) {
             Storage::disk('public')->delete($path);
         }
+    }
+
+    private function sendHkiNotifications(Hki $hki): void
+    {
+        if (empty($hki->pencipta)) {
+            return;
+        }
+
+        // Pecah string nama pencipta berdasarkan koma
+        $names = array_map('trim', explode(',', $hki->pencipta));
+        
+        if (count($names) > 0) {
+            // Cari user dosen yang namanya ada di daftar pencipta dan bukan penginput sendiri
+            $usersToNotify = User::whereIn('fullname', $names)
+                                 ->where('role', 'dosen')
+                                 ->where('id', '!=', Auth::id())
+                                 ->get();
+
+            foreach ($usersToNotify as $user) {
+                // Hindari duplikasi notifikasi untuk HKI yang sama
+                $alreadyNotified = $user->notifications()
+                                        ->where('type', HkiAddedNotification::class)
+                                        ->where('data->hki_id', $hki->id)
+                                        ->exists();
+                
+                if (!$alreadyNotified) {
+                    $user->notify(new HkiAddedNotification($hki));
+                }
+            }
+        }
+    }
+
+    public function markNotificationAsRead($id)
+    {
+        $notification = Auth::user()->notifications()->find($id);
+        if ($notification) {
+            $notification->markAsRead();
+            
+            // Redirect ke halaman index HKI atau langsung ke item jika diperlukan
+            return redirect()->route('dosen.hki.index');
+        }
+        return back();
     }
 }

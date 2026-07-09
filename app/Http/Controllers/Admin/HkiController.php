@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Hki;
 use App\Models\User;
+use App\Notifications\HkiAddedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -31,7 +32,7 @@ class HkiController extends Controller
         $dosens = User::where('role', 'dosen')
             ->where('registration_status', 'approved')
             ->orderBy('fullname')
-            ->get(['id', 'fullname', 'nip']);
+            ->get(['id', 'fullname', 'nip', 'prodi', 'fakultas']);
 
         return view('admin.hki.index', [
             'hkis'     => $hkis,
@@ -48,7 +49,7 @@ class HkiController extends Controller
         $dosens = User::where('role', 'dosen')
             ->where('registration_status', 'approved')
             ->orderBy('fullname')
-            ->get(['id', 'fullname', 'nip']);
+            ->get(['id', 'fullname', 'nip', 'prodi', 'fakultas']);
 
         return view('admin.hki.create', [
             'hki'      => new Hki(['status' => Hki::STATUS_DRAFT, 'submission_type' => 'non_member']),
@@ -69,7 +70,8 @@ class HkiController extends Controller
         }
         unset($data['file_sertifikat_upload']);
 
-        Hki::create($data);
+        $hki = Hki::create($data);
+        $this->sendHkiNotifications($hki);
 
         return redirect()->route('admin.hki.index')->with('success', 'HKI berhasil ditambahkan.');
     }
@@ -81,7 +83,7 @@ class HkiController extends Controller
         $dosens = User::where('role', 'dosen')
             ->where('registration_status', 'approved')
             ->orderBy('fullname')
-            ->get(['id', 'fullname', 'nip']);
+            ->get(['id', 'fullname', 'nip', 'prodi', 'fakultas']);
 
         return view('admin.hki.edit', [
             'hki'      => $hki,
@@ -104,6 +106,7 @@ class HkiController extends Controller
         unset($data['file_sertifikat_upload']);
 
         $hki->update($data);
+        $this->sendHkiNotifications($hki);
 
         return redirect()->route('admin.hki.index')->with('success', 'HKI berhasil diperbarui.');
     }
@@ -154,6 +157,33 @@ class HkiController extends Controller
     {
         if ($path && Storage::disk('public')->exists($path)) {
             Storage::disk('public')->delete($path);
+        }
+    }
+
+    private function sendHkiNotifications(Hki $hki): void
+    {
+        if (empty($hki->pencipta)) {
+            return;
+        }
+
+        $names = array_map('trim', explode(',', $hki->pencipta));
+        
+        if (count($names) > 0) {
+            $usersToNotify = User::whereIn('fullname', $names)
+                                 ->where('role', 'dosen')
+                                 ->get();
+
+            foreach ($usersToNotify as $user) {
+                // Admin can notify everyone, so no Auth::id() exclusion needed
+                $alreadyNotified = $user->notifications()
+                                        ->where('type', HkiAddedNotification::class)
+                                        ->where('data->hki_id', $hki->id)
+                                        ->exists();
+                
+                if (!$alreadyNotified) {
+                    $user->notify(new HkiAddedNotification($hki));
+                }
+            }
         }
     }
 }

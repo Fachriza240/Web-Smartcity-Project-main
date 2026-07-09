@@ -441,6 +441,55 @@
 
                 <div class="sc-nav-divider"></div>
 
+                <!-- Notifications Dropdown -->
+                <div class="sc-user-dropdown dropdown me-2">
+                    <a href="#" class="d-flex align-items-center justify-content-center position-relative text-decoration-none" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="color: #7a9bbf; width: 40px; height: 40px; background: #f4f8fd; border-radius: 50%; border: 1.5px solid #d0dff0; transition: all 0.2s;">
+                        <i class="fas fa-bell" style="font-size: 1.1rem;"></i>
+                        @if(Auth::check() && Auth::user()->unreadNotifications->count() > 0)
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-white" style="font-size: 0.65rem; padding: 0.25em 0.4em;">
+                                {{ Auth::user()->unreadNotifications->count() }}
+                            </span>
+                        @endif
+                    </a>
+                    <ul class="dropdown-menu sc-dropdown-menu dropdown-menu-end p-0 shadow-sm" aria-labelledby="notifDropdown" style="width: 320px; border-radius: 12px; overflow: hidden;">
+                        <li class="p-3 border-bottom" style="background: #f8fafc;">
+                            <h6 class="mb-0 fw-bold" style="color: #1e293b; font-size: 14px;"><i class="fas fa-bell text-primary me-2"></i>Notifikasi</h6>
+                        </li>
+                        <div style="max-height: 350px; overflow-y: auto;">
+                            @if(Auth::check() && Auth::user()->notifications->count() > 0)
+                                @foreach(Auth::user()->notifications->take(10) as $notif)
+                                    <li class="border-bottom">
+                                        <a class="dropdown-item py-3 px-3 {{ $notif->unread() ? 'bg-white' : 'bg-light' }}" 
+                                           href="{{ route('dosen.notifications.read', $notif->id) }}" 
+                                           style="white-space: normal; line-height: 1.4;">
+                                            <div class="d-flex align-items-start gap-3">
+                                                <div class="d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; flex-shrink: 0; background: #edf4fc; border: 1px solid #d0dff0; border-radius: 10px; color: #4c8dc9;">
+                                                    <i class="fas fa-lightbulb fa-fw" style="font-size: 1.25rem; transform: translateY(-1.5px);"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="mb-1 text-wrap" style="font-size: 13.5px; color: {{ $notif->unread() ? '#1e293b' : '#64748b' }}; line-height: 1.4;">
+                                                        {!! str_replace('Anda telah ditambahkan menjadi pencipta HKI:', 'Anda ditambahkan sebagai pencipta HKI:<br><strong style="color: #0f172a; display: inline-block; margin-top: 4px;">', $notif->data['message']) !!}</strong>
+                                                    </p>
+                                                    <small class="text-muted mt-2 d-flex align-items-center" style="font-size: 11.5px; font-weight: 500;">
+                                                        <i class="far fa-clock me-1" style="color: #9ab0c8;"></i>{{ $notif->created_at->diffForHumans() }}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                @endforeach
+                            @else
+                                <li>
+                                    <div class="text-center py-5 text-muted">
+                                        <i class="fas fa-bell-slash mb-3" style="font-size: 2rem; color: #cbd5e1;"></i>
+                                        <p class="mb-0" style="font-size: 13px; color: #64748b;">Belum ada notifikasi baru</p>
+                                    </div>
+                                </li>
+                            @endif
+                        </div>
+                    </ul>
+                </div>
+
                 <!-- User Profile Dropdown -->
                 <div class="sc-user-dropdown dropdown">
                     @if(auth()->user()?->foto)
