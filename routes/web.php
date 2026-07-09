@@ -91,6 +91,9 @@ Route::middleware(\App\Http\Middleware\EnsureUserApproved::class)->group(functio
     Route::get('/dosen/hki/{h}/edit',      [App\Http\Controllers\DosenKontenController::class, 'hkiEdit'])->name('dosen.hki.edit');
     Route::put('/dosen/hki/{h}',           [App\Http\Controllers\DosenKontenController::class, 'hkiUpdate'])->name('dosen.hki.update');
     Route::delete('/dosen/hki/{h}',        [App\Http\Controllers\DosenKontenController::class, 'hkiDestroy'])->name('dosen.hki.destroy');
+
+    // Notifikasi Dosen
+    Route::get('/dosen/notifications/{id}/read', [App\Http\Controllers\DosenKontenController::class, 'markNotificationAsRead'])->name('dosen.notifications.read');
 });
 
 Route::get('/biografi-dosen', function () {
