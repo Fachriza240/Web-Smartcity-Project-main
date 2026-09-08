@@ -47,20 +47,29 @@ class DatabaseSeeder extends Seeder
             'registration_status' => 'rejected',
         ]);
 
-        // 5. Dosen (Approved) - Untuk Pengujian /beranda-dosen
-        $dosenApproved = User::firstOrCreate(['email' => 'dosen.approved@smartcity.ac.id'], [
-            'fullname'            => 'Dr. Dosen Approved, M.T.',
+        // 5. Dosen A (Pengirim HKI / Inputter)
+        $dosenA = User::firstOrCreate(['email' => 'dosenA@smartcity.ac.id'], [
+            'fullname'            => 'Dosen A Pengirim',
             'nip'                 => '198501012015011001',
             'password'            => 'password',
             'role'                => 'dosen',
             'registration_status' => 'approved',
         ]);
 
-        // Dummy Data 1 Publikasi
+        // 6. Dosen B (Penerima Notifikasi HKI)
+        $dosenB = User::firstOrCreate(['email' => 'dosenB@smartcity.ac.id'], [
+            'fullname'            => 'Dosen B Penerima',
+            'nip'                 => '198501012015011002',
+            'password'            => 'password',
+            'role'                => 'dosen',
+            'registration_status' => 'approved',
+        ]);
+
+        // Dummy Data 1 Publikasi milik Dosen A
         Publication::firstOrCreate([
             'judul'          => 'Pengembangan Sistem Smart City Berbasis IoT',
         ], [
-            'penulis'        => $dosenApproved->fullname,
+            'penulis'        => $dosenA->fullname,
             'tahun'          => 2024,
             'abstrak'        => 'Abstrak penelitian smart city.',
             'kategori'       => 'Jurnal',
@@ -69,15 +78,15 @@ class DatabaseSeeder extends Seeder
             'status'         => 'Publish',
         ]);
 
-        // Dummy Data 1 HKI 
+        // Dummy Data 1 HKI milik Dosen A
         Hki::firstOrCreate([
             'nomor_sertifikat' => 'HKI-2024-001',
         ], [
             'tgl_terbit'       => '2024-01-15',
             'judul_sertifikat' => 'Hak Cipta Perangkat Lunak SmartCity Monitoring',
             'jenis_sertifikat' => 'Hak Cipta',
-            'pencipta'         => $dosenApproved->fullname,
-            'user_id'          => $dosenApproved->id,
+            'pencipta'         => $dosenA->fullname,
+            'user_id'          => $dosenA->id,
             'submission_type'  => 'member',
             'status'           => 'Publish',
         ]);
