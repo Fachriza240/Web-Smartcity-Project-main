@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 trait AuthorizesRoles
 {
 
-    protected function authorizeRole(array $allowedRoles): void
+    protected function authorizeRole(array $allowedRoles, bool $requireApproved = true): void
     {
         $user = Auth::user();
 
@@ -16,6 +16,10 @@ trait AuthorizesRoles
         }
 
         if (!in_array($user->role, $allowedRoles, true)) {
+            abort(403);
+        }
+
+        if ($requireApproved && $user->role !== 'admin' && !$user->isApproved()) {
             abort(403);
         }
     }
