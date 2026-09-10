@@ -17,7 +17,6 @@ use App\Http\Controllers\Admin\PartnerController as AdminPartnerController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProfileController;
 
-// --Route Halaman User--
 Route::get('/', function () {
     return view('halaman-user.beranda-user');
 });
@@ -44,7 +43,6 @@ Route::get('/biografi-user', function () {
 });
 
 
-// --Route Halaman Dosen--
 Route::get('/team-dosen', [TeamController::class, 'dosenIndex'])
     ->middleware(\App\Http\Middleware\EnsureUserApproved::class);
 
@@ -74,9 +72,8 @@ Route::put('/profil-dosen', [App\Http\Controllers\ProfileController::class, 'upd
     ->middleware(\App\Http\Middleware\EnsureUserApproved::class)
     ->name('profil.dosen.update');
 
-// Dosen — kelola konten pribadi
 Route::middleware(\App\Http\Middleware\EnsureUserApproved::class)->group(function () {
-    // Publikasi dosen
+
     Route::get('/dosen/publikasi',         [App\Http\Controllers\DosenKontenController::class, 'publikasiIndex'])->name('dosen.publikasi.index');
     Route::get('/dosen/publikasi/create',  [App\Http\Controllers\DosenKontenController::class, 'publikasiCreate'])->name('dosen.publikasi.create');
     Route::post('/dosen/publikasi',        [App\Http\Controllers\DosenKontenController::class, 'publikasiStore'])->name('dosen.publikasi.store');
@@ -84,7 +81,6 @@ Route::middleware(\App\Http\Middleware\EnsureUserApproved::class)->group(functio
     Route::put('/dosen/publikasi/{p}',     [App\Http\Controllers\DosenKontenController::class, 'publikasiUpdate'])->name('dosen.publikasi.update');
     Route::delete('/dosen/publikasi/{p}',  [App\Http\Controllers\DosenKontenController::class, 'publikasiDestroy'])->name('dosen.publikasi.destroy');
 
-    // HKI dosen
     Route::get('/dosen/hki',               [App\Http\Controllers\DosenKontenController::class, 'hkiIndex'])->name('dosen.hki.index');
     Route::get('/dosen/hki/create',        [App\Http\Controllers\DosenKontenController::class, 'hkiCreate'])->name('dosen.hki.create');
     Route::post('/dosen/hki',              [App\Http\Controllers\DosenKontenController::class, 'hkiStore'])->name('dosen.hki.store');
@@ -92,7 +88,6 @@ Route::middleware(\App\Http\Middleware\EnsureUserApproved::class)->group(functio
     Route::put('/dosen/hki/{h}',           [App\Http\Controllers\DosenKontenController::class, 'hkiUpdate'])->name('dosen.hki.update');
     Route::delete('/dosen/hki/{h}',        [App\Http\Controllers\DosenKontenController::class, 'hkiDestroy'])->name('dosen.hki.destroy');
 
-    // Notifikasi Dosen
     Route::get('/dosen/notifications/{id}/read', [App\Http\Controllers\DosenKontenController::class, 'markNotificationAsRead'])->name('dosen.notifications.read');
 });
 
@@ -101,24 +96,21 @@ Route::get('/biografi-dosen', function () {
 })->middleware(\App\Http\Middleware\EnsureUserApproved::class);
 
 
-// --Route Halaman Admin (legacy static pages)--
-Route::get('/research-team-admin', function () {
-    if (!Auth::check() || (Auth::user()->role !== 'admin' && Auth::user()->role !== 'content_creator')) abort(403);
-    return view('halaman-admin.research-team-admin');
+Route::middleware('role:admin,content_creator')->group(function () {
+    Route::get('/research-team-admin', function () {
+        return view('halaman-admin.research-team-admin');
+    });
+
+    Route::get('/news-admin', function () {
+        return redirect()->route('admin.news.index');
+    });
+
+    Route::get('/program-admin', function () {
+        return redirect()->route('admin.programs.index');
+    });
 });
 
-Route::get('/news-admin', function () {
-    if (!Auth::check() || (Auth::user()->role !== 'admin' && Auth::user()->role !== 'content_creator')) abort(403);
-    return redirect()->route('admin.news.index');
-});
 
-Route::get('/program-admin', function () {
-    if (!Auth::check() || (Auth::user()->role !== 'admin' && Auth::user()->role !== 'content_creator')) abort(403);
-    return redirect()->route('admin.programs.index');
-});
-
-
-// --Authorized--
 Route::get('/registrasi', [AuthController::class, 'showRegister'])->name('registrasi');
 Route::post('/registrasi', [AuthController::class, 'register']);
 
@@ -126,40 +118,42 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.masuk');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Halaman role
 Route::get('/beranda-admin', function () {
-    if (!Auth::check() || Auth::user()->role !== 'admin') abort(403);
     return view('halaman-admin.beranda-admin');
-});
+})->middleware('role:admin');
 
 Route::get('/beranda-dosen', function () {
-    if (!Auth::check() || Auth::user()->role !== 'dosen') abort(403);
     return view('halaman-dosen.beranda-dosen');
-})->middleware(\App\Http\Middleware\EnsureUserApproved::class);
+})->middleware('role:dosen');
 
 Route::get('/dosen/status', function () {
-    if (!Auth::check()) return redirect('/login');
     return view('halaman-dosen.status-pending');
 })->name('dosen.status')->middleware('auth');
 
 Route::get('/beranda-creator', function () {
-    if (!Auth::check() || Auth::user()->role !== 'content_creator') abort(403);
     return view('halaman-creator.beranda-creator');
-});
+})->middleware('role:content_creator');
 
 
-// --Admin CMS Routes (semua dalam group auth)--
-Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->group(function () {
 
-    // Validasi Registrasi
-    Route::get('/validasi-registrasi', [ValidationController::class, 'index'])->name('validasi.index');
-    Route::post('/validasi-registrasi/{id}/approve', [ValidationController::class, 'approve'])->name('validasi.approve');
-    Route::post('/validasi-registrasi/{id}/reject', [ValidationController::class, 'reject'])->name('validasi.reject');
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/validasi-registrasi', [ValidationController::class, 'index'])->name('validasi.index');
+        Route::post('/validasi-registrasi/{id}/approve', [ValidationController::class, 'approve'])->name('validasi.approve');
+        Route::post('/validasi-registrasi/{id}/reject', [ValidationController::class, 'reject'])->name('validasi.reject');
 
-    // Publications
+        Route::get('/hki', [\App\Http\Controllers\Admin\HkiController::class, 'index'])->name('hki.index');
+        Route::get('/hki/create', [\App\Http\Controllers\Admin\HkiController::class, 'create'])->name('hki.create');
+        Route::post('/hki', [\App\Http\Controllers\Admin\HkiController::class, 'store'])->name('hki.store');
+        Route::get('/hki/{hki}/edit', [\App\Http\Controllers\Admin\HkiController::class, 'edit'])->name('hki.edit');
+        Route::put('/hki/{hki}', [\App\Http\Controllers\Admin\HkiController::class, 'update'])->name('hki.update');
+        Route::delete('/hki/{hki}', [\App\Http\Controllers\Admin\HkiController::class, 'destroy'])->name('hki.destroy');
+    });
+
+    Route::middleware('role:admin,content_creator')->group(function () {
+
     Route::resource('/publications', AdminPublicationController::class)->except(['show']);
 
-    // Projects
     Route::get('/projects', [AdminProjectController::class, 'index'])->name('projects.index');
     Route::get('/projects/create', [AdminProjectController::class, 'create'])->name('projects.create');
     Route::post('/projects', [AdminProjectController::class, 'store'])->name('projects.store');
@@ -167,7 +161,6 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::put('/projects/{project}', [AdminProjectController::class, 'update'])->name('projects.update');
     Route::delete('/projects/{project}', [AdminProjectController::class, 'destroy'])->name('projects.destroy');
 
-    // News
     Route::get('/news', [AdminNewsController::class, 'index'])->name('news.index');
     Route::get('/news/create', [AdminNewsController::class, 'create'])->name('news.create');
     Route::post('/news', [AdminNewsController::class, 'store'])->name('news.store');
@@ -175,7 +168,6 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::put('/news/{news}', [AdminNewsController::class, 'update'])->name('news.update');
     Route::delete('/news/{news}', [AdminNewsController::class, 'destroy'])->name('news.destroy');
 
-    // Programs
     Route::get('/programs', [AdminProgramController::class, 'index'])->name('programs.index');
     Route::get('/programs/create', [AdminProgramController::class, 'create'])->name('programs.create');
     Route::post('/programs', [AdminProgramController::class, 'store'])->name('programs.store');
@@ -183,7 +175,6 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::put('/programs/{program}', [AdminProgramController::class, 'update'])->name('programs.update');
     Route::delete('/programs/{program}', [AdminProgramController::class, 'destroy'])->name('programs.destroy');
 
-    // Teams
     Route::get('/teams', [AdminTeamController::class, 'index'])->name('teams.index');
     Route::get('/teams/create', [AdminTeamController::class, 'create'])->name('teams.create');
     Route::post('/teams', [AdminTeamController::class, 'store'])->name('teams.store');
@@ -191,7 +182,6 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::put('/teams/{team}', [AdminTeamController::class, 'update'])->name('teams.update');
     Route::delete('/teams/{team}', [AdminTeamController::class, 'destroy'])->name('teams.destroy');
 
-    // Partners / Mitra
     Route::get('/partners', [AdminPartnerController::class, 'index'])->name('partners.index');
     Route::get('/partners/create', [AdminPartnerController::class, 'create'])->name('partners.create');
     Route::post('/partners', [AdminPartnerController::class, 'store'])->name('partners.store');
@@ -199,21 +189,9 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::put('/partners/{partner}', [AdminPartnerController::class, 'update'])->name('partners.update');
     Route::delete('/partners/{partner}', [AdminPartnerController::class, 'destroy'])->name('partners.destroy');
 
-    // HKI
-    Route::get('/hki', [\App\Http\Controllers\Admin\HkiController::class, 'index'])->name('hki.index');
-    Route::get('/hki/create', [\App\Http\Controllers\Admin\HkiController::class, 'create'])->name('hki.create');
-    Route::post('/hki', [\App\Http\Controllers\Admin\HkiController::class, 'store'])->name('hki.store');
-    Route::get('/hki/{hki}/edit', [\App\Http\Controllers\Admin\HkiController::class, 'edit'])->name('hki.edit');
-    Route::put('/hki/{hki}', [\App\Http\Controllers\Admin\HkiController::class, 'update'])->name('hki.update');
-    Route::delete('/hki/{hki}', [\App\Http\Controllers\Admin\HkiController::class, 'destroy'])->name('hki.destroy');
-
-    // Settings
     Route::get('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings');
+
+    }); 
 });
 
 
-// // Profile routes (harus login)
-// Route::middleware('auth')->group(function () {
-//     Route::get('/profil-dosen', [ProfileController::class, 'showProfile'])->name('profile.show');
-//     Route::put('/profil-dosen/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
-// });
