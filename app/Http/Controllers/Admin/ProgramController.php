@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\AuthorizesRoles;
 use App\Http\Controllers\Controller;
 use App\Models\Program;
 use Illuminate\Http\Request;
@@ -11,6 +12,8 @@ use Illuminate\Validation\Rule;
 
 class ProgramController extends Controller
 {
+    use AuthorizesRoles;
+
     public function index(Request $request)
     {
         $this->authorizeContentManager();
@@ -110,12 +113,6 @@ class ProgramController extends Controller
         return $data;
     }
 
-    private function authorizeContentManager(): void
-    {
-        if (!Auth::check() || !in_array(Auth::user()->role, ['admin', 'content_creator'], true)) {
-            abort(403);
-        }
-    }
 
     private function deleteFile(?string $path): void
     {

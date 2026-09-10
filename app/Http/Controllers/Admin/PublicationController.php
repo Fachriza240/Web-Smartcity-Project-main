@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\AuthorizesRoles;
 use App\Http\Controllers\Controller;
 use App\Models\Publication;
 use App\Models\User;
@@ -12,6 +13,8 @@ use Illuminate\Validation\Rule;
 
 class PublicationController extends Controller
 {
+    use AuthorizesRoles;
+
     public function index(Request $request)
     {
         $this->authorizeContentManager();
@@ -152,7 +155,6 @@ class PublicationController extends Controller
             'status'          => ['required', Rule::in(Publication::statuses())],
         ]);
 
-        // Bersihkan field yang tidak relevan berdasarkan submission_type
         if ($data['submission_type'] === 'non_member') {
             $data['user_id'] = null;
         } else {
@@ -162,12 +164,6 @@ class PublicationController extends Controller
         return $data;
     }
 
-    private function authorizeContentManager(): void
-    {
-        if (!Auth::check() || Auth::user()->role !== 'admin') {
-            abort(403);
-        }
-    }
 
     private function deleteFile(?string $path): void
     {

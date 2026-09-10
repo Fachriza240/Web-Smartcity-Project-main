@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\AuthorizesRoles;
 use App\Http\Controllers\Controller;
 use App\Models\Team;
 use Illuminate\Http\Request;
@@ -11,6 +12,8 @@ use Illuminate\Validation\Rule;
 
 class TeamController extends Controller
 {
+    use AuthorizesRoles;
+
     public function index(Request $request)
     {
         $this->authorizeContentManager();
@@ -120,12 +123,6 @@ class TeamController extends Controller
         ]);
     }
 
-    private function authorizeContentManager(): void
-    {
-        if (!Auth::check() || Auth::user()->role !== 'admin') {
-            abort(403);
-        }
-    }
 
     private function deleteFile(?string $path): void
     {

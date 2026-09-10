@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\AuthorizesRoles;
 use App\Http\Controllers\Controller;
 use App\Models\Hki;
 use App\Models\User;
@@ -13,6 +14,8 @@ use Illuminate\Validation\Rule;
 
 class HkiController extends Controller
 {
+    use AuthorizesRoles;
+
     public function index(Request $request)
     {
         $this->authorizeAdmin();
@@ -136,7 +139,6 @@ class HkiController extends Controller
             'status'            => ['required', Rule::in(Hki::statuses())],
         ]);
 
-        // Non-member: hapus user_id
         if ($data['submission_type'] === 'non_member') {
             $data['user_id'] = null;
         } else {
@@ -146,12 +148,6 @@ class HkiController extends Controller
         return $data;
     }
 
-    private function authorizeAdmin(): void
-    {
-        if (!Auth::check() || Auth::user()->role !== 'admin') {
-            abort(403);
-        }
-    }
 
     private function deleteFile(?string $path): void
     {
@@ -174,7 +170,6 @@ class HkiController extends Controller
                                  ->get();
 
             foreach ($usersToNotify as $user) {
-                // Admin can notify everyone, so no Auth::id() exclusion needed
                 $alreadyNotified = $user->notifications()
                                         ->where('type', HkiAddedNotification::class)
                                         ->where('data->hki_id', $hki->id)
