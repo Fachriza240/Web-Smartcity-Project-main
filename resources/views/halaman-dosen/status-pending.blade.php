@@ -10,7 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="{{ asset('css/auth.css') }}" rel="stylesheet">
   <style>
-    /* Override: buat card ini single-panel (tanpa gambar kanan) */
     .auth-card { max-width: 480px; min-height: auto; }
     .auth-left  { flex: 1; padding: 48px 44px; justify-content: flex-start; min-height: auto; }
 
@@ -72,6 +71,12 @@
 @php
   $user   = auth()->user();
   $status = $user?->registration_status ?? 'pending';
+
+  $dashboardUrl = match ($user?->role) {
+      'admin'           => '/beranda-admin',
+      'content_creator' => '/beranda-creator',
+      default           => '/beranda-dosen',
+  };
 @endphp
 
 <div class="auth-card">
@@ -132,7 +137,7 @@
       <span class="status-badge badge-approved">
         <i class="bi bi-check-circle"></i> Approved
       </span>
-      <a href="/beranda-dosen" class="auth-btn">Masuk Dashboard</a>
+      <a href="{{ $dashboardUrl }}" class="auth-btn">Masuk Dashboard</a>
 
     @endif
 
