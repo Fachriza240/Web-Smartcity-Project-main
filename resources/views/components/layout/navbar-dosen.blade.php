@@ -468,7 +468,7 @@
                                                 </div>
                                                 <div>
                                                     <p class="mb-1 text-wrap" style="font-size: 13.5px; color: {{ $notif->unread() ? '#1e293b' : '#64748b' }}; line-height: 1.4;">
-                                                        {!! str_replace('Anda telah ditambahkan menjadi pencipta HKI:', 'Anda ditambahkan sebagai pencipta HKI:<br><strong style="color: #0f172a; display: inline-block; margin-top: 4px;">', $notif->data['message']) !!}</strong>
+                                                        {!! str_replace('Anda telah ditambahkan menjadi pencipta HKI:', 'Anda ditambahkan sebagai pencipta HKI:<br><strong style="color: #0f172a; display: inline-block; margin-top: 4px;">', e($notif->data['message'])) !!}</strong>
                                                     </p>
                                                     <small class="text-muted mt-2 d-flex align-items-center" style="font-size: 11.5px; font-weight: 500;">
                                                         <i class="far fa-clock me-1" style="color: #9ab0c8;"></i>{{ $notif->created_at->diffForHumans() }}
