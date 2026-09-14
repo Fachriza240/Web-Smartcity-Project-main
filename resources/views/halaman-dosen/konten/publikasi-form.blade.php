@@ -23,8 +23,12 @@
                     display:flex;align-items:flex-start;gap:8px;margin-bottom:24px;">
             <i class="bi bi-info-circle-fill" style="margin-top:1px;flex-shrink:0;"></i>
             <span>
-                Publikasi yang Anda tambahkan akan masuk status <strong>Draft</strong> terlebih dahulu
-                dan perlu direview oleh admin sebelum tampil di halaman publik.
+                Publikasi yang Anda tambahkan/ubah akan otomatis berstatus <strong>Draft</strong>
+                dan perlu direview serta disetujui oleh admin sebelum tampil di halaman publik.
+                @if($mode === 'edit' && $publication->status === 'Publish')
+                    Publikasi ini saat ini sudah <strong>Publish</strong> — jika Anda menyimpan perubahan,
+                    statusnya akan kembali menjadi <strong>Draft</strong> dan perlu disetujui ulang oleh admin.
+                @endif
             </span>
         </div>
 
@@ -95,15 +99,20 @@
                 </div>
                 <div>
                     <label class="form-label">Status</label>
-                    <select name="status" class="form-select">
-                        @foreach($statuses as $s)
-                            <option value="{{ $s }}"
-                                    @selected(old('status', $publication->status) === $s)>
-                                {{ $s }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <div class="form-text">Status Publish hanya berlaku setelah disetujui admin.</div>
+                    <div>
+                        @php $currentStatus = $publication->status ?? \App\Models\Publication::STATUS_DRAFT; @endphp
+                        <span style="display:inline-block;font-size:13px;font-weight:700;padding:7px 14px;
+                                     border-radius:20px;
+                                     {{ $currentStatus === 'Publish'
+                                        ? 'background:#dcfce7;color:#16a34a;'
+                                        : 'background:#f1f5f9;color:#64748b;' }}">
+                            {{ $currentStatus }}
+                        </span>
+                    </div>
+                    <div class="form-text">
+                        Status tidak bisa diubah manual. Publikasi baru/hasil edit otomatis
+                        berstatus <strong>Draft</strong> dan menunggu review admin.
+                    </div>
                 </div>
             </div>
 
