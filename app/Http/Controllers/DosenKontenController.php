@@ -13,10 +13,6 @@ use Illuminate\Validation\Rule;
 
 class DosenKontenController extends Controller
 {
-    /* ══════════════════════════════════════════════════════════════
-       PUBLIKASI
-       ══════════════════════════════════════════════════════════════ */
-
     public function publikasiIndex()
     {
         $user = Auth::user();
@@ -48,6 +44,7 @@ class DosenKontenController extends Controller
         $data['user_id']         = Auth::id();
         $data['submission_type'] = 'member';
         $data['recommended_by']  = null;
+        $data['status'] = Publication::STATUS_DRAFT;
 
         if (!$request->hasFile('pdf')) {
             return back()->withErrors(['pdf' => 'File PDF wajib diupload.'])->withInput();
@@ -99,10 +96,12 @@ class DosenKontenController extends Controller
         }
         unset($data['thumbnail']);
 
+        $data['status'] = Publication::STATUS_DRAFT;
+
         $p->update($data);
 
         return redirect()->route('dosen.publikasi.index')
-            ->with('success', 'Publikasi berhasil diperbarui.');
+            ->with('success', 'Publikasi berhasil diperbarui dan menunggu review admin kembali.');
     }
 
     public function publikasiDestroy(Publication $p)
@@ -116,10 +115,6 @@ class DosenKontenController extends Controller
         return redirect()->route('dosen.publikasi.index')
             ->with('success', 'Publikasi berhasil dihapus.');
     }
-
-    /* ══════════════════════════════════════════════════════════════
-       HKI
-       ══════════════════════════════════════════════════════════════ */
 
     public function hkiIndex()
     {
@@ -215,10 +210,6 @@ class DosenKontenController extends Controller
             ->with('success', 'HKI berhasil dihapus.');
     }
 
-    /* ══════════════════════════════════════════════════════════════
-       HELPERS PRIVATE
-       ══════════════════════════════════════════════════════════════ */
-
     private function validatePublication(Request $request, ?Publication $pub = null): array
     {
         return $request->validate([
@@ -231,7 +222,6 @@ class DosenKontenController extends Controller
             'doi'       => ['nullable', 'string', 'max:255'],
             'pdf'       => [$pub ? 'nullable' : 'required', 'file', 'mimes:pdf', 'max:20480'],
             'thumbnail' => ['nullable', 'image', 'max:4096'],
-            'status'    => ['required', Rule::in(Publication::statuses())],
         ]);
     }
 
@@ -274,18 +264,15 @@ class DosenKontenController extends Controller
             return;
         }
 
-        // Pecah string nama pencipta berdasarkan koma
         $names = array_map('trim', explode(',', $hki->pencipta));
         
         if (count($names) > 0) {
-            // Cari user dosen yang namanya ada di daftar pencipta dan bukan penginput sendiri
             $usersToNotify = User::whereIn('fullname', $names)
                                  ->where('role', 'dosen')
                                  ->where('id', '!=', Auth::id())
                                  ->get();
 
             foreach ($usersToNotify as $user) {
-                // Hindari duplikasi notifikasi untuk HKI yang sama
                 $alreadyNotified = $user->notifications()
                                         ->where('type', HkiAddedNotification::class)
                                         ->where('data->hki_id', $hki->id)
@@ -304,7 +291,6 @@ class DosenKontenController extends Controller
         if ($notification) {
             $notification->markAsRead();
             
-            // Redirect ke halaman index HKI atau langsung ke item jika diperlukan
             return redirect()->route('dosen.hki.index');
         }
         return back();
