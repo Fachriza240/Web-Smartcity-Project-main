@@ -78,6 +78,7 @@ Route::middleware(\App\Http\Middleware\EnsureUserApproved::class)->group(functio
     Route::get('/dosen/publikasi/create',  [App\Http\Controllers\DosenKontenController::class, 'publikasiCreate'])->name('dosen.publikasi.create');
     Route::post('/dosen/publikasi',        [App\Http\Controllers\DosenKontenController::class, 'publikasiStore'])->name('dosen.publikasi.store');
     Route::get('/dosen/publikasi/{p}/edit',[App\Http\Controllers\DosenKontenController::class, 'publikasiEdit'])->name('dosen.publikasi.edit');
+    Route::get('/dosen/publikasi/{p}/file',[App\Http\Controllers\DosenKontenController::class, 'publikasiFile'])->name('dosen.publikasi.file');
     Route::put('/dosen/publikasi/{p}',     [App\Http\Controllers\DosenKontenController::class, 'publikasiUpdate'])->name('dosen.publikasi.update');
     Route::delete('/dosen/publikasi/{p}',  [App\Http\Controllers\DosenKontenController::class, 'publikasiDestroy'])->name('dosen.publikasi.destroy');
 
@@ -153,6 +154,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('role:admin,content_creator')->group(function () {
 
     Route::resource('/publications', AdminPublicationController::class)->except(['show']);
+    Route::get('/publications/{publication}/file', [AdminPublicationController::class, 'file'])->name('publications.file');
 
     Route::get('/projects', [AdminProjectController::class, 'index'])->name('projects.index');
     Route::get('/projects/create', [AdminProjectController::class, 'create'])->name('projects.create');
