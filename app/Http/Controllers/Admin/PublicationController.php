@@ -74,7 +74,7 @@ class PublicationController extends Controller
             return back()->withErrors(['pdf' => 'File PDF wajib diupload.'])->withInput();
         }
 
-        $data['pdf_path'] = $request->file('pdf')->store('publications/pdf', 'public');
+        $data['pdf_path'] = $request->file('pdf')->store('publications/pdf', 'local');
         unset($data['pdf']);
 
         if ($request->hasFile('thumbnail')) {
@@ -110,8 +110,8 @@ class PublicationController extends Controller
         $data = $this->validatedData($request, $publication);
 
         if ($request->hasFile('pdf')) {
-            $this->deleteFile($publication->pdf_path);
-            $data['pdf_path'] = $request->file('pdf')->store('publications/pdf', 'public');
+            $this->deleteFile($publication->pdf_path, 'local');
+            $data['pdf_path'] = $request->file('pdf')->store('publications/pdf', 'local');
         }
         unset($data['pdf']);
 
@@ -126,11 +126,22 @@ class PublicationController extends Controller
         return redirect()->route('admin.publications.index')->with('success', 'Publication berhasil diperbarui.');
     }
 
+    public function file(Publication $publication)
+    {
+        $this->authorizeContentManager();
+
+        abort_unless($publication->pdf_path && Storage::disk('local')->exists($publication->pdf_path), 404);
+
+        $filename = str($publication->judul)->slug()->append('.pdf')->toString();
+
+        return Storage::disk('local')->download($publication->pdf_path, $filename);
+    }
+
     public function destroy(Publication $publication)
     {
         $this->authorizeContentManager();
 
-        $this->deleteFile($publication->pdf_path);
+        $this->deleteFile($publication->pdf_path, 'local');
         $this->deleteFile($publication->thumbnail_path);
         $publication->delete();
 
@@ -165,10 +176,10 @@ class PublicationController extends Controller
     }
 
 
-    private function deleteFile(?string $path): void
+    private function deleteFile(?string $path, string $disk = 'public'): void
     {
-        if ($path && Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
+        if ($path && Storage::disk($disk)->exists($path)) {
+            Storage::disk($disk)->delete($path);
         }
     }
 }
