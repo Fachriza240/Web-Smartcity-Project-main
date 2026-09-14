@@ -145,7 +145,7 @@
                     @if($publication->pdf_path)
                         <div class="small mt-1">
                             File saat ini:
-                            <a href="{{ asset('storage/'.$publication->pdf_path) }}" target="_blank">
+                            <a href="{{ route('dosen.publikasi.file', $publication) }}" target="_blank">
                                 Download PDF
                             </a>
                         </div>
