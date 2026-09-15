@@ -9,8 +9,10 @@ use Illuminate\Support\Facades\Auth;
 class AuthController extends Controller
 {
     public function showRegister(){
-        if (Auth::check()) {
-            return redirect(Auth::user()->dashboardUrl());
+        $user = Auth::user();
+
+        if ($user && !$user->isRejected()) {
+            return redirect($user->dashboardUrl());
         }
 
         return view('authorized.registrasi');
@@ -21,21 +23,41 @@ class AuthController extends Controller
 
         $rules = [
             'fullname' => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email',
+            'email'    => 'required|email',
             'password' => 'required|confirmed|min:6',
             'role'     => 'required|in:dosen,content_creator',
             'foto'     => 'nullable|image|max:2048',
         ];
 
         if ($role === 'dosen') {
-            $rules['nip']      = 'required|numeric|unique:users,nip';
+            $rules['nip']      = 'required|numeric';
             $rules['prodi']    = 'nullable|string|max:255';
             $rules['fakultas'] = 'nullable|string|max:255';
         } else {
-            $rules['nip'] = 'nullable|numeric|unique:users,nip';
+            $rules['nip'] = 'nullable|numeric';
         }
 
         $data = $request->validate($rules);
+
+        $existingByEmail = User::where('email', $data['email'])->first();
+
+        if ($existingByEmail && !$existingByEmail->isRejected()) {
+            return back()
+                ->withErrors(['email' => 'Email sudah terdaftar.'])
+                ->withInput($request->except('password', 'password_confirmation'));
+        }
+
+        if (!empty($data['nip'])) {
+            $existingByNip = User::where('nip', $data['nip'])
+                ->when($existingByEmail, fn ($q) => $q->where('id', '!=', $existingByEmail->id))
+                ->first();
+
+            if ($existingByNip && !$existingByNip->isRejected()) {
+                return back()
+                    ->withErrors(['nip' => 'NIP sudah terdaftar.'])
+                    ->withInput($request->except('password', 'password_confirmation'));
+            }
+        }
 
         $data['role'] = $role;
 
@@ -45,7 +67,18 @@ class AuthController extends Controller
             $data['foto'] = $request->file('foto')->store('foto-users', 'public');
         }
 
-        User::create($data);
+        if ($existingByEmail && $existingByEmail->isRejected()) {
+            $existingByEmail->fill($data);
+            $existingByEmail->save();
+
+            if (Auth::check() && Auth::id() === $existingByEmail->id) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+            }
+        } else {
+            User::create($data);
+        }
 
         $message = ($role === 'dosen')
             ? 'Registrasi berhasil. Akun dosen Anda menunggu validasi admin.'
@@ -88,7 +121,7 @@ class AuthController extends Controller
 
     // public function showProfile()
     // {
-    //     $user = Auth::user(); // ambil user yang sedang login
+    //     $user = Auth::user(); 
     //     return view('profil', compact('user'));
     // }
 }
