@@ -19,7 +19,6 @@
     <link href="{{ asset('css/admin.css') }}" rel="stylesheet">
 
     <script>
-        // Terapkan tema sebelum render agar tidak flicker
         (function () {
             var t = localStorage.getItem('adm-theme') || 'light';
             document.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : '');
@@ -42,16 +41,20 @@
 
             {{-- Page content --}}
             <main class="main-content">
+                @if(session('error'))
+                    <div class="alert alert-danger">{{ session('error') }}</div>
+                @endif
+                @if(session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
                 {{ $slot }}
             </main>
 
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Admin JS -->
     <script src="{{ asset('js/admin.js') }}"></script>
 
 </body>
