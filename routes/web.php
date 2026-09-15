@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PublicationController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\NewsController;
@@ -26,6 +27,8 @@ Route::get('/team-user', [TeamController::class, 'index'])->name('teams.frontend
 Route::get('/about-user', [AboutController::class, 'userIndex'])->name('about.user');
 
 Route::get('/mitra-user', [AboutController::class, 'partnersIndex'])->name('partners.user');
+
+Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
 
 Route::get('/program-user', [ProgramController::class, 'index'])->name('programs.frontend.index');
 
