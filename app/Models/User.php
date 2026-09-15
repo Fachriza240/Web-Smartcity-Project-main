@@ -33,7 +33,6 @@ class User extends Authenticatable
         $this->attributes['password'] = bcrypt($value);
     }
 
-    // Registration status constants and helpers
     const STATUS_PENDING = 'pending';
     const STATUS_APPROVED = 'approved';
     const STATUS_REJECTED = 'rejected';
@@ -51,5 +50,20 @@ class User extends Authenticatable
     public function isRejected(): bool
     {
         return ($this->registration_status ?? null) === self::STATUS_REJECTED;
+    }
+
+
+    public function dashboardUrl(): string
+    {
+        if (in_array($this->role, ['dosen', 'content_creator'], true) && !$this->isApproved()) {
+            return route('dosen.status');
+        }
+
+        return match ($this->role) {
+            'admin'           => '/beranda-admin',
+            'dosen'           => '/beranda-dosen',
+            'content_creator' => '/beranda-creator',
+            default           => '/',
+        };
     }
 }
