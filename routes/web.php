@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\TeamController as AdminTeamController;
 use App\Http\Controllers\Admin\PartnerController as AdminPartnerController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SearchController;
 
 Route::get('/', function () {
     return view('halaman-user.beranda-user');
@@ -33,6 +34,8 @@ Route::get('/contact', [ContactController::class, 'index'])->name('contact.index
 Route::get('/program-user', [ProgramController::class, 'index'])->name('programs.frontend.index');
 
 Route::get('/project-user', [ProjectController::class, 'index'])->name('projects.frontend.index');
+
+Route::get('/search', [SearchController::class, 'index'])->name('search.index');
 
 Route::get('/news-user', [NewsController::class, 'index'])->name('news.index');
 Route::get('/news/{news:slug}', [NewsController::class, 'show'])->name('news.show');

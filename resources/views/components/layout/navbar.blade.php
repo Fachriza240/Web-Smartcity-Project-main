@@ -221,6 +221,26 @@
         font-size: 13px;
     }
 
+    .sc-search-submit {
+        border: none;
+        background: transparent;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .sc-search-submit i {
+        color: #7a9bbf;
+        font-size: 13px;
+        transition: color 0.2s;
+    }
+
+    .sc-search-submit:hover i {
+        color: var(--sc-accent);
+    }
+
     /* Contact Us Button */
     .sc-contact-btn {
         display: inline-flex;
@@ -462,13 +482,13 @@
                 </li>
             </ul>
 
-            <!-- Right Side -->
-            <div class="sc-navbar-right">
-                <!-- Search Box -->
-                <div class="sc-search-box">
+            <!-- Search Box -->
+            <form class="sc-search-box" action="{{ route('search.index') }}" method="GET" role="search">
+                <button type="submit" class="sc-search-submit" aria-label="Cari">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Cari...">
-                </div>
+                </button>
+                <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari..." autocomplete="off" required>
+            </form>
 
                 <div class="sc-nav-divider"></div>
 
