@@ -9,13 +9,16 @@ use Illuminate\Support\Facades\Auth;
 class AuthController extends Controller
 {
     public function showRegister(){
+        if (Auth::check()) {
+            return redirect(Auth::user()->dashboardUrl());
+        }
+
         return view('authorized.registrasi');
     }
 
     public function register(Request $request){
         $role = $request->input('role', 'dosen');
 
-        // Validasi berbeda berdasarkan role
         $rules = [
             'fullname' => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
@@ -24,7 +27,6 @@ class AuthController extends Controller
             'foto'     => 'nullable|image|max:2048',
         ];
 
-        // NIP hanya wajib untuk dosen
         if ($role === 'dosen') {
             $rules['nip']      = 'required|numeric|unique:users,nip';
             $rules['prodi']    = 'nullable|string|max:255';
@@ -37,7 +39,6 @@ class AuthController extends Controller
 
         $data['role'] = $role;
 
-        // Semua role baru harus menunggu validasi admin
         $data['registration_status'] = User::STATUS_PENDING;
 
         if ($request->hasFile('foto')) {
@@ -54,6 +55,10 @@ class AuthController extends Controller
     }
 
     public function showLogin(){
+        if (Auth::check()) {
+            return redirect(Auth::user()->dashboardUrl());
+        }
+
         return view('authorized.login');
     }
 
@@ -68,19 +73,7 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
-            // Dosen atau content_creator belum approved → redirect ke halaman status
-            if (in_array($user->role, ['dosen', 'content_creator'])
-                && $user->registration_status !== User::STATUS_APPROVED) {
-                return redirect()->route('dosen.status');
-            }
-
-            // Redirect berdasarkan role
-            return match ($user->role) {
-                'admin'           => redirect('/beranda-admin'),
-                'dosen'           => redirect('/beranda-dosen'),
-                'content_creator' => redirect('/beranda-creator'),
-                default           => redirect('/'),
-            };
+            return redirect($user->dashboardUrl());
         }
 
         return back()->withErrors(['email' => 'Email atau password salah.'])->withInput($request->only('email'));
