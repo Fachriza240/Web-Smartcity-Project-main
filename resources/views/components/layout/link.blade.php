@@ -27,6 +27,13 @@
 
 <body>
 
+    @if(session('error'))
+        <div class="alert alert-danger text-center mb-0 rounded-0" style="z-index: 2000; position: relative;">{{ session('error') }}</div>
+    @endif
+    @if(session('success'))
+        <div class="alert alert-success text-center mb-0 rounded-0" style="z-index: 2000; position: relative;">{{ session('success') }}</div>
+    @endif
+
     {{ $slot }}
 
     <!-- Scroll Top -->
