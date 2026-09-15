@@ -72,11 +72,7 @@
   $user   = auth()->user();
   $status = $user?->registration_status ?? 'pending';
 
-  $dashboardUrl = match ($user?->role) {
-      'admin'           => '/beranda-admin',
-      'content_creator' => '/beranda-creator',
-      default           => '/beranda-dosen',
-  };
+  $dashboardUrl = $user?->dashboardUrl() ?? '/';
 @endphp
 
 <div class="auth-card">
