@@ -473,7 +473,7 @@
                 <div class="sc-nav-divider"></div>
 
                 <!-- Contact Us Button -->
-                <a href="/contact" class="sc-contact-btn">
+                <a href="{{ route('contact.index') }}" class="sc-contact-btn">
                     <i class="fas fa-envelope"></i>
                     Kontak Kami
                 </a>
