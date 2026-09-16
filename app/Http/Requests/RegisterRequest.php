@@ -10,14 +10,14 @@ class RegisterRequest extends FormRequest
     {
         return true;
     }
-
+    
     public function rules(): array
     {
         $role = $this->input('role', 'dosen');
 
         $rules = [
             'fullname' => 'required|string|max:255',
-            'email'    => 'required|email:rfc,dns|max:255',
+            'email'    => 'required|email:rfc|max:255',
             'password' => 'required|string|min:6|confirmed',
             'role'     => 'required|in:dosen,content_creator',
             'foto'     => 'nullable|image|max:2048',
@@ -37,22 +37,23 @@ class RegisterRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'fullname.required' => 'Nama lengkap wajib diisi.',
-            'fullname.max'      => 'Nama lengkap maksimal 255 karakter.',
-            'email.required'    => 'Email wajib diisi.',
-            'email.email'       => 'Format email tidak valid.',
-            'password.required' => 'Password wajib diisi.',
-            'password.min'      => 'Password minimal 6 karakter.',
-            'password.confirmed'=> 'Konfirmasi password tidak cocok.',
-            'role.required'     => 'Silakan pilih role akun.',
-            'role.in'           => 'Role yang dipilih tidak valid.',
-            'foto.image'        => 'File foto harus berupa gambar.',
-            'foto.max'          => 'Ukuran foto maksimal 2MB.',
-            'nip.required'      => 'NIP wajib diisi untuk akun dosen.',
-            'nip.numeric'       => 'NIP hanya boleh berisi angka.',
-            'nip.digits_between'=> 'NIP harus terdiri dari 5–20 digit.',
-            'prodi.max'         => 'Program studi maksimal 255 karakter.',
-            'fakultas.max'      => 'Fakultas maksimal 255 karakter.',
+            'fullname.required'  => 'Nama lengkap wajib diisi.',
+            'fullname.max'       => 'Nama lengkap maksimal 255 karakter.',
+            'email.required'     => 'Email wajib diisi.',
+            'email.email'        => 'Format email tidak valid.',
+            'email.max'          => 'Email maksimal 255 karakter.',
+            'password.required'  => 'Password wajib diisi.',
+            'password.min'       => 'Password minimal 6 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'role.required'      => 'Silakan pilih role akun.',
+            'role.in'            => 'Role yang dipilih tidak valid.',
+            'foto.image'         => 'File foto harus berupa gambar.',
+            'foto.max'           => 'Ukuran foto maksimal 2MB.',
+            'nip.required'       => 'NIP wajib diisi untuk akun dosen.',
+            'nip.numeric'        => 'NIP hanya boleh berisi angka.',
+            'nip.digits_between' => 'NIP harus terdiri dari 5–20 digit.',
+            'prodi.max'          => 'Program studi maksimal 255 karakter.',
+            'fakultas.max'       => 'Fakultas maksimal 255 karakter.',
         ];
     }
 
