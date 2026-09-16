@@ -42,7 +42,7 @@
       </div>
     @endif
 
-    <form action="{{ route('login.masuk') }}" method="POST" novalidate>
+    <form action="{{ route('login.masuk') }}" method="POST" id="loginForm" novalidate>
       @csrf
 
       <div class="auth-field">
@@ -53,6 +53,7 @@
                autocomplete="email"
                class="{{ $errors->has('email') ? 'is-error' : '' }}"
                required>
+        <div class="auth-error-text" id="err-email">{{ $errors->first('email') }}</div>
       </div>
 
       <div class="auth-field">
@@ -60,10 +61,12 @@
         <input type="password" id="password" name="password"
                placeholder="••••••••••••"
                autocomplete="current-password"
+               minlength="6"
                required>
         <span class="auth-eye" id="togglePwd" title="Tampilkan password">
           <i class="bi bi-eye-slash" id="eyeIcon"></i>
         </span>
+        <div class="auth-error-text" id="err-password">{{ $errors->first('password') }}</div>
       </div>
 
       <div class="auth-meta">
@@ -73,7 +76,7 @@
         <a href="#">Forgot Password?</a>
       </div>
 
-      <button type="submit" class="auth-btn">Login</button>
+      <button type="submit" class="auth-btn" id="loginSubmitBtn">Login</button>
     </form>
 
     <p class="auth-bottom">
@@ -108,6 +111,69 @@
         icon.className = show ? 'bi bi-eye' : 'bi bi-eye-slash';
       });
     }
+
+    /* ── Validasi client-side ────────────────────────────────
+       Aturan di bawah ini SENGAJA disamakan dengan
+       app/Http/Requests/LoginRequest.php agar pesan &
+       kondisi valid antara front-end dan back-end konsisten.
+    ------------------------------------------------------- */
+    var form       = document.getElementById('loginForm');
+    var submitBtn  = document.getElementById('loginSubmitBtn');
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    var fields = {
+      email: {
+        el: document.getElementById('email'),
+        errEl: document.getElementById('err-email'),
+        validate: function (v) {
+          if (!v.trim()) return 'Email wajib diisi.';
+          if (!emailRegex.test(v)) return 'Format email tidak valid.';
+          return '';
+        }
+      },
+      password: {
+        el: document.getElementById('password'),
+        errEl: document.getElementById('err-password'),
+        validate: function (v) {
+          if (!v) return 'Password wajib diisi.';
+          if (v.length < 6) return 'Password minimal 6 karakter.';
+          return '';
+        }
+      }
+    };
+
+    function validateField(key) {
+      var f = fields[key];
+      var message = f.validate(f.el.value);
+      f.el.classList.toggle('is-error', !!message);
+      if (f.errEl) f.errEl.textContent = message;
+      return !message;
+    }
+
+    function validateAll() {
+      var valid = true;
+      Object.keys(fields).forEach(function (key) {
+        if (!validateField(key)) valid = false;
+      });
+      return valid;
+    }
+
+    Object.keys(fields).forEach(function (key) {
+      var f = fields[key];
+      f.el.addEventListener('input', function () { validateField(key); });
+      f.el.addEventListener('blur', function () { validateField(key); });
+    });
+
+    form.addEventListener('submit', function (e) {
+      if (!validateAll()) {
+        e.preventDefault();
+        var firstInvalid = form.querySelector('.is-error');
+        if (firstInvalid) firstInvalid.focus();
+      } else {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Memproses...';
+      }
+    });
   })();
 </script>
 
