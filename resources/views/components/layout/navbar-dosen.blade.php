@@ -568,6 +568,7 @@
     // Shadow saat scroll
     const scNav = document.getElementById('scNavbar');
     window.addEventListener('scroll', () => {
+        if (!scNav) return; 
         scNav.classList.toggle('scrolled', window.scrollY > 10);
     });
 
