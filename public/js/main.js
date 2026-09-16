@@ -1,37 +1,47 @@
-// Main JS
+function $id(id) {
+    return document.getElementById(id);
+}
+
+function setDisplay(id, value) {
+    const el = $id(id);
+    if (el) {
+        el.style.display = value;
+    }
+}
 
 window.addEventListener("scroll", function () {
+    const navbar = document.querySelector(".navbar");
+    if (!navbar) return; 
+
     if (window.scrollY > 50) {
-        document.querySelector(".navbar").classList.add("scrolled");
+        navbar.classList.add("scrolled");
     } else {
-        document.querySelector(".navbar").classList.remove("scrolled");
+        navbar.classList.remove("scrolled");
     }
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-    // Initialize the carousel with custom options
-    const galleryCarousel = new bootstrap.Carousel(
-        document.getElementById("galleryCarousel"),
-        {
-            interval: 3000, // Change slides every 3 seconds
-            wrap: true, // Continuous loop
-            pause: "hover", // Pause on mouse hover
-        }
-    );
+    const galleryEl = $id("galleryCarousel");
+
+    if (!galleryEl || typeof bootstrap === "undefined") return;
+
+    new bootstrap.Carousel(galleryEl, {
+        interval: 3000, 
+        wrap: true, 
+        pause: "hover", 
+    });
 });
 
-/**
- * Scroll top button
- */
+
 document.addEventListener("DOMContentLoaded", function () {
-    let scrollTop = document.querySelector(".scroll-top");
+    const scrollTop = document.querySelector(".scroll-top");
 
     function toggleScrollTop() {
-        if (scrollTop) {
-            window.scrollY > 100
-                ? scrollTop.classList.add("active")
-                : scrollTop.classList.remove("active");
-        }
+        if (!scrollTop) return;
+
+        window.scrollY > 100
+            ? scrollTop.classList.add("active")
+            : scrollTop.classList.remove("active");
     }
 
     if (scrollTop) {
@@ -48,210 +58,154 @@ document.addEventListener("DOMContentLoaded", function () {
     document.addEventListener("scroll", toggleScrollTop);
 });
 
-// Navbar Active
 document.addEventListener("DOMContentLoaded", function () {
-    const currentPath = window.location.pathname; // Mendapatkan URL path saat ini
-    const menuItems = document.querySelectorAll(".navbar-nav .nav-item > a"); // Menu utama (navbar)
+    const currentPath = window.location.pathname; 
+    const menuItems = document.querySelectorAll(".navbar-nav .nav-item > a"); 
 
-    // Hapus kelas active dari semua item menu
+    if (!menuItems || menuItems.length === 0) return; 
+
     menuItems.forEach((menuItem) => {
         menuItem.classList.remove("active");
-        // Pastikan parent element (nav-item) juga tidak memiliki class active
-        menuItem.parentElement.classList.remove("active");
+        if (menuItem.parentElement) {
+            menuItem.parentElement.classList.remove("active");
+        }
     });
 
-    // Cek menu utama apakah cocok dengan currentPath
     menuItems.forEach((menuItem) => {
         const menuHref = menuItem.getAttribute("href");
 
-        // Untuk link dengan anchor (#) seperti #about, #program
+        if (!menuHref) return; 
         if (menuHref.startsWith("#") && window.location.pathname === "/") {
-            // Jika ini adalah halaman home dan link memiliki anchor
             menuItem.classList.add("active");
-            menuItem.parentElement.classList.add("active");
+            menuItem.parentElement?.classList.add("active");
         }
-        // Untuk path penuh seperti /people, /indexuser
         else if (
             currentPath === menuHref ||
             (menuHref !== "/" && currentPath.startsWith(menuHref)) ||
             (menuHref === "/" && currentPath === "/")
         ) {
             menuItem.classList.add("active");
-            menuItem.parentElement.classList.add("active");
+            menuItem.parentElement?.classList.add("active");
         }
     });
 
-    // Menangani klik pada link navbar untuk menandai yang aktif
     menuItems.forEach((menuItem) => {
         menuItem.addEventListener("click", function (e) {
-            // Hapus active dari semua item
             menuItems.forEach((item) => {
                 item.classList.remove("active");
-                item.parentElement.classList.remove("active");
+                item.parentElement?.classList.remove("active");
             });
 
-            // Tambahkan active ke item yang diklik
             this.classList.add("active");
-            this.parentElement.classList.add("active");
+            this.parentElement?.classList.add("active");
         });
     });
 });
 
-// Cek apakah pengguna adalah pemilik profil (diimplementasikan berdasarkan sistem autentikasi Anda)
+
 function isProfileOwner() {
-    // Contoh implementasi sederhana
-    // Di implementasi sebenarnya, Anda akan memeriksa session atau token autentikasi
-    // Misalnya: return currentUserId === profileOwnerId;
-    return true; // Untuk demo, kita anggap pengunjung adalah pemilik profil
+    return true; 
 }
 
-// Tampilkan kontrol edit jika pengguna adalah pemilik profil
 document.addEventListener("DOMContentLoaded", function () {
     if (isProfileOwner()) {
-        document.getElementById("edit-controls").style.display = "block";
+        setDisplay("edit-controls", "block");
     }
 
-    // Event listener untuk tombol edit
-    document
-        .getElementById("edit-profile-btn")
-        .addEventListener("click", function () {
-            // Sembunyikan tombol edit dan tampilkan tombol simpan/batal
-            this.style.display = "none";
-            document.getElementById("save-profile-btn").style.display =
-                "inline-block";
-            document.getElementById("cancel-edit-btn").style.display =
-                "inline-block";
+    const editBtn   = $id("edit-profile-btn");
+    const saveBtn   = $id("save-profile-btn");
+    const cancelBtn = $id("cancel-edit-btn");
+    const addEduBtn = $id("add-education");
+    const addPubBtn = $id("add-publication");
 
-            // Beralih ke mode edit
+    if (editBtn) {
+        editBtn.addEventListener("click", function () {
+            this.style.display = "none";
+            setDisplay("save-profile-btn", "inline-block");
+            setDisplay("cancel-edit-btn", "inline-block");
+
             toggleEditMode(true);
         });
+    }
 
-    // Event listener untuk tombol simpan
-    document
-        .getElementById("save-profile-btn")
-        .addEventListener("click", function () {
-            // Di sini seharusnya ada kode untuk menyimpan perubahan ke server
-            // Untuk contoh ini, kita hanya beralih kembali ke mode tampilan
+    if (saveBtn) {
+        saveBtn.addEventListener("click", function () {
             saveProfileChanges();
 
-            // Sembunyikan tombol simpan/batal dan tampilkan tombol edit
             this.style.display = "none";
-            document.getElementById("cancel-edit-btn").style.display = "none";
-            document.getElementById("edit-profile-btn").style.display =
-                "inline-block";
+            setDisplay("cancel-edit-btn", "none");
+            setDisplay("edit-profile-btn", "inline-block");
 
-            // Beralih kembali ke mode tampilan
             toggleEditMode(false);
         });
+    }
 
-    // Event listener untuk tombol batal
-    document
-        .getElementById("cancel-edit-btn")
-        .addEventListener("click", function () {
-            // Sembunyikan tombol simpan/batal dan tampilkan tombol edit
+    if (cancelBtn) {
+        cancelBtn.addEventListener("click", function () {
             this.style.display = "none";
-            document.getElementById("save-profile-btn").style.display = "none";
-            document.getElementById("edit-profile-btn").style.display =
-                "inline-block";
+            setDisplay("save-profile-btn", "none");
+            setDisplay("edit-profile-btn", "inline-block");
 
-            // Beralih kembali ke mode tampilan tanpa menyimpan perubahan
             toggleEditMode(false);
         });
+    }
 
-    // Event listener untuk tombol tambah pendidikan
-    document
-        .getElementById("add-education")
-        .addEventListener("click", function () {
+    if (addEduBtn) {
+        addEduBtn.addEventListener("click", function () {
             addEducationItem();
         });
+    }
 
-    // Event listener untuk tombol tambah publikasi
-    document
-        .getElementById("add-publication")
-        .addEventListener("click", function () {
+    if (addPubBtn) {
+        addPubBtn.addEventListener("click", function () {
             addPublicationItem();
         });
+    }
 
-    // Event delegation untuk tombol hapus pendidikan dan publikasi
     document.addEventListener("click", function (event) {
-        if (
-            event.target.classList.contains("remove-education") ||
-            event.target.parentElement.classList.contains("remove-education")
-        ) {
-            removeEducationItem(event.target.closest(".education-edit-item"));
+        const target = event.target;
+        if (!target) return;
+
+        const removeEduBtn = target.closest?.(".remove-education");
+        if (removeEduBtn) {
+            removeEducationItem(removeEduBtn.closest(".education-edit-item"));
         }
 
-        if (
-            event.target.classList.contains("remove-publication") ||
-            event.target.parentElement.classList.contains("remove-publication")
-        ) {
-            removePublicationItem(
-                event.target.closest(".publication-edit-item")
-            );
+        const removePubBtn = target.closest?.(".remove-publication");
+        if (removePubBtn) {
+            removePublicationItem(removePubBtn.closest(".publication-edit-item"));
         }
     });
 });
 
-// Fungsi untuk beralih antara mode tampilan dan mode edit
 function toggleEditMode(isEdit) {
-    // Toggle elemen header
-    document.getElementById("display-header-info").style.display = isEdit
-        ? "none"
-        : "block";
-    document.getElementById("edit-header-info").style.display = isEdit
-        ? "block"
-        : "none";
-    document.getElementById("edit-photo-btn").style.display = isEdit
-        ? "block"
-        : "none";
+    setDisplay("display-header-info", isEdit ? "none" : "block");
+    setDisplay("edit-header-info", isEdit ? "block" : "none");
+    setDisplay("edit-photo-btn", isEdit ? "block" : "none");
 
-    // Toggle bagian About
-    document.getElementById("display-about").style.display = isEdit
-        ? "none"
-        : "block";
-    document.getElementById("edit-about").style.display = isEdit
-        ? "block"
-        : "none";
+    setDisplay("display-about", isEdit ? "none" : "block");
+    setDisplay("edit-about", isEdit ? "block" : "none");
 
-    // Toggle bagian Education
-    document.getElementById("display-education").style.display = isEdit
-        ? "none"
-        : "block";
-    document.getElementById("edit-education").style.display = isEdit
-        ? "block"
-        : "none";
+    setDisplay("display-education", isEdit ? "none" : "block");
+    setDisplay("edit-education", isEdit ? "block" : "none");
 
-    // Toggle bagian Research
-    document.getElementById("display-research").style.display = isEdit
-        ? "none"
-        : "block";
-    document.getElementById("edit-research").style.display = isEdit
-        ? "block"
-        : "none";
+    setDisplay("display-research", isEdit ? "none" : "block");
+    setDisplay("edit-research", isEdit ? "block" : "none");
 
-    // Toggle bagian Publications
-    document.getElementById("display-publications").style.display = isEdit
-        ? "none"
-        : "block";
-    document.getElementById("edit-publications").style.display = isEdit
-        ? "block"
-        : "none";
+    setDisplay("display-publications", isEdit ? "none" : "block");
+    setDisplay("edit-publications", isEdit ? "block" : "none");
 }
 
-// Fungsi untuk menyimpan perubahan (sebenarnya akan melibatkan AJAX/fetch ke server)
 function saveProfileChanges() {
-    // Di implementasi sebenarnya, kode ini akan mengumpulkan semua data dari form
-    // dan mengirimkannya ke server untuk disimpan ke database
     console.log("Menyimpan perubahan profil...");
 
-    // Ini hanya contoh visualisasi perubahan tanpa benar-benar menyimpannya
-    // Di aplikasi sebenarnya, ini akan diimplementasikan dengan AJAX/fetch
     alert("Perubahan profil berhasil disimpan!");
 }
 
-// Fungsi untuk menambahkan item pendidikan baru
 function addEducationItem() {
-    const container = document.getElementById("education-items");
+    const container = $id("education-items");
+    if (!container) return; 
+
     const newItem = document.createElement("div");
     newItem.className = "education-edit-item mb-3 border p-3 rounded";
     newItem.innerHTML = `
@@ -282,16 +236,18 @@ function addEducationItem() {
     container.appendChild(newItem);
 }
 
-// Fungsi untuk menghapus item pendidikan
 function removeEducationItem(item) {
+    if (!item) return; 
+
     if (confirm("Apakah Anda yakin ingin menghapus riwayat pendidikan ini?")) {
         item.remove();
     }
 }
 
-// Fungsi untuk menambahkan item publikasi baru
 function addPublicationItem() {
-    const container = document.getElementById("publication-items");
+    const container = $id("publication-items");
+    if (!container) return; 
+
     const newItem = document.createElement("div");
     newItem.className = "publication-edit-item mb-3 border p-3 rounded";
     newItem.innerHTML = `
@@ -320,8 +276,9 @@ function addPublicationItem() {
     container.appendChild(newItem);
 }
 
-// Fungsi untuk menghapus item publikasi
 function removePublicationItem(item) {
+    if (!item) return; 
+
     if (confirm("Apakah Anda yakin ingin menghapus publikasi ini?")) {
         item.remove();
     }
