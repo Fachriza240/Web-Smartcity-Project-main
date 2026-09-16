@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\LoginRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,26 +20,10 @@ class AuthController extends Controller
         return view('authorized.registrasi');
     }
 
-    public function register(Request $request){
+    public function register(RegisterRequest $request){
         $role = $request->input('role', 'dosen');
 
-        $rules = [
-            'fullname' => 'required|string|max:255',
-            'email'    => 'required|email',
-            'password' => 'required|confirmed|min:6',
-            'role'     => 'required|in:dosen,content_creator',
-            'foto'     => 'nullable|image|max:2048',
-        ];
-
-        if ($role === 'dosen') {
-            $rules['nip']      = 'required|numeric';
-            $rules['prodi']    = 'nullable|string|max:255';
-            $rules['fakultas'] = 'nullable|string|max:255';
-        } else {
-            $rules['nip'] = 'nullable|numeric';
-        }
-
-        $data = $request->validate($rules);
+        $data = $request->validated();
 
         $existingByEmail = User::where('email', $data['email'])->first();
 
@@ -95,11 +81,8 @@ class AuthController extends Controller
         return view('authorized.login');
     }
 
-    public function login(Request $request){
-        $credentials = $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required',
-        ]);
+    public function login(LoginRequest $request){
+        $credentials = $request->validated();
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
