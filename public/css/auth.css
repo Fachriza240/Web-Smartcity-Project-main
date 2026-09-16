@@ -288,6 +288,16 @@ body.auth-body {
 
 .auth-field input.is-error { border-color: #ef4444 !important; }
 
+.auth-error-text {
+  min-height: 16px;
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.3;
+  color: #ef4444;
+}
+
+.auth-error-text:empty { margin-top: 0; }
+
 /* Password eye toggle */
 .auth-eye {
   position: absolute;
