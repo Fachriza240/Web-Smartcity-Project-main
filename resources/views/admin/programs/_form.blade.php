@@ -26,7 +26,7 @@
         <label class="form-label">Thumbnail {{ $program->exists ? '' : '<span class="text-danger">*</span>' }}</label>
         <input type="file" name="thumbnail"
                class="form-control @error('thumbnail') is-invalid @enderror"
-               accept="image/*"
+               accept="image/jpeg,image/png,image/gif,image/bmp,image/webp"
                @if(!$program->exists) required @endif>
         @if($program->thumbnail_path)
             <div class="mt-2">

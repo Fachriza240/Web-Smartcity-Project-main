@@ -43,7 +43,7 @@
         <label class="form-label">Thumbnail {{ $project->exists ? '' : '<span class="text-danger">*</span>' }}</label>
         <input type="file" name="thumbnail"
                class="form-control @error('thumbnail') is-invalid @enderror"
-               accept="image/*"
+               accept="image/jpeg,image/png,image/gif,image/bmp,image/webp"
                @if(!$project->exists) required @endif>
         @if($project->thumbnail_path)
             <div class="mt-2">
@@ -69,9 +69,8 @@
 
 <div class="mb-3">
     <label class="form-label">Gallery (bisa pilih banyak foto)</label>
-    <input type="file" name="gallery[]"
-           class="form-control @error('gallery') is-invalid @enderror @error('gallery.*') is-invalid @enderror"
-           accept="image/*" multiple>
+        <input type="file" name="gallery[]" class="form-control @error('gallery.*') is-invalid @enderror"
+           accept="image/jpeg,image/png,image/gif,image/bmp,image/webp" multiple>
     @error('gallery') <div class="text-danger small">{{ $message }}</div> @enderror
     @error('gallery.*') <div class="text-danger small">{{ $message }}</div> @enderror
     @if($project->exists && !empty($project->gallery_paths))

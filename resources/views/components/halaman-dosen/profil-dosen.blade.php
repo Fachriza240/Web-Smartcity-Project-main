@@ -192,7 +192,7 @@
                         <i class="bi bi-camera-fill"></i>
                         <span>Ganti<br>Foto</span>
                     </label>
-                    <input type="file" name="foto" id="fotoInput" accept="image/*"
+                        <input type="file" name="foto" id="fotoInput" accept="image/jpeg,image/png,image/gif,image/bmp,image/webp"
                            style="display:none;" onchange="previewFoto(this)">
                 </div>
             </div>

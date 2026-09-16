@@ -49,7 +49,7 @@
 <div class="mb-3">
     <label class="form-label">Foto {{ $team->exists ? '' : '<span class="text-danger">*</span>' }}</label>
     <input type="file" name="foto" class="form-control @error('foto') is-invalid @enderror"
-           accept="image/*" @if(!$team->exists) required @endif>
+           accept="image/jpeg,image/png,image/gif,image/bmp,image/webp" @if(!$team->exists) required @endif>
     @if($team->foto_path)
         <div class="mt-2">
             <img src="{{ asset('storage/'.$team->foto_path) }}" alt="{{ $team->nama }}"

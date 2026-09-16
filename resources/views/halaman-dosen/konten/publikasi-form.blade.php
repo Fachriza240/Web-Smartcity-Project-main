@@ -155,7 +155,7 @@
                 </div>
                 <div>
                     <label class="form-label">Thumbnail</label>
-                    <input type="file" name="thumbnail" class="form-control" accept="image/*">
+                    <input type="file" name="thumbnail" class="form-control" accept="image/jpeg,image/png,image/gif,image/bmp,image/webp">
                     @if($publication->thumbnail_path)
                         <img src="{{ asset('storage/'.$publication->thumbnail_path) }}"
                              style="width:80px;height:55px;object-fit:cover;border-radius:6px;margin-top:8px;">

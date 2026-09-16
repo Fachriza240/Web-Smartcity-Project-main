@@ -30,7 +30,7 @@
         <label class="form-label">Thumbnail {{ $news->exists ? '' : '<span class="text-danger">*</span>' }}</label>
         <input type="file" name="thumbnail"
                class="form-control @error('thumbnail') is-invalid @enderror"
-               accept="image/*"
+               accept="image/jpeg,image/png,image/gif,image/bmp,image/webp"
                @if(!$news->exists) required @endif>
         @if($news->thumbnail_path)
             <div class="mt-2">

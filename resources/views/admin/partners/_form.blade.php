@@ -39,8 +39,8 @@
 
 <div class="mb-3">
     <label class="form-label">Logo</label>
-    <input type="file" name="logo" class="form-control @error('logo') is-invalid @enderror" accept="image/*">
-    <div class="form-text">Format: JPG, PNG, SVG, WebP. Maks 4MB.</div>
+    <input type="file" name="logo" class="form-control @error('logo') is-invalid @enderror" accept="image/jpeg,image/png,image/gif,image/bmp,image/webp">
+    <div class="form-text">Format: JPG, PNG, GIF, WebP. Maks 4MB.</div>
     @if($partner->exists && $partner->logo_path)
         <div class="mt-2">
             <img src="{{ asset('storage/'.$partner->logo_path) }}" alt="{{ $partner->nama }}"
