@@ -566,7 +566,7 @@
                             @endif
 
                             @if($project->dokumen_path)
-                                <a href="{{ asset('storage/' . $project->dokumen_path) }}"
+                                <a href="{{ route('project.document', $project) }}" ...
                                    target="_blank"
                                    class="proj-card__doc-btn">
                                     <i class="bi bi-file-earmark-text"></i>
