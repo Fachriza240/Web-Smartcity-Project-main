@@ -546,7 +546,7 @@
                         </li>
                         <li>
                             <a class="dropdown-item" href="#"
-                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                onclick="event.preventDefault(); confirmLogoutForm('logout-form');">
                                 <i class="fas fa-sign-out-alt"></i>
                                 Keluar
                             </a>
@@ -554,6 +554,7 @@
                                 style="display: none;">
                                 @csrf
                             </form>
+                            @include('partials.logout-confirm-modal')
                         </li>
                     </ul>
                 </div>
