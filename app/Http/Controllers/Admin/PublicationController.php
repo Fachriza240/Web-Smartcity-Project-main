@@ -6,6 +6,8 @@ use App\Http\Controllers\Concerns\AuthorizesRoles;
 use App\Http\Controllers\Controller;
 use App\Models\Publication;
 use App\Models\User;
+use App\Rules\SafeName;
+use App\Rules\SafeText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -110,14 +112,16 @@ class PublicationController extends Controller
         $data = $this->validatedData($request, $publication);
 
         if ($request->hasFile('pdf')) {
+            $newPdfPath = $request->file('pdf')->store('publications/pdf', 'local');
             $this->deleteFile($publication->pdf_path, 'local');
-            $data['pdf_path'] = $request->file('pdf')->store('publications/pdf', 'local');
+            $data['pdf_path'] = $newPdfPath;
         }
         unset($data['pdf']);
 
         if ($request->hasFile('thumbnail')) {
+            $newThumbPath = $request->file('thumbnail')->store('publications/thumbnails', 'public');
             $this->deleteFile($publication->thumbnail_path);
-            $data['thumbnail_path'] = $request->file('thumbnail')->store('publications/thumbnails', 'public');
+            $data['thumbnail_path'] = $newThumbPath;
         }
         unset($data['thumbnail']);
 
@@ -152,15 +156,25 @@ class PublicationController extends Controller
     {
         $data = $request->validate([
             'submission_type' => ['required', 'in:member,non_member'],
-            'user_id'         => ['nullable', 'exists:users,id'],
-            'recommended_by'  => ['nullable', 'string', 'max:255'],
-            'judul'           => ['required', 'string', 'max:255'],
-            'penulis'         => ['required', 'string', 'max:255'],
+            'user_id'         => [
+                Rule::requiredIf(fn () => $request->input('submission_type') === 'member'),
+                'nullable', 'exists:users,id',
+            ],
+            'recommended_by'  => [
+                Rule::requiredIf(fn () => $request->input('submission_type') === 'non_member'),
+                'nullable', 'string', 'max:255', new SafeName(),
+            ],
+            'judul'           => ['required', 'string', 'min:5', 'max:255', new SafeText()],
+            'penulis'         => ['required', 'string', 'max:255', new SafeName()],
             'tahun'           => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
-            'abstrak'         => ['required', 'string'],
+            'abstrak'         => ['required', 'string', new SafeText()],
             'kategori'        => ['required', Rule::in(Publication::categories())],
-            'penerbit'        => ['nullable', 'string', 'max:255'],
-            'doi'             => ['nullable', 'string', 'max:255'],
+            'penerbit'        => ['nullable', 'string', 'max:255', new SafeText()],
+            'doi'             => [
+                'nullable', 'string', 'max:255',
+                'regex:/^10\.\d{4,9}\/\S+$/i',
+                Rule::unique('publications', 'doi')->ignore($publication?->id),
+            ],
             'pdf'             => [$publication ? 'nullable' : 'required', 'file', 'mimes:pdf', 'max:20480'],
             'thumbnail'       => ['nullable', 'image', 'max:4096'],
             'status'          => ['required', Rule::in(Publication::statuses())],
