@@ -91,12 +91,13 @@
             </li>
             <li class="nav-item">
                 <a href="#" class="nav-link"
-                   onclick="event.preventDefault(); document.getElementById('cms-logout-form').submit();">
+                   onclick="event.preventDefault(); confirmLogoutForm('cms-logout-form');">
                     <i class="bi bi-box-arrow-right"></i> Logout
                 </a>
                 <form id="cms-logout-form" action="{{ route('logout') }}" method="POST" style="display:none;">
                     @csrf
                 </form>
+                @include('partials.logout-confirm-modal')
             </li>
 
         </ul>

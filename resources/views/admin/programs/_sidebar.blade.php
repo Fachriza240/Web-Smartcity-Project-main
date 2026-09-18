@@ -38,10 +38,11 @@
             <a href="#" class="nav-link"><i class="bi bi-gear"></i> Pengaturan</a>
         </li>
         <li class="nav-item">
-            <a href="#" class="nav-link" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+            <a href="#" class="nav-link" onclick="event.preventDefault(); confirmLogoutForm('logout-form');">
                 <i class="bi bi-box-arrow-right"></i> Logout
             </a>
             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none;">@csrf</form>
+            @include('partials.logout-confirm-modal')
         </li>
     </ul>
 </aside>
