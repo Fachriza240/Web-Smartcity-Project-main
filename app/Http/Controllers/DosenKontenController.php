@@ -6,6 +6,8 @@ use App\Models\Hki;
 use App\Models\Publication;
 use App\Models\User;
 use App\Notifications\HkiAddedNotification;
+use App\Rules\SafeName;
+use App\Rules\SafeText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -160,6 +162,7 @@ class DosenKontenController extends Controller
         $data['user_id']         = Auth::id();
         $data['submission_type'] = 'member';
         $data['recommended_by']  = null;
+        $data['status'] = Hki::STATUS_DRAFT;
 
         if ($request->hasFile('file_sertifikat')) {
             $data['file_sertifikat'] = $request->file('file_sertifikat')
@@ -203,11 +206,13 @@ class DosenKontenController extends Controller
                 ->store('hki/sertifikat', 'public');
         }
 
+        $data['status'] = Hki::STATUS_DRAFT;
+
         $h->update($data);
         $this->sendHkiNotifications($h);
 
         return redirect()->route('dosen.hki.index')
-            ->with('success', 'HKI berhasil diperbarui.');
+            ->with('success', 'HKI berhasil diperbarui dan menunggu review admin kembali.');
     }
 
     public function hkiDestroy(Hki $h)
@@ -224,13 +229,17 @@ class DosenKontenController extends Controller
     private function validatePublication(Request $request, ?Publication $pub = null): array
     {
         return $request->validate([
-            'judul'     => ['required', 'string', 'max:255'],
-            'penulis'   => ['required', 'string', 'max:255'],
+            'judul'     => ['required', 'string', 'min:5', 'max:255', new SafeText()],
+            'penulis'   => ['required', 'string', 'max:255', new SafeName()],
             'tahun'     => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
-            'abstrak'   => ['required', 'string'],
+            'abstrak'   => ['required', 'string', new SafeText()],
             'kategori'  => ['required', Rule::in(Publication::categories())],
-            'penerbit'  => ['nullable', 'string', 'max:255'],
-            'doi'       => ['nullable', 'string', 'max:255'],
+            'penerbit'  => ['nullable', 'string', 'max:255', new SafeText()],
+            'doi'       => [
+                'nullable', 'string', 'max:255',
+                'regex:/^10\.\d{4,9}\/\S+$/i',
+                Rule::unique('publications', 'doi')->ignore($pub?->id),
+            ],
             'pdf'       => [$pub ? 'nullable' : 'required', 'file', 'mimes:pdf', 'max:20480'],
             'thumbnail' => ['nullable', 'image', 'max:4096'],
         ]);
@@ -243,10 +252,10 @@ class DosenKontenController extends Controller
                 'required', 'string', 'max:255',
                 Rule::unique('hkis', 'nomor_sertifikat')->ignore($hki?->id),
             ],
-            'tgl_terbit'       => ['required', 'date'],
-            'judul_sertifikat' => ['required', 'string', 'max:255'],
+            'tgl_terbit'       => ['required', 'date', 'before_or_equal:today'],
+            'judul_sertifikat' => ['required', 'string', 'min:5', 'max:255', new SafeText()],
             'jenis_sertifikat' => ['required', Rule::in(Hki::JENIS)],
-            'pencipta'         => ['required', 'string', 'max:255'],
+            'pencipta'         => ['required', 'string', 'max:255', new SafeName()],
             'file_sertifikat'  => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
             'status'           => ['required', Rule::in(Hki::statuses())],
         ]);
