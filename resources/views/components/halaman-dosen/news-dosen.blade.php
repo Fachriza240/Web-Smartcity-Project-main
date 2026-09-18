@@ -443,7 +443,7 @@
      ═══════════════════════════════════════ -->
 <section class="news-search">
     <div class="container">
-        <form action="{{ route('news.index') }}" method="GET" data-aos="fade-up">
+        <form action="{{ route('news.dosen') }}" method="GET" data-aos="fade-up">
             <div class="news-search__bar">
                 <i class="bi bi-search" style="color: var(--primary-blue); font-size: 18px; margin-left: 8px;"></i>
                 <input type="text" name="search" class="news-search__input"
