@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Concerns\AuthorizesRoles;
 use App\Http\Controllers\Controller;
 use App\Models\News;
+use App\Rules\SafeText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -98,9 +99,9 @@ class NewsController extends Controller
     private function validatedData(Request $request, ?News $news = null): array
     {
         return $request->validate([
-            'judul'     => ['required', 'string', 'max:255'],
-            'kategori'  => ['nullable', 'string', 'max:255'],
-            'konten'    => ['required', 'string'],
+            'judul'     => ['required', 'string', 'min:5', 'max:255', new SafeText()],
+            'kategori'  => ['nullable', Rule::in(News::categories())],
+            'konten'    => ['required', 'string', new SafeText()],
             'thumbnail' => [$news ? 'nullable' : 'required', 'image', 'max:4096'],
             'status'    => ['required', Rule::in(News::statuses())],
         ]);
@@ -111,8 +112,9 @@ class NewsController extends Controller
         unset($data['thumbnail']);
 
         if ($request->hasFile('thumbnail')) {
+            $newPath = $request->file('thumbnail')->store('news/thumbnails', 'public');
             $this->deleteFile($news?->thumbnail_path);
-            $data['thumbnail_path'] = $request->file('thumbnail')->store('news/thumbnails', 'public');
+            $data['thumbnail_path'] = $newPath;
         }
 
         return $data;
