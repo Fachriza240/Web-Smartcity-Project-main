@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\News;
+use Illuminate\Support\Carbon;
 
 class NewsController extends Controller
 {
@@ -21,11 +22,7 @@ class NewsController extends Controller
         $news = $query->orderByDesc('published_at')->paginate(9)->withQueryString();
 
         $categories = News::categories();
-        $years = News::published()
-            ->selectRaw('YEAR(published_at) as tahun')
-            ->groupBy('tahun')
-            ->orderByDesc('tahun')
-            ->pluck('tahun');
+        $years = $this->publishedYears();
 
         return view('halaman-user.news-user', compact('news', 'categories', 'years'));
     }
@@ -54,12 +51,19 @@ class NewsController extends Controller
         $news = $query->orderByDesc('published_at')->paginate(9)->withQueryString();
 
         $categories = News::categories();
-        $years = News::published()
-            ->selectRaw('YEAR(published_at) as tahun')
-            ->groupBy('tahun')
-            ->orderByDesc('tahun')
-            ->pluck('tahun');
+        $years = $this->publishedYears();
 
         return view('halaman-dosen.news-dosen', compact('news', 'categories', 'years'));
+    }
+
+    private function publishedYears()
+    {
+        return News::published()
+            ->whereNotNull('published_at')
+            ->pluck('published_at')
+            ->map(fn ($date) => Carbon::parse($date)->year)
+            ->unique()
+            ->sortDesc()
+            ->values();
     }
 }
