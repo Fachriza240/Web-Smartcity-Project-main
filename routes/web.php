@@ -34,6 +34,7 @@ Route::get('/contact', [ContactController::class, 'index'])->name('contact.index
 Route::get('/program-user', [ProgramController::class, 'index'])->name('programs.frontend.index');
 
 Route::get('/project-user', [ProjectController::class, 'index'])->name('projects.frontend.index');
+Route::get('/project/{project}/document', [ProjectController::class, 'document'])->name('project.document');
 
 Route::get('/search', [SearchController::class, 'index'])->name('search.index');
 
