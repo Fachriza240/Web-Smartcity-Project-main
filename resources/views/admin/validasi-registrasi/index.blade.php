@@ -103,17 +103,31 @@
                                                     Terima
                                                 </button>
                                             </form>
-                                            <form action="{{ route('admin.validasi.reject', $user->id) }}" method="POST">
+                                            <form action="{{ route('admin.validasi.reject', $user->id) }}" method="POST" onsubmit="return handleReject(this, '{{ addslashes($user->fullname) }}')">
                                                 @csrf
+                                                <input type="hidden" name="rejection_reason">
                                                 <button type="submit"
-                                                        onclick="return confirm('Tolak akun {{ addslashes($user->fullname) }}?')"
                                                         style="padding:6px 14px; font-size:12px; font-weight:700;
-                                                               background:#fef2f2; color:#dc2626;
-                                                               border:1.5px solid #fecaca; border-radius:8px;
-                                                               cursor:pointer; white-space:nowrap;">
+                                                            background:#fef2f2; color:#dc2626;
+                                                            border:1.5px solid #fecaca; border-radius:8px;
+                                                            cursor:pointer; white-space:nowrap;">
                                                     Tolak
                                                 </button>
                                             </form>
+                                            <script>
+                                                function handleReject(form, fullname) {
+                                                    const reason = prompt('Alasan penolakan untuk akun ' + fullname + ' (minimal 10 karakter):');
+                                                    if (reason === null) {
+                                                        return false; // dibatalkan
+                                                    }
+                                                    if (reason.trim().length < 10) {
+                                                        alert('Alasan penolakan minimal 10 karakter.');
+                                                        return false;
+                                                    }
+                                                    form.querySelector('input[name="rejection_reason"]').value = reason.trim();
+                                                    return true;
+                                                }
+                                            </script>
 
                                         @elseif($user->registration_status === \App\Models\User::STATUS_REJECTED)
                                             {{-- Rejected: hanya bisa di-Terima --}}

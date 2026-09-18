@@ -126,13 +126,15 @@
             <i class="bi bi-box-arrow-right" style="color:#ef4444;"></i> Sesi
         </div>
         <p class="adm-settings-section__desc">Keluar dari panel admin.</p>
-        <form action="{{ route('logout') }}" method="POST">
+        <form id="settings-logout-form" action="{{ route('logout') }}" method="POST">
             @csrf
-            <button type="submit" class="btn btn-sm"
+            <button type="button" class="btn btn-sm"
+                    onclick="confirmLogoutForm('settings-logout-form')"
                     style="background:#fef2f2;color:#ef4444;border:1px solid #fecaca;border-radius:8px;font-weight:600;padding:9px 20px;">
                 <i class="bi bi-box-arrow-right me-1"></i> Logout Sekarang
             </button>
         </form>
+        @include('partials.logout-confirm-modal')
     </div>
 
 </x-layout.admin>
