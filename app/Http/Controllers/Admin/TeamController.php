@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Concerns\AuthorizesRoles;
 use App\Http\Controllers\Controller;
 use App\Models\Team;
+use App\Rules\SafeName;
+use App\Rules\SafeText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -85,8 +87,9 @@ class TeamController extends Controller
         $data = $this->validatedData($request, $team);
 
         if ($request->hasFile('foto')) {
+            $newPath = $request->file('foto')->store('teams/photos', 'public');
             $this->deleteFile($team->foto_path);
-            $data['foto_path'] = $request->file('foto')->store('teams/photos', 'public');
+            $data['foto_path'] = $newPath;
         }
         unset($data['foto']);
 
@@ -108,21 +111,20 @@ class TeamController extends Controller
     private function validatedData(Request $request, ?Team $team = null): array
     {
         return $request->validate([
-            'nama'      => ['required', 'string', 'max:255'],
-            'jabatan'   => ['required', 'string', 'max:255'],
-            'bidang'    => ['nullable', 'string', 'max:255'],
+            'nama'      => ['required', 'string', 'min:3', 'max:255', new SafeName()],
+            'jabatan'   => ['required', 'string', 'max:255', new SafeText()],
+            'bidang'    => ['nullable', 'string', 'max:255', new SafeText()],
             'foto'      => [$team ? 'nullable' : 'required', 'image', 'max:4096'],
             'email'     => ['nullable', 'email', 'max:255'],
-            'telepon'   => ['nullable', 'string', 'max:50'],
+            'telepon'   => ['nullable', 'string', 'max:50', 'regex:/^[0-9+\-\s()]+$/'],
             'linkedin'  => ['nullable', 'url', 'max:500'],
             'instagram' => ['nullable', 'string', 'max:255'],
             'github'    => ['nullable', 'string', 'max:255'],
             'tipe'      => ['required', Rule::in(Team::tipes())],
             'status'    => ['required', Rule::in(Team::statuses())],
-            'urutan'    => ['nullable', 'integer'],
+            'urutan'    => ['nullable', 'integer', 'min:1'],
         ]);
     }
-
 
     private function deleteFile(?string $path): void
     {
