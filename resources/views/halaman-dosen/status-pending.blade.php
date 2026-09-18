@@ -137,12 +137,13 @@
 
     @endif
 
-    <form action="{{ route('logout') }}" method="POST" style="margin-top: 16px;">
+    <form id="status-logout-form" action="{{ route('logout') }}" method="POST" style="margin-top: 16px;">
       @csrf
-      <button type="submit" class="auth-btn-outline">
+      <button type="button" class="auth-btn-outline" onclick="confirmLogoutForm('status-logout-form')">
         <i class="bi bi-box-arrow-right me-1"></i> Logout
       </button>
     </form>
+    @include('partials.logout-confirm-modal')
 
     <p class="auth-bottom" style="margin-top:16px;">
       <a href="/">← Kembali ke Beranda</a>
