@@ -13,7 +13,7 @@
                 <li><hr class="dropdown-divider"></li>
                 <li>
                     <a class="dropdown-item" href="#"
-                       onclick="event.preventDefault(); document.getElementById('logout-form-mobile').submit();">
+                       onclick="event.preventDefault(); confirmLogoutForm('logout-form-mobile');">
                         Logout
                     </a>
                     <form id="logout-form-mobile" action="{{ route('logout') }}" method="POST" style="display: none;">
@@ -51,7 +51,7 @@
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item" href="#"
-                                   onclick="event.preventDefault(); document.getElementById('logout-form-desktop').submit();">
+                                   onclick="event.preventDefault(); confirmLogoutForm('logout-form-desktop');">
                                     Logout
                                 </a>
                                 <form id="logout-form-desktop" action="{{ route('logout') }}" method="POST" style="display: none;">
@@ -66,4 +66,4 @@
     </div>
 </nav>
 
-
+@include('partials.logout-confirm-modal')
