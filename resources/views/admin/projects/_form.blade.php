@@ -93,7 +93,7 @@
     @if($project->dokumen_path)
         <div class="small mt-1">
             Dokumen saat ini:
-            <a href="{{ asset('storage/' . $project->dokumen_path) }}" target="_blank">Download</a>
+           <a href="{{ route('project.document', $project) }}" target="_blank">Download</a>
             <span class="text-muted">— Upload baru untuk mengganti.</span>
         </div>
     @endif
