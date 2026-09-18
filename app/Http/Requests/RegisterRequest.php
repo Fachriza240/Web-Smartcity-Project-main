@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\SafeName;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RegisterRequest extends FormRequest
@@ -16,9 +17,9 @@ class RegisterRequest extends FormRequest
         $role = $this->input('role', 'dosen');
 
         $rules = [
-            'fullname' => 'required|string|max:255',
+            'fullname' => ['required', 'string', 'min:3', 'max:255', new SafeName()],
             'email'    => 'required|email:rfc|max:255',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:6|max:72|confirmed',
             'role'     => 'required|in:dosen,content_creator',
             'foto'     => 'nullable|image|max:2048',
         ];
@@ -38,12 +39,14 @@ class RegisterRequest extends FormRequest
     {
         return [
             'fullname.required'  => 'Nama lengkap wajib diisi.',
+            'fullname.min'       => 'Nama lengkap minimal 3 karakter.',
             'fullname.max'       => 'Nama lengkap maksimal 255 karakter.',
             'email.required'     => 'Email wajib diisi.',
             'email.email'        => 'Format email tidak valid.',
             'email.max'          => 'Email maksimal 255 karakter.',
             'password.required'  => 'Password wajib diisi.',
             'password.min'       => 'Password minimal 6 karakter.',
+            'password.max'       => 'Password maksimal 72 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
             'role.required'      => 'Silakan pilih role akun.',
             'role.in'            => 'Role yang dipilih tidak valid.',
