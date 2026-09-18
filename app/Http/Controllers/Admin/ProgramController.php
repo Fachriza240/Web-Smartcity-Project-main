@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Concerns\AuthorizesRoles;
 use App\Http\Controllers\Controller;
 use App\Models\Program;
+use App\Rules\SafeText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -93,10 +94,10 @@ class ProgramController extends Controller
     private function validatedData(Request $request, ?Program $program = null): array
     {
         return $request->validate([
-            'judul'     => ['required', 'string', 'max:255'],
-            'deskripsi' => ['required', 'string'],
+            'judul'     => ['required', 'string', 'min:5', 'max:255', new SafeText()],
+            'deskripsi' => ['required', 'string', new SafeText()],
             'thumbnail' => [$program ? 'nullable' : 'required', 'image', 'max:4096'],
-            'urutan'    => ['nullable', 'integer'],
+            'urutan'    => ['nullable', 'integer', 'min:1'],
             'status'    => ['required', Rule::in(Program::statuses())],
         ]);
     }
@@ -106,8 +107,9 @@ class ProgramController extends Controller
         unset($data['thumbnail']);
 
         if ($request->hasFile('thumbnail')) {
+            $newPath = $request->file('thumbnail')->store('programs/thumbnails', 'public');
             $this->deleteFile($program?->thumbnail_path);
-            $data['thumbnail_path'] = $request->file('thumbnail')->store('programs/thumbnails', 'public');
+            $data['thumbnail_path'] = $newPath;
         }
 
         return $data;
