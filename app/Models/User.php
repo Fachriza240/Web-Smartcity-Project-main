@@ -23,7 +23,14 @@ class User extends Authenticatable
         'password',
         'role',
         'foto',
-        'registration_status'
+        'registration_status',
+        'rejection_reason',
+        'reviewed_by',
+        'reviewed_at',
+    ];
+
+    protected $casts = [
+        'reviewed_at' => 'datetime',
     ];
 
     protected $hidden = ['password'];
