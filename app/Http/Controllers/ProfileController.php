@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Rules\SafeName;
+use App\Rules\SafeText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -19,14 +21,14 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         $request->validate([
-            'fullname'          => 'required|string|max:255',
-            'email'             => 'required|email|unique:users,email,' . $user->id,
-            'nip'               => 'nullable|string|max:50|unique:users,nip,' . $user->id,
-            'prodi'             => 'nullable|string|max:255',
-            'fakultas'          => 'nullable|string|max:255',
-            'bio'               => 'nullable|string',
-            'bidang_penelitian' => 'nullable|string',
-            'foto'              => 'nullable|image|max:4096',
+            'fullname' => ['required', 'string', 'min:3', 'max:255', new SafeName()],
+            'email'    => 'required|email|unique:users,email,' . $user->id,
+            'nip'      => 'nullable|numeric|digits_between:5,20|unique:users,nip,' . $user->id,
+            'prodi'    => ['nullable', 'string', 'max:255', new SafeText()],
+            'fakultas' => ['nullable', 'string', 'max:255', new SafeText()],
+            'bio'                => ['nullable', 'string', 'max:2000', new SafeText()],
+            'bidang_penelitian'  => ['nullable', 'string', 'max:500', new SafeText()],
+            'foto'               => 'nullable|image|max:4096',
         ]);
 
         $data = $request->only([
@@ -35,7 +37,6 @@ class ProfileController extends Controller
             'bio', 'bidang_penelitian',
         ]);
 
-        // Jangan bcrypt — password tidak diubah di sini
         if ($request->hasFile('foto')) {
             if ($user->foto && Storage::disk('public')->exists($user->foto)) {
                 Storage::disk('public')->delete($user->foto);
@@ -43,7 +44,6 @@ class ProfileController extends Controller
             $data['foto'] = $request->file('foto')->store('foto-users', 'public');
         }
 
-        // Update tanpa trigger password mutator
         $user->forceFill($data)->save();
 
         return redirect()->route('profil.dosen')->with('success', 'Profil berhasil diperbarui.');
