@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Concerns\AuthorizesRoles;
 use App\Http\Controllers\Controller;
 use App\Models\Partner;
+use App\Rules\SafeText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -80,8 +81,9 @@ class PartnerController extends Controller
         $data = $this->validatedData($request, $partner);
 
         if ($request->hasFile('logo')) {
+            $newPath = $request->file('logo')->store('partners/logos', 'public');
             $this->deleteFile($partner->logo_path);
-            $data['logo_path'] = $request->file('logo')->store('partners/logos', 'public');
+            $data['logo_path'] = $newPath;
         }
         unset($data['logo']);
 
@@ -103,12 +105,12 @@ class PartnerController extends Controller
     private function validatedData(Request $request, ?Partner $partner = null): array
     {
         return $request->validate([
-            'nama'      => ['required', 'string', 'max:255'],
-            'deskripsi' => ['nullable', 'string'],
-            'logo'      => ['nullable', 'image', 'max:4096'],
+            'nama'      => ['required', 'string', 'min:2', 'max:255', new SafeText()],
+            'deskripsi' => ['nullable', 'string', new SafeText()],
+            'logo'      => ['nullable', 'file', 'mimes:jpg,jpeg,png,gif,webp,svg', 'max:4096'],
             'website'   => ['nullable', 'url', 'max:500'],
             'status'    => ['required', Rule::in(Partner::statuses())],
-            'urutan'    => ['nullable', 'integer'],
+            'urutan'    => ['nullable', 'integer', 'min:1'],
         ]);
     }
 
