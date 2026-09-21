@@ -156,12 +156,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/hki/{hki}/edit', [\App\Http\Controllers\Admin\HkiController::class, 'edit'])->name('hki.edit');
         Route::put('/hki/{hki}', [\App\Http\Controllers\Admin\HkiController::class, 'update'])->name('hki.update');
         Route::delete('/hki/{hki}', [\App\Http\Controllers\Admin\HkiController::class, 'destroy'])->name('hki.destroy');
+
+        Route::resource('/publications', AdminPublicationController::class)->except(['show']);
+        Route::get('/publications/{publication}/file', [AdminPublicationController::class, 'file'])->name('publications.file');
+
+        Route::get('/teams', [AdminTeamController::class, 'index'])->name('teams.index');
+        Route::get('/teams/create', [AdminTeamController::class, 'create'])->name('teams.create');
+        Route::post('/teams', [AdminTeamController::class, 'store'])->name('teams.store');
+        Route::get('/teams/{team}/edit', [AdminTeamController::class, 'edit'])->name('teams.edit');
+        Route::put('/teams/{team}', [AdminTeamController::class, 'update'])->name('teams.update');
+        Route::delete('/teams/{team}', [AdminTeamController::class, 'destroy'])->name('teams.destroy');
     });
 
     Route::middleware('role:admin,content_creator')->group(function () {
-
-    Route::resource('/publications', AdminPublicationController::class)->except(['show']);
-    Route::get('/publications/{publication}/file', [AdminPublicationController::class, 'file'])->name('publications.file');
 
     Route::get('/projects', [AdminProjectController::class, 'index'])->name('projects.index');
     Route::get('/projects/create', [AdminProjectController::class, 'create'])->name('projects.create');
@@ -184,13 +191,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('/programs/{program}', [AdminProgramController::class, 'update'])->name('programs.update');
     Route::delete('/programs/{program}', [AdminProgramController::class, 'destroy'])->name('programs.destroy');
 
-    Route::get('/teams', [AdminTeamController::class, 'index'])->name('teams.index');
-    Route::get('/teams/create', [AdminTeamController::class, 'create'])->name('teams.create');
-    Route::post('/teams', [AdminTeamController::class, 'store'])->name('teams.store');
-    Route::get('/teams/{team}/edit', [AdminTeamController::class, 'edit'])->name('teams.edit');
-    Route::put('/teams/{team}', [AdminTeamController::class, 'update'])->name('teams.update');
-    Route::delete('/teams/{team}', [AdminTeamController::class, 'destroy'])->name('teams.destroy');
-
     Route::get('/partners', [AdminPartnerController::class, 'index'])->name('partners.index');
     Route::get('/partners/create', [AdminPartnerController::class, 'create'])->name('partners.create');
     Route::post('/partners', [AdminPartnerController::class, 'store'])->name('partners.store');
@@ -202,5 +202,3 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     }); 
 });
-
-
