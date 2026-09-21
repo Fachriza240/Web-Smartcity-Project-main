@@ -19,7 +19,7 @@ class PublicationController extends Controller
 
     public function index(Request $request)
     {
-        $this->authorizeContentManager();
+        $this->authorizeAdmin();
 
         $publications = Publication::query()
             ->with('recommender')
@@ -52,7 +52,7 @@ class PublicationController extends Controller
 
     public function create()
     {
-        $this->authorizeContentManager();
+        $this->authorizeAdmin();
 
         $dosens = User::where('role', 'dosen')
             ->where('registration_status', 'approved')
@@ -68,7 +68,7 @@ class PublicationController extends Controller
 
     public function store(Request $request)
     {
-        $this->authorizeContentManager();
+        $this->authorizeAdmin();
 
         $data = $this->validatedData($request);
 
@@ -91,7 +91,7 @@ class PublicationController extends Controller
 
     public function edit(Publication $publication)
     {
-        $this->authorizeContentManager();
+        $this->authorizeAdmin();
 
         $dosens = User::where('role', 'dosen')
             ->where('registration_status', 'approved')
@@ -107,7 +107,7 @@ class PublicationController extends Controller
 
     public function update(Request $request, Publication $publication)
     {
-        $this->authorizeContentManager();
+        $this->authorizeAdmin();
 
         $data = $this->validatedData($request, $publication);
 
@@ -132,7 +132,7 @@ class PublicationController extends Controller
 
     public function file(Publication $publication)
     {
-        $this->authorizeContentManager();
+        $this->authorizeAdmin();
 
         abort_unless($publication->pdf_path && Storage::disk('local')->exists($publication->pdf_path), 404);
 
@@ -143,7 +143,7 @@ class PublicationController extends Controller
 
     public function destroy(Publication $publication)
     {
-        $this->authorizeContentManager();
+        $this->authorizeAdmin();
 
         $this->deleteFile($publication->pdf_path, 'local');
         $this->deleteFile($publication->thumbnail_path);
