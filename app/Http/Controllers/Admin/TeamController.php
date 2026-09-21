@@ -18,7 +18,7 @@ class TeamController extends Controller
 
     public function index(Request $request)
     {
-        $this->authorizeContentManager();
+        $this->authorizeAdmin();
 
         $teams = Team::query()
             ->when($request->filled('search'), function ($q) use ($request) {
@@ -44,7 +44,7 @@ class TeamController extends Controller
 
     public function create()
     {
-        $this->authorizeContentManager();
+        $this->authorizeAdmin();
 
         return view('admin.teams.create', [
             'team'     => new Team(['status' => Team::STATUS_DRAFT, 'tipe' => Team::TIPE_STAFF]),
@@ -55,7 +55,7 @@ class TeamController extends Controller
 
     public function store(Request $request)
     {
-        $this->authorizeContentManager();
+        $this->authorizeAdmin();
 
         $data = $this->validatedData($request);
 
@@ -71,7 +71,7 @@ class TeamController extends Controller
 
     public function edit(Team $team)
     {
-        $this->authorizeContentManager();
+        $this->authorizeAdmin();
 
         return view('admin.teams.edit', [
             'team'     => $team,
@@ -82,7 +82,7 @@ class TeamController extends Controller
 
     public function update(Request $request, Team $team)
     {
-        $this->authorizeContentManager();
+        $this->authorizeAdmin();
 
         $data = $this->validatedData($request, $team);
 
@@ -100,7 +100,7 @@ class TeamController extends Controller
 
     public function destroy(Team $team)
     {
-        $this->authorizeContentManager();
+        $this->authorizeAdmin();
 
         $this->deleteFile($team->foto_path);
         $team->delete();
