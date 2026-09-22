@@ -14,7 +14,6 @@
 
 <div class="auth-card">
 
-  {{-- ── Kiri: Form ──────────────────────────────────────── --}}
   <div class="auth-left">
 
     <a href="/" class="auth-back">
@@ -63,12 +62,11 @@
       <div class="auth-field">
         <label for="fullname">Nama Lengkap</label>
         <input type="text" id="fullname" name="fullname"
-               value="{{ old('fullname') }}"
-               placeholder="Nama lengkap Anda"
-               autocomplete="name"
-               maxlength="255"
-               class="{{ $errors->has('fullname') ? 'is-error' : '' }}"
-               required>
+              class="form-control" placeholder="Masukkan nama lengkap"
+              minlength="3" maxlength="255"
+              pattern="[\p{L}\s\.'\-,]+"
+              title="Hanya huruf, spasi, titik, apostrof, tanda hubung, dan koma yang diperbolehkan"
+              required>
         <div class="auth-error-text" id="err-fullname">{{ $errors->first('fullname') }}</div>
       </div>
 
@@ -137,21 +135,18 @@
         <div class="auth-field">
           <label for="password">Password</label>
           <input type="password" id="password" name="password"
-                 placeholder="Min. 6 karakter"
-                 autocomplete="new-password"
-                 minlength="6"
-                 class="{{ $errors->has('password') ? 'is-error' : '' }}"
-                 required>
+                class="form-control" placeholder="Minimal 6 karakter"
+                minlength="6" maxlength="64"
+                required>
           <span class="auth-eye" id="togglePwd1"><i class="bi bi-eye-slash" id="eyeIcon1"></i></span>
           <div class="auth-error-text" id="err-password">{{ $errors->first('password') }}</div>
         </div>
         <div class="auth-field">
           <label for="password_confirmation">Konfirmasi</label>
           <input type="password" id="password_confirmation" name="password_confirmation"
-                 placeholder="Ulangi password"
-                 autocomplete="new-password"
-                 minlength="6"
-                 required>
+                class="form-control" placeholder="Ulangi password"
+                minlength="6" maxlength="64"
+                required>
           <span class="auth-eye" id="togglePwd2"><i class="bi bi-eye-slash" id="eyeIcon2"></i></span>
           <div class="auth-error-text" id="err-password_confirmation"></div>
         </div>
