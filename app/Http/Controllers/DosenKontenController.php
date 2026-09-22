@@ -257,7 +257,6 @@ class DosenKontenController extends Controller
             'jenis_sertifikat' => ['required', Rule::in(Hki::JENIS)],
             'pencipta'         => ['required', 'string', 'max:255', new SafeName()],
             'file_sertifikat'  => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
-            'status'           => ['required', Rule::in(Hki::statuses())],
         ]);
     }
 
