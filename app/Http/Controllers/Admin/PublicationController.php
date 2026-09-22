@@ -164,7 +164,7 @@ class PublicationController extends Controller
                 Rule::requiredIf(fn () => $request->input('submission_type') === 'non_member'),
                 'nullable', 'string', 'max:255', new SafeName(),
             ],
-            'judul'           => ['required', 'string', 'min:5', 'max:255', new SafeText()],
+            'judul'           => ['required', 'string', 'min:5', 'max:200', new SafeText()],
             'penulis'         => ['required', 'string', 'max:255', new SafeName()],
             'tahun'           => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
             'abstrak'         => ['required', 'string', new SafeText()],
