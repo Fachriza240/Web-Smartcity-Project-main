@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Rules\SafeName;
+use App\Rules\SafeText;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RegisterRequest extends FormRequest
@@ -11,7 +12,7 @@ class RegisterRequest extends FormRequest
     {
         return true;
     }
-    
+
     public function rules(): array
     {
         $role = $this->input('role', 'dosen');
@@ -19,15 +20,15 @@ class RegisterRequest extends FormRequest
         $rules = [
             'fullname' => ['required', 'string', 'min:3', 'max:255', new SafeName()],
             'email'    => 'required|email:rfc|max:255',
-            'password' => 'required|string|min:6|max:72|confirmed',
+            'password' => 'required|string|min:6|max:64|confirmed',
             'role'     => 'required|in:dosen,content_creator',
             'foto'     => 'nullable|image|max:2048',
         ];
 
         if ($role === 'dosen') {
             $rules['nip']      = 'required|numeric|digits_between:5,20';
-            $rules['prodi']    = 'nullable|string|max:255';
-            $rules['fakultas'] = 'nullable|string|max:255';
+            $rules['prodi']    = ['nullable', 'string', 'max:255', new SafeText()];
+            $rules['fakultas'] = ['nullable', 'string', 'max:255', new SafeText()];
         } else {
             $rules['nip'] = 'nullable|numeric|digits_between:5,20';
         }
@@ -46,7 +47,7 @@ class RegisterRequest extends FormRequest
             'email.max'          => 'Email maksimal 255 karakter.',
             'password.required'  => 'Password wajib diisi.',
             'password.min'       => 'Password minimal 6 karakter.',
-            'password.max'       => 'Password maksimal 72 karakter.',
+            'password.max'       => 'Password maksimal 64 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
             'role.required'      => 'Silakan pilih role akun.',
             'role.in'            => 'Role yang dipilih tidak valid.',
