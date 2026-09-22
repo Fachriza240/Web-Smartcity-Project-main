@@ -229,7 +229,7 @@ class DosenKontenController extends Controller
     private function validatePublication(Request $request, ?Publication $pub = null): array
     {
         return $request->validate([
-            'judul'     => ['required', 'string', 'min:5', 'max:255', new SafeText()],
+            'judul'     => ['required', 'string', 'min:5', 'max:200', new SafeText()],
             'penulis'   => ['required', 'string', 'max:255', new SafeName()],
             'tahun'     => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
             'abstrak'   => ['required', 'string', new SafeText()],
@@ -253,7 +253,7 @@ class DosenKontenController extends Controller
                 Rule::unique('hkis', 'nomor_sertifikat')->ignore($hki?->id),
             ],
             'tgl_terbit'       => ['required', 'date', 'before_or_equal:today'],
-            'judul_sertifikat' => ['required', 'string', 'min:5', 'max:255', new SafeText()],
+            'judul_sertifikat' => ['required', 'string', 'min:5', 'max:200', new SafeText()],
             'jenis_sertifikat' => ['required', Rule::in(Hki::JENIS)],
             'pencipta'         => ['required', 'string', 'max:255', new SafeName()],
             'file_sertifikat'  => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
