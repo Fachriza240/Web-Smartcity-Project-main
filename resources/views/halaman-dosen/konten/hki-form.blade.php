@@ -101,8 +101,8 @@
                 <div>
                     <label class="form-label">File Sertifikat</label>
                     <input type="file" name="file_sertifikat"
-                           class="form-control @error('file_sertifikat') is-invalid @enderror"
-                           accept=".pdf,.jpg,.jpeg,.png">
+                        class="form-control @error('file_sertifikat') is-invalid @enderror"
+                        accept=".pdf,.jpg,.jpeg,.png">
                     <div class="form-text">PDF / Gambar, maks 10MB</div>
                     @if($hki->exists && $hki->file_sertifikat)
                         <div class="small mt-1">
@@ -117,15 +117,20 @@
                 </div>
                 <div>
                     <label class="form-label">Status</label>
-                    <select name="status" class="form-select">
-                        @foreach($statuses as $s)
-                            <option value="{{ $s }}"
-                                    @selected(old('status', $hki->status) === $s)>
-                                {{ $s }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <div class="form-text">Status Publish perlu disetujui admin.</div>
+                    <div>
+                        @php $currentStatus = $hki->status ?? \App\Models\Hki::STATUS_DRAFT; @endphp
+                        <span style="display:inline-block;font-size:13px;font-weight:700;padding:7px 14px;
+                                    border-radius:20px;
+                                    {{ $currentStatus === 'Publish'
+                                        ? 'background:#dcfce7;color:#16a34a;'
+                                        : 'background:#f1f5f9;color:#64748b;' }}">
+                            {{ $currentStatus }}
+                        </span>
+                    </div>
+                    <div class="form-text">
+                        Status tidak bisa diubah manual. HKI baru/hasil edit otomatis
+                        berstatus <strong>Draft</strong> dan menunggu review admin.
+                    </div>
                 </div>
             </div>
 
