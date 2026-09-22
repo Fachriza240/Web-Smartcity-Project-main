@@ -25,9 +25,29 @@ class SafeName implements ValidationRule
             $fail('Kolom :attribute hanya boleh berisi huruf, spasi, titik, apostrof, tanda hubung, dan koma (tidak boleh angka, simbol, emoji, atau tag HTML).');
             return;
         }
-        
+
         if (strip_tags($trimmed) !== $trimmed) {
             $fail('Kolom :attribute tidak boleh mengandung tag HTML atau script.');
+            return;
+        }
+
+        if (str_contains($trimmed, '--')) {
+            $fail('Kolom :attribute mengandung pola karakter yang tidak diizinkan.');
+            return;
+        }
+
+        if (preg_match('/^[\'\-,]|[\'\-,]$/u', $trimmed)) {
+            $fail('Kolom :attribute tidak boleh diawali atau diakhiri oleh apostrof, tanda hubung, atau koma.');
+            return;
+        }
+
+        if (substr_count($trimmed, "'") > 1) {
+            $fail('Kolom :attribute hanya boleh mengandung satu apostrof.');
+            return;
+        }
+
+        if (preg_match('/[\'\-,]{2,}/u', $trimmed)) {
+            $fail('Kolom :attribute tidak boleh memiliki tanda baca yang berurutan.');
         }
     }
 }
