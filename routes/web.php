@@ -80,6 +80,10 @@ Route::put('/profil-dosen', [App\Http\Controllers\ProfileController::class, 'upd
     ->name('profil.dosen.update');
 
 Route::put('/profil/password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])
+    ->middleware('auth')
+    ->name('profil.password.update');
+
+Route::put('/profil/password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])
     ->name('profil.password.update');
 
 Route::middleware(\App\Http\Middleware\EnsureUserApproved::class)->group(function () {
