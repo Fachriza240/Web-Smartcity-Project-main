@@ -714,3 +714,25 @@
         }
     });
 </script>
+
+{{-- Auto-close navbar mobile saat salah satu nav-link diklik (mandiri, tidak bergantung layout pembungkus) --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var navbarCollapseEl = document.getElementById('navbarNav');
+        if (!navbarCollapseEl) return;
+
+        var navLinks = navbarCollapseEl.querySelectorAll('.nav-link:not(.dropdown-toggle)');
+        navLinks.forEach(function (link) {
+            link.addEventListener('click', function () {
+                if (!navbarCollapseEl.classList.contains('show')) return;
+
+                if (window.bootstrap && window.bootstrap.Collapse) {
+                    var instance = window.bootstrap.Collapse.getOrCreateInstance(navbarCollapseEl, { toggle: false });
+                    instance.hide();
+                } else {
+                    navbarCollapseEl.classList.remove('show');
+                }
+            });
+        });
+    });
+</script>
