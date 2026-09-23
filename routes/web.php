@@ -30,6 +30,9 @@ Route::get('/about-user', [AboutController::class, 'userIndex'])->name('about.us
 Route::get('/mitra-user', [AboutController::class, 'partnersIndex'])->name('partners.user');
 
 Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
+Route::post('/contact', [ContactController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('contact.store');
 
 Route::get('/program-user', [ProgramController::class, 'index'])->name('programs.frontend.index');
 
