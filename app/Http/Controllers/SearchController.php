@@ -16,6 +16,12 @@ class SearchController extends Controller
     {
         $keyword = trim((string) $request->get('q'));
 
+        $escaped = $keyword === '' ? '' : str_replace(
+            ['\\', '%', '_'],
+            ['\\\\', '\\%', '\\_'],
+            $keyword
+        );
+
         $news = collect();
         $publications = collect();
         $programs = collect();
@@ -25,61 +31,61 @@ class SearchController extends Controller
 
         if ($keyword !== '') {
             $news = News::published()
-                ->where(function ($q) use ($keyword) {
-                    $q->where('judul', 'like', "%{$keyword}%")
-                      ->orWhere('konten', 'like', "%{$keyword}%")
-                      ->orWhere('kategori', 'like', "%{$keyword}%");
+                ->where(function ($q) use ($escaped) {
+                    $q->where('judul', 'like', "%{$escaped}%")
+                      ->orWhere('konten', 'like', "%{$escaped}%")
+                      ->orWhere('kategori', 'like', "%{$escaped}%");
                 })
                 ->orderByDesc('published_at')
                 ->limit(12)
                 ->get();
 
             $publications = Publication::where('status', Publication::STATUS_PUBLISH)
-                ->where(function ($q) use ($keyword) {
-                    $q->where('judul', 'like', "%{$keyword}%")
-                      ->orWhere('penulis', 'like', "%{$keyword}%")
-                      ->orWhere('abstrak', 'like', "%{$keyword}%")
-                      ->orWhere('penerbit', 'like', "%{$keyword}%")
-                      ->orWhere('doi', 'like', "%{$keyword}%");
+                ->where(function ($q) use ($escaped) {
+                    $q->where('judul', 'like', "%{$escaped}%")
+                      ->orWhere('penulis', 'like', "%{$escaped}%")
+                      ->orWhere('abstrak', 'like', "%{$escaped}%")
+                      ->orWhere('penerbit', 'like', "%{$escaped}%")
+                      ->orWhere('doi', 'like', "%{$escaped}%");
                 })
                 ->orderByDesc('tahun')
                 ->limit(12)
                 ->get();
 
             $programs = Program::published()
-                ->where(function ($q) use ($keyword) {
-                    $q->where('judul', 'like', "%{$keyword}%")
-                      ->orWhere('deskripsi', 'like', "%{$keyword}%");
+                ->where(function ($q) use ($escaped) {
+                    $q->where('judul', 'like', "%{$escaped}%")
+                      ->orWhere('deskripsi', 'like', "%{$escaped}%");
                 })
                 ->orderBy('urutan')
                 ->limit(12)
                 ->get();
 
             $projects = Project::published()
-                ->where(function ($q) use ($keyword) {
-                    $q->where('judul', 'like', "%{$keyword}%")
-                      ->orWhere('deskripsi', 'like', "%{$keyword}%")
-                      ->orWhere('kategori', 'like', "%{$keyword}%")
-                      ->orWhere('partner', 'like', "%{$keyword}%");
+                ->where(function ($q) use ($escaped) {
+                    $q->where('judul', 'like', "%{$escaped}%")
+                      ->orWhere('deskripsi', 'like', "%{$escaped}%")
+                      ->orWhere('kategori', 'like', "%{$escaped}%")
+                      ->orWhere('partner', 'like', "%{$escaped}%");
                 })
                 ->orderByDesc('tahun')
                 ->limit(12)
                 ->get();
 
             $teams = Team::published()
-                ->where(function ($q) use ($keyword) {
-                    $q->where('nama', 'like', "%{$keyword}%")
-                      ->orWhere('jabatan', 'like', "%{$keyword}%")
-                      ->orWhere('bidang', 'like', "%{$keyword}%");
+                ->where(function ($q) use ($escaped) {
+                    $q->where('nama', 'like', "%{$escaped}%")
+                      ->orWhere('jabatan', 'like', "%{$escaped}%")
+                      ->orWhere('bidang', 'like', "%{$escaped}%");
                 })
                 ->orderBy('urutan')
                 ->limit(12)
                 ->get();
 
             $partners = Partner::published()
-                ->where(function ($q) use ($keyword) {
-                    $q->where('nama', 'like', "%{$keyword}%")
-                      ->orWhere('deskripsi', 'like', "%{$keyword}%");
+                ->where(function ($q) use ($escaped) {
+                    $q->where('nama', 'like', "%{$escaped}%")
+                      ->orWhere('deskripsi', 'like', "%{$escaped}%");
                 })
                 ->orderBy('urutan')
                 ->limit(12)
