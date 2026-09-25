@@ -83,7 +83,7 @@ class PublicationController extends Controller
 
         Publication::create($data);
 
-        return redirect()->route('admin.publications.index')->with('success', 'Publication berhasil ditambahkan.');
+        return redirect()->route('admin.publications.index')->with('success', 'Publikasi berhasil ditambahkan.');
     }
 
     public function edit(Publication $publication)
@@ -122,7 +122,7 @@ class PublicationController extends Controller
 
         $publication->update($data);
 
-        return redirect()->route('admin.publications.index')->with('success', 'Publication berhasil diperbarui.');
+        return redirect()->route('admin.publications.index')->with('success', 'Publikasi berhasil diperbarui.');
     }
 
     public function destroy(Publication $publication)
@@ -133,7 +133,7 @@ class PublicationController extends Controller
         $this->deleteFile($publication->thumbnail_path);
         $publication->delete();
 
-        return redirect()->route('admin.publications.index')->with('success', 'Publication berhasil dihapus.');
+        return redirect()->route('admin.publications.index')->with('success', 'Publikasi berhasil dihapus.');
     }
 
     private function validatedData(Request $request, ?Publication $publication = null): array
