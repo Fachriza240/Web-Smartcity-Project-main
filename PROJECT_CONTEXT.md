@@ -1,10 +1,10 @@
-# Konteks Project: Website CoE Smart City — Universitas Telkom
+# Konteks Project: Website CoE Smart City - Universitas Telkom
 
 ## Identitas Project
 
 **Nama:** Website Center of Excellence (CoE) Smart City  
 **Institusi:** Universitas Telkom  
-**Deskripsi:** Platform informasi dan layanan untuk CoE Smart City — unit strategis yang mempercepat riset, inovasi, bisnis, dan layanan masyarakat di bidang ilmu pengetahuan, teknologi, manajemen, dan seni.  
+**Deskripsi:** Platform informasi dan layanan untuk CoE Smart City - unit strategis yang mempercepat riset, inovasi, bisnis, dan layanan masyarakat di bidang ilmu pengetahuan, teknologi, manajemen, dan seni.  
 **Framework:** Laravel (PHP)  
 **Database:** MySQL  
 **Autentikasi:** Laravel built-in session-based auth (tanpa Sanctum/Passport)
@@ -32,7 +32,7 @@
 - **Warna teks paragraf:** `--text-gray: #7b7b7b`
 - **Background:** `--bg-white: #ffffff`
 - **Lebar sidebar admin:** `--sidebar-width: 280px`
-- Seluruh teks web menggunakan **Bahasa Indonesia** — tidak ada teks Bahasa Inggris pada antarmuka pengguna
+- Seluruh teks web menggunakan **Bahasa Indonesia** - tidak ada teks Bahasa Inggris pada antarmuka pengguna
 - Desain halaman baru harus konsisten dengan gaya halaman Beranda yang sudah ada
 
 ---
@@ -50,7 +50,9 @@ app/
 │   │   ├── ProjectController.php       ← halaman publik proyek
 │   │   ├── PublicationController.php   ← halaman publik publikasi
 │   │   ├── TeamController.php          ← halaman publik tim
-│   │   ├── ProfileController.php       ← (dikomentari, belum aktif)
+│   │   ├── ProfileController.php       ← profil dosen (lihat & edit)
+│   │   ├── BiografiController.php      ← halaman biografi dosen publik
+│   │   ├── SearchController.php        ← pencarian konten dari navbar
 │   │   └── Admin/
 │   │       ├── ValidationController.php   ← approve/reject dosen
 │   │       ├── NewsController.php
@@ -190,14 +192,14 @@ Masing-masing memiliki kolom dasar: `id`, konten relevan (judul/nama, deskripsi,
   5. Jika dosen login saat masih `pending` atau `rejected`, langsung diblokir di `AuthController@login` dan dikembalikan ke halaman login dengan pesan error
 - **Login:** `/login`
 - **Dashboard:** `/beranda-dosen`
-- **Hak akses:** Melihat semua halaman konten versi dosen, mengisi/mengelola profil pribadi (ProfileController sedang dikomentari, belum aktif)
-- **Middleware:** `EnsureUserApproved` — memastikan role adalah `dosen` dan status adalah `approved`; jika tidak, redirect ke `/dosen/status`
+- **Hak akses:** Melihat semua halaman konten versi dosen, mengisi/mengelola profil pribadi lewat `/profil-dosen`
+- **Middleware:** `EnsureUserApproved` - memastikan role adalah `dosen` dan status adalah `approved`; jika tidak, redirect ke `/dosen/status`
 
 ### 3. Content Creator
 - **Dibuat oleh:** Developer secara manual (seeder/tinker/database langsung). Saat ini tidak ada form registrasi publik untuk role ini
 - **Login:** `/login`
 - **Dashboard:** `/beranda-creator`
-- **Hak akses:** CRUD konten (Publikasi, Proyek, Berita, Program, Tim, Mitra) — sama seperti admin untuk manajemen konten, tetapi tidak bisa approve/reject user dan tidak bisa akses Settings
+- **Hak akses:** CRUD konten (Publikasi, Proyek, Berita, Program, Tim, Mitra) - sama seperti admin untuk manajemen konten, tetapi tidak bisa approve/reject user dan tidak bisa akses Settings
 - **Catatan:** Diperuntukkan untuk anak magang yang bertugas mengisi konten website
 
 ---
@@ -315,17 +317,17 @@ File berisi HTML/CSS aktual dari section tersebut.
 
 ---
 
-## CSS — Cara Penulisan yang Dipakai Project Ini
+## CSS - Cara Penulisan yang Dipakai Project Ini
 
 Project ini menggunakan tiga lapisan CSS secara bersamaan:
 
-1. **External CSS (`public/css/main.css`)** — style global yang berlaku di semua halaman publik dan dosen. Berisi variabel warna, font, navbar, about-section, cards, gallery, footer, scroll-top, dll. Ini yang paling utama untuk style reusable.
+1. **External CSS (`public/css/main.css`)** - style global yang berlaku di semua halaman publik dan dosen. Berisi variabel warna, font, navbar, about-section, cards, gallery, footer, scroll-top, dll. Ini yang paling utama untuk style reusable.
 
-2. **Bootstrap 5** — juga External CSS (dari CDN). Dipakai lewat class langsung di HTML: `container`, `row`, `col-lg-6`, `d-flex`, `btn`, dll. Tidak perlu tulis CSS manual untuk layout dan utilitas umum.
+2. **Bootstrap 5** - juga External CSS (dari CDN). Dipakai lewat class langsung di HTML: `container`, `row`, `col-lg-6`, `d-flex`, `btn`, dll. Tidak perlu tulis CSS manual untuk layout dan utilitas umum.
 
-3. **Internal CSS (`<style>` tag di dalam file blade)** — dipakai untuk style khusus section baru yang belum ada di `main.css`. Jika makin berkembang, pindahkan ke `main.css`.
+3. **Internal CSS (`<style>` tag di dalam file blade)** - dipakai untuk style khusus section baru yang belum ada di `main.css`. Jika makin berkembang, pindahkan ke `main.css`.
 
-Inline CSS (`style="..."` langsung di tag HTML) dihindari — hanya untuk kondisi darurat seperti fallback foto (`onerror`).
+Inline CSS (`style="..."` langsung di tag HTML) dihindari - hanya untuk kondisi darurat seperti fallback foto (`onerror`).
 
 ---
 
@@ -347,8 +349,14 @@ Inline CSS (`style="..."` langsung di tag HTML) dihindari — hanya untuk kondis
 
 3. **Registrasi publik** hanya untuk role `dosen`. Role `admin` dan `content_creator` dibuat manual oleh developer.
 
-4. **Pengecekan role** dilakukan secara inline di masing-masing route (closure) atau di controller menggunakan `Auth::user()->role`. Belum ada RoleMiddleware terpusat.
+4. **Pengecekan role** memakai middleware `role:admin`, `role:content_creator`, atau gabungan `role:admin,content_creator` (file `app/Http/Middleware/EnsureRole.php`). Halaman dosen memakai middleware `approved`. Controller admin tetap punya pengecekan tambahan di dalamnya.
 
 5. **Tabel `publications`** menggunakan kolom `penulis` sebagai teks bebas (bukan foreign key ke dosen). Ini kondisi sementara yang disengaja.
 
-6. **ProfileController** saat ini dikomentari — fitur edit profil dosen belum aktif.
+6. **Data kontak** (alamat, email, WhatsApp, Instagram, TikTok, YouTube, Google Maps) disimpan di `config/smartcity.php`. Ubah di sana saja, navbar, footer, dan halaman Kontak ikut berubah. Link YouTube masih kosong, jadi ikonnya otomatis tidak ditampilkan.
+
+7. **Validasi input** memakai rule `App\Rules\PersonName` (untuk nama orang) dan `App\Rules\SafeText` (untuk judul/teks, menolak emoji, tag HTML, dan pola SQL injection). Di sisi browser, validasi yang sama ada di `public/js/validation.js` dan dipasang lewat atribut `data-validate` pada form serta `data-rules` pada input.
+
+8. **Konfirmasi aksi** (hapus data dan keluar akun) memakai atribut `data-confirm="Pesan"` pada tag form. Jangan pakai `onsubmit` atau `onclick` inline.
+
+9. **Komponen dosen dan user sudah digabung.** Halaman versi dosen memakai komponen `components/halaman-user/*` yang sama, navbar otomatis menyesuaikan role yang sedang login (`components/layout/navbar.blade.php`).
