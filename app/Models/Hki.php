@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\MatchesPersonList;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Hki extends Model
 {
+    use MatchesPersonList;
+
+    protected string $personListColumn = 'pencipta';
     public const STATUS_DRAFT   = 'Draft';
     public const STATUS_PUBLISH = 'Publish';
 

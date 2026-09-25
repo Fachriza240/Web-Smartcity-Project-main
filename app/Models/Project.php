@@ -19,7 +19,6 @@ class Project extends Model
         'tahun',
         'gallery_paths',
         'dokumen_path',
-        'dokumen_disk',
         'status',
     ];
 

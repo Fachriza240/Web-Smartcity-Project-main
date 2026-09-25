@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\MatchesPersonList;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Publication extends Model
 {
+    use MatchesPersonList;
+
+    protected string $personListColumn = 'penulis';
     public const CATEGORY_JOURNAL = 'Jurnal';
     public const CATEGORY_CONFERENCE = 'Conference';
     public const CATEGORY_BOOK = 'Buku';
