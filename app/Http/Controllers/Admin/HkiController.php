@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Concerns\AuthorizesRoles;
 use App\Http\Controllers\Controller;
 use App\Models\Hki;
 use App\Models\User;
 use App\Notifications\HkiAddedNotification;
-use App\Rules\SafeName;
+use App\Rules\PersonName;
 use App\Rules\SafeText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,8 +15,6 @@ use Illuminate\Validation\Rule;
 
 class HkiController extends Controller
 {
-    use AuthorizesRoles;
-
     public function index(Request $request)
     {
         $this->authorizeAdmin();
@@ -105,9 +102,8 @@ class HkiController extends Controller
         $data = $this->validatedData($request, $hki);
 
         if ($request->hasFile('file_sertifikat')) {
-            $newPath = $request->file('file_sertifikat')->store('hki/sertifikat', 'public');
             $this->deleteFile($hki->file_sertifikat);
-            $data['file_sertifikat'] = $newPath;
+            $data['file_sertifikat'] = $request->file('file_sertifikat')->store('hki/sertifikat', 'public');
         }
         unset($data['file_sertifikat_upload']);
 
@@ -130,20 +126,14 @@ class HkiController extends Controller
     private function validatedData(Request $request, ?Hki $hki = null): array
     {
         $data = $request->validate([
-            'nomor_sertifikat'  => ['required', 'string', 'max:255', Rule::unique('hkis', 'nomor_sertifikat')->ignore($hki?->id)],
-            'tgl_terbit'        => ['required', 'date', 'before_or_equal:today'],
-            'judul_sertifikat'  => ['required', 'string', 'min:5', 'max:200', new SafeText()],
+            'nomor_sertifikat'  => ['required', 'string', 'min:3', 'max:100', 'regex:/^[A-Za-z0-9.\/\-\s]+$/', Rule::unique('hkis', 'nomor_sertifikat')->ignore($hki?->id)],
+            'tgl_terbit'        => ['required', 'date'],
+            'judul_sertifikat'  => ['required', 'string', 'min:5', 'max:200', new SafeText],
             'jenis_sertifikat'  => ['required', Rule::in(Hki::JENIS)],
-            'pencipta'          => ['required', 'string', 'max:255', new SafeName()],
+            'pencipta'          => ['required', 'string', 'min:3', 'max:255', new PersonName],
             'submission_type'   => ['required', 'in:member,non_member'],
-            'user_id'           => [
-                Rule::requiredIf(fn () => $request->input('submission_type') === 'member'),
-                'nullable', 'exists:users,id',
-            ],
-            'recommended_by'    => [
-                Rule::requiredIf(fn () => $request->input('submission_type') === 'non_member'),
-                'nullable', 'string', 'max:255', new SafeName(),
-            ],
+            'user_id'           => ['nullable', 'exists:users,id'],
+            'recommended_by'    => ['nullable', 'string', 'min:3', 'max:100', new PersonName],
             'file_sertifikat'   => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
             'status'            => ['required', Rule::in(Hki::statuses())],
         ]);
@@ -157,6 +147,12 @@ class HkiController extends Controller
         return $data;
     }
 
+    private function authorizeAdmin(): void
+    {
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+    }
 
     private function deleteFile(?string $path): void
     {

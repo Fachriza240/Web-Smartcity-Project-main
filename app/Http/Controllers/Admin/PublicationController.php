@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Concerns\AuthorizesRoles;
 use App\Http\Controllers\Controller;
 use App\Models\Publication;
 use App\Models\User;
-use App\Rules\SafeName;
+use App\Rules\PersonName;
 use App\Rules\SafeText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,11 +14,9 @@ use Illuminate\Validation\Rule;
 
 class PublicationController extends Controller
 {
-    use AuthorizesRoles;
-
     public function index(Request $request)
     {
-        $this->authorizeAdmin();
+        $this->authorizeContentManager();
 
         $publications = Publication::query()
             ->with('recommender')
@@ -52,7 +49,7 @@ class PublicationController extends Controller
 
     public function create()
     {
-        $this->authorizeAdmin();
+        $this->authorizeContentManager();
 
         $dosens = User::where('role', 'dosen')
             ->where('registration_status', 'approved')
@@ -68,7 +65,7 @@ class PublicationController extends Controller
 
     public function store(Request $request)
     {
-        $this->authorizeAdmin();
+        $this->authorizeContentManager();
 
         $data = $this->validatedData($request);
 
@@ -76,7 +73,7 @@ class PublicationController extends Controller
             return back()->withErrors(['pdf' => 'File PDF wajib diupload.'])->withInput();
         }
 
-        $data['pdf_path'] = $request->file('pdf')->store('publications/pdf', 'local');
+        $data['pdf_path'] = $request->file('pdf')->store('publications/pdf', 'public');
         unset($data['pdf']);
 
         if ($request->hasFile('thumbnail')) {
@@ -91,7 +88,7 @@ class PublicationController extends Controller
 
     public function edit(Publication $publication)
     {
-        $this->authorizeAdmin();
+        $this->authorizeContentManager();
 
         $dosens = User::where('role', 'dosen')
             ->where('registration_status', 'approved')
@@ -107,21 +104,19 @@ class PublicationController extends Controller
 
     public function update(Request $request, Publication $publication)
     {
-        $this->authorizeAdmin();
+        $this->authorizeContentManager();
 
         $data = $this->validatedData($request, $publication);
 
         if ($request->hasFile('pdf')) {
-            $newPdfPath = $request->file('pdf')->store('publications/pdf', 'local');
-            $this->deleteFile($publication->pdf_path, 'local');
-            $data['pdf_path'] = $newPdfPath;
+            $this->deleteFile($publication->pdf_path);
+            $data['pdf_path'] = $request->file('pdf')->store('publications/pdf', 'public');
         }
         unset($data['pdf']);
 
         if ($request->hasFile('thumbnail')) {
-            $newThumbPath = $request->file('thumbnail')->store('publications/thumbnails', 'public');
             $this->deleteFile($publication->thumbnail_path);
-            $data['thumbnail_path'] = $newThumbPath;
+            $data['thumbnail_path'] = $request->file('thumbnail')->store('publications/thumbnails', 'public');
         }
         unset($data['thumbnail']);
 
@@ -130,22 +125,11 @@ class PublicationController extends Controller
         return redirect()->route('admin.publications.index')->with('success', 'Publication berhasil diperbarui.');
     }
 
-    public function file(Publication $publication)
-    {
-        $this->authorizeAdmin();
-
-        abort_unless($publication->pdf_path && Storage::disk('local')->exists($publication->pdf_path), 404);
-
-        $filename = str($publication->judul)->slug()->append('.pdf')->toString();
-
-        return Storage::disk('local')->download($publication->pdf_path, $filename);
-    }
-
     public function destroy(Publication $publication)
     {
-        $this->authorizeAdmin();
+        $this->authorizeContentManager();
 
-        $this->deleteFile($publication->pdf_path, 'local');
+        $this->deleteFile($publication->pdf_path);
         $this->deleteFile($publication->thumbnail_path);
         $publication->delete();
 
@@ -156,25 +140,15 @@ class PublicationController extends Controller
     {
         $data = $request->validate([
             'submission_type' => ['required', 'in:member,non_member'],
-            'user_id'         => [
-                Rule::requiredIf(fn () => $request->input('submission_type') === 'member'),
-                'nullable', 'exists:users,id',
-            ],
-            'recommended_by'  => [
-                Rule::requiredIf(fn () => $request->input('submission_type') === 'non_member'),
-                'nullable', 'string', 'max:255', new SafeName(),
-            ],
-            'judul'           => ['required', 'string', 'min:5', 'max:200', new SafeText()],
-            'penulis'         => ['required', 'string', 'max:255', new SafeName()],
+            'user_id'         => ['nullable', 'exists:users,id'],
+            'recommended_by'  => ['nullable', 'string', 'min:3', 'max:100', new PersonName],
+            'judul'           => ['required', 'string', 'min:5', 'max:200', new SafeText],
+            'penulis'         => ['required', 'string', 'min:3', 'max:255', new PersonName],
             'tahun'           => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
-            'abstrak'         => ['required', 'string', new SafeText()],
+            'abstrak'         => ['required', 'string', 'min:10', 'max:10000', new SafeText],
             'kategori'        => ['required', Rule::in(Publication::categories())],
-            'penerbit'        => ['nullable', 'string', 'max:255', new SafeText()],
-            'doi'             => [
-                'nullable', 'string', 'max:255',
-                'regex:/^10\.\d{4,9}\/\S+$/i',
-                Rule::unique('publications', 'doi')->ignore($publication?->id),
-            ],
+            'penerbit'        => ['nullable', 'string', 'min:2', 'max:200', new SafeText],
+            'doi'             => ['nullable', 'string', 'max:255', 'regex:/^[A-Za-z0-9.\/:_()\-]+$/'],
             'pdf'             => [$publication ? 'nullable' : 'required', 'file', 'mimes:pdf', 'max:20480'],
             'thumbnail'       => ['nullable', 'image', 'max:4096'],
             'status'          => ['required', Rule::in(Publication::statuses())],
@@ -189,11 +163,17 @@ class PublicationController extends Controller
         return $data;
     }
 
-
-    private function deleteFile(?string $path, string $disk = 'public'): void
+    private function authorizeContentManager(): void
     {
-        if ($path && Storage::disk($disk)->exists($path)) {
-            Storage::disk($disk)->delete($path);
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+    }
+
+    private function deleteFile(?string $path): void
+    {
+        if ($path && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
         }
     }
 }

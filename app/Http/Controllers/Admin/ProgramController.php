@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Concerns\AuthorizesRoles;
 use App\Http\Controllers\Controller;
 use App\Models\Program;
 use App\Rules\SafeText;
@@ -13,8 +12,6 @@ use Illuminate\Validation\Rule;
 
 class ProgramController extends Controller
 {
-    use AuthorizesRoles;
-
     public function index(Request $request)
     {
         $this->authorizeContentManager();
@@ -94,10 +91,10 @@ class ProgramController extends Controller
     private function validatedData(Request $request, ?Program $program = null): array
     {
         return $request->validate([
-            'judul'     => ['required', 'string', 'min:5', 'max:255', new SafeText()],
-            'deskripsi' => ['required', 'string', new SafeText()],
+            'judul'     => ['required', 'string', 'min:3', 'max:100', new SafeText],
+            'deskripsi' => ['required', 'string', 'min:10', 'max:5000', new SafeText(false)],
             'thumbnail' => [$program ? 'nullable' : 'required', 'image', 'max:4096'],
-            'urutan'    => ['nullable', 'integer', 'min:1'],
+            'urutan'    => ['nullable', 'integer', 'min:0', 'max:9999'],
             'status'    => ['required', Rule::in(Program::statuses())],
         ]);
     }
@@ -107,14 +104,19 @@ class ProgramController extends Controller
         unset($data['thumbnail']);
 
         if ($request->hasFile('thumbnail')) {
-            $newPath = $request->file('thumbnail')->store('programs/thumbnails', 'public');
             $this->deleteFile($program?->thumbnail_path);
-            $data['thumbnail_path'] = $newPath;
+            $data['thumbnail_path'] = $request->file('thumbnail')->store('programs/thumbnails', 'public');
         }
 
         return $data;
     }
 
+    private function authorizeContentManager(): void
+    {
+        if (!Auth::check() || !in_array(Auth::user()->role, ['admin', 'content_creator'], true)) {
+            abort(403);
+        }
+    }
 
     private function deleteFile(?string $path): void
     {

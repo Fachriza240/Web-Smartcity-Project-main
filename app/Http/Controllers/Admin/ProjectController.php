@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Concerns\AuthorizesRoles;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
-use App\Rules\MaxTotalUploadSize;
 use App\Rules\SafeText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,13 +12,6 @@ use Illuminate\Validation\Rule;
 
 class ProjectController extends Controller
 {
-    use AuthorizesRoles;
-
-    // Maksimal jumlah file gallery per proyek.
-    private const MAX_GALLERY_ITEMS = 10;
-    // Maksimal total ukuran gabungan seluruh file gallery (dalam KB).
-    private const MAX_GALLERY_TOTAL_KB = 40 * 1024; // 40 MB
-
     public function index(Request $request)
     {
         $this->authorizeContentManager();
@@ -96,7 +87,7 @@ class ProjectController extends Controller
         $this->authorizeContentManager();
 
         $this->deleteFile($project->thumbnail_path);
-        $this->deleteFile($project->dokumen_path, $project->dokumen_disk ?? 'public');
+        $this->deleteFile($project->dokumen_path);
         foreach ($project->gallery_paths ?? [] as $path) {
             $this->deleteFile($path);
         }
@@ -109,18 +100,16 @@ class ProjectController extends Controller
     private function validatedData(Request $request, ?Project $project = null): array
     {
         return $request->validate([
-            'judul' => ['required', 'string', 'min:5', 'max:255', new SafeText()],
+            'judul' => ['required', 'string', 'min:5', 'max:200', new SafeText],
             'thumbnail' => [$project ? 'nullable' : 'required', 'image', 'max:4096'],
-            'deskripsi' => ['required', 'string', new SafeText()],
-            'kategori' => ['nullable', 'string', 'max:255', new SafeText()],
-            'partner' => ['nullable', 'string', 'max:255', new SafeText()],
+            'deskripsi' => ['required', 'string', 'min:10', 'max:10000', new SafeText(false)],
+            'kategori' => ['nullable', 'string', 'min:2', 'max:100', new SafeText],
+            'partner' => ['nullable', 'string', 'min:2', 'max:200', new SafeText],
             'tahun' => ['nullable', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
-            'gallery' => ['nullable', 'array', 'max:' . self::MAX_GALLERY_ITEMS, new MaxTotalUploadSize(self::MAX_GALLERY_TOTAL_KB)],
+            'gallery' => ['nullable', 'array'],
             'gallery.*' => ['image', 'max:4096'],
             'dokumen' => ['nullable', 'file', 'mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,zip,rar', 'max:20480'],
             'status' => ['required', Rule::in(Project::statuses())],
-        ], [
-            'gallery.max' => 'Maksimal ' . self::MAX_GALLERY_ITEMS . ' file gallery per proyek.',
         ]);
     }
 
@@ -129,39 +118,40 @@ class ProjectController extends Controller
         unset($data['thumbnail'], $data['gallery'], $data['dokumen']);
 
         if ($request->hasFile('thumbnail')) {
-            $newThumbPath = $request->file('thumbnail')->store('projects/thumbnails', 'public');
             $this->deleteFile($project?->thumbnail_path);
-            $data['thumbnail_path'] = $newThumbPath;
+            $data['thumbnail_path'] = $request->file('thumbnail')->store('projects/thumbnails', 'public');
         }
 
         if ($request->hasFile('dokumen')) {
-            $newDokumenPath = $request->file('dokumen')->store('projects/documents', 'local');
-            $this->deleteFile($project?->dokumen_path, $project?->dokumen_disk ?? 'public');
-            $data['dokumen_path'] = $newDokumenPath;
-            $data['dokumen_disk'] = 'local';
+            $this->deleteFile($project?->dokumen_path);
+            $data['dokumen_path'] = $request->file('dokumen')->store('projects/documents', 'public');
         }
 
         if ($request->hasFile('gallery')) {
-            $newGalleryPaths = collect($request->file('gallery'))
-                ->map(fn ($file) => $file->store('projects/gallery', 'public'))
-                ->values()
-                ->all();
-
             foreach ($project?->gallery_paths ?? [] as $path) {
                 $this->deleteFile($path);
             }
 
-            $data['gallery_paths'] = $newGalleryPaths;
+            $data['gallery_paths'] = collect($request->file('gallery'))
+                ->map(fn ($file) => $file->store('projects/gallery', 'public'))
+                ->values()
+                ->all();
         }
 
         return $data;
     }
 
-
-    private function deleteFile(?string $path, string $disk = 'public'): void
+    private function authorizeContentManager(): void
     {
-        if ($path && Storage::disk($disk)->exists($path)) {
-            Storage::disk($disk)->delete($path);
+        if (!Auth::check() || !in_array(Auth::user()->role, ['admin', 'content_creator'], true)) {
+            abort(403);
+        }
+    }
+
+    private function deleteFile(?string $path): void
+    {
+        if ($path && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
         }
     }
 }

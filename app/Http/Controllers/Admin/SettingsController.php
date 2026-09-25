@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Concerns\AuthorizesRoles;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class SettingsController extends Controller
 {
-    use AuthorizesRoles;
-
     public function index()
     {
-        $this->authorizeContentManager();
+        if (!Auth::check() || !in_array(Auth::user()->role, ['admin', 'content_creator'], true)) {
+            abort(403);
+        }
 
         return view('admin.settings.index');
     }
