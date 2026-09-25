@@ -9,9 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('publications', function (Blueprint $table) {
-            // user_id = dosen yang merekomendasikan (nullable = non-member/manual)
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete()->after('id');
-            // Nama perekomendasi manual (untuk non-member)
+
             $table->string('recommended_by')->nullable()->after('user_id');
             $table->enum('submission_type', ['member', 'non_member'])->default('non_member')->after('recommended_by');
         });

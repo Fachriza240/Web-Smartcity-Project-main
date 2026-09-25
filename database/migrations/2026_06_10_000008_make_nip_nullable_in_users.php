@@ -9,7 +9,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // Jadikan nip nullable agar content_creator bisa daftar tanpa NIP
             $table->string('nip')->nullable()->change();
         });
     }

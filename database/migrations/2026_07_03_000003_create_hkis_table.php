@@ -23,12 +23,12 @@ return new class extends Migration
                 'Rahasia Dagang',
                 'Varietas Tanaman',
             ]);
-            $table->string('pencipta');           // nama pencipta/pemegang
-            // user_id = dosen member (nullable = non-member)
+            $table->string('pencipta');
+
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->string('recommended_by')->nullable(); // manual non-member
+            $table->string('recommended_by')->nullable();
             $table->enum('submission_type', ['member', 'non_member'])->default('non_member');
-            $table->string('file_sertifikat')->nullable();  // upload PDF sertifikat
+            $table->string('file_sertifikat')->nullable();
             $table->enum('status', ['Draft', 'Publish'])->default('Draft');
             $table->timestamps();
         });
