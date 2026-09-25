@@ -12,18 +12,22 @@ class EnsureUserApproved
     {
         $user = $request->user();
 
-        if (!$user) {
-            return redirect('/login');
+        if (! $user) {
+            return redirect()->route('login');
         }
 
-        if ($user->role !== 'dosen') {
-            abort(403);
+        if ($user->role === 'admin') {
+            return $next($request);
         }
 
-        if (($user->registration_status ?? null) !== User::STATUS_APPROVED) {
-            return redirect()->route('dosen.status');
+        if (in_array($user->role, ['dosen', 'content_creator'], true)) {
+            if ($user->registration_status !== User::STATUS_APPROVED) {
+                return redirect()->route('dosen.status');
+            }
+
+            return $next($request);
         }
 
-        return $next($request);
+        abort(403);
     }
 }

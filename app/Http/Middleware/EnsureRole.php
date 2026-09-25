@@ -11,18 +11,11 @@ class EnsureRole
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login');
         }
 
-        if ($user->role !== 'admin' && !$user->isApproved()) {
-            return redirect()->route('dosen.status');
-        }
-
-        if (!in_array($user->role, $roles, true)) {
-            return redirect($user->dashboardUrl())
-                ->with('error', 'Anda tidak memiliki akses ke halaman tersebut.');
-        }
+        abort_unless(in_array($user->role, $roles, true), 403);
 
         return $next($request);
     }
