@@ -1,285 +1,217 @@
-function $id(id) {
-    return document.getElementById(id);
-}
+(function () {
+    'use strict';
 
-function setDisplay(id, value) {
-    const el = $id(id);
-    if (el) {
-        el.style.display = value;
-    }
-}
-
-window.addEventListener("scroll", function () {
-    const navbar = document.querySelector(".navbar");
-    if (!navbar) return; 
-
-    if (window.scrollY > 50) {
-        navbar.classList.add("scrolled");
-    } else {
-        navbar.classList.remove("scrolled");
-    }
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-    const galleryEl = $id("galleryCarousel");
-
-    if (!galleryEl || typeof bootstrap === "undefined") return;
-
-    new bootstrap.Carousel(galleryEl, {
-        interval: 3000, 
-        wrap: true, 
-        pause: "hover", 
-    });
-});
-
-
-document.addEventListener("DOMContentLoaded", function () {
-    const scrollTop = document.querySelector(".scroll-top");
-
-    function toggleScrollTop() {
-        if (!scrollTop) return;
-
-        window.scrollY > 100
-            ? scrollTop.classList.add("active")
-            : scrollTop.classList.remove("active");
+    function onReady(callback) {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', callback);
+        } else {
+            callback();
+        }
     }
 
-    if (scrollTop) {
-        scrollTop.addEventListener("click", (e) => {
-            e.preventDefault();
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth",
+    function initConfirmForms() {
+        document.addEventListener('submit', function (event) {
+            var form = event.target;
+            if (!(form instanceof HTMLFormElement) || !form.hasAttribute('data-confirm')) {
+                return;
+            }
+            if (form.dataset.confirmed === 'true') {
+                return;
+            }
+            if (!window.confirm(form.getAttribute('data-confirm'))) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                return;
+            }
+            form.dataset.confirmed = 'true';
+        }, true);
+    }
+
+    function initNavbar() {
+        var navbar = document.getElementById('scNavbar');
+        if (!navbar) {
+            return;
+        }
+
+        var toggleShadow = function () {
+            navbar.classList.toggle('scrolled', window.scrollY > 10);
+        };
+        toggleShadow();
+        window.addEventListener('scroll', toggleShadow, { passive: true });
+
+        var collapseEl = document.getElementById('navbarNav');
+        var toggler = navbar.querySelector('.navbar-toggler');
+        if (!collapseEl || !toggler || typeof bootstrap === 'undefined') {
+            return;
+        }
+
+        var collapse = bootstrap.Collapse.getOrCreateInstance(collapseEl, { toggle: false });
+        var isMobile = function () {
+            return window.getComputedStyle(toggler).display !== 'none';
+        };
+
+        collapseEl.querySelectorAll('.nav-link').forEach(function (link) {
+            link.addEventListener('click', function () {
+                if (isMobile() && collapseEl.classList.contains('show')) {
+                    collapse.hide();
+                }
+            });
+        });
+
+        document.addEventListener('click', function (event) {
+            if (isMobile() && collapseEl.classList.contains('show') && !navbar.contains(event.target)) {
+                collapse.hide();
+            }
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && collapseEl.classList.contains('show')) {
+                collapse.hide();
+                toggler.focus();
+            }
+        });
+
+        window.addEventListener('resize', function () {
+            if (!isMobile() && collapseEl.classList.contains('show')) {
+                collapse.hide();
+            }
+        });
+    }
+
+    function initScrollTop() {
+        var button = document.getElementById('scroll-top');
+        if (!button) {
+            return;
+        }
+        var toggle = function () {
+            button.classList.toggle('active', window.scrollY > 200);
+        };
+        toggle();
+        window.addEventListener('scroll', toggle, { passive: true });
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
+    function initGallery() {
+        var gallery = document.getElementById('galleryCarousel');
+        if (gallery && typeof bootstrap !== 'undefined') {
+            bootstrap.Carousel.getOrCreateInstance(gallery, { interval: 4000, wrap: true, pause: 'hover' });
+        }
+    }
+
+    function initTabs() {
+        document.querySelectorAll('[data-tab-group]').forEach(function (group) {
+            var name = group.getAttribute('data-tab-group');
+            var buttons = group.querySelectorAll('[data-tab-target]');
+            buttons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    buttons.forEach(function (item) {
+                        var active = item === button;
+                        item.classList.toggle('active', active);
+                        item.setAttribute('aria-selected', active ? 'true' : 'false');
+                        item.tabIndex = active ? 0 : -1;
+                    });
+                    document.querySelectorAll('[data-tab-panel="' + name + '"]').forEach(function (panel) {
+                        panel.hidden = panel.id !== button.getAttribute('data-tab-target');
+                    });
+                    if (typeof AOS !== 'undefined') {
+                        AOS.refresh();
+                    }
+                });
+                button.addEventListener('keydown', function (event) {
+                    if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') {
+                        return;
+                    }
+                    var list = Array.prototype.slice.call(buttons);
+                    var index = list.indexOf(button) + (event.key === 'ArrowRight' ? 1 : -1);
+                    var next = list[(index + list.length) % list.length];
+                    next.focus();
+                    next.click();
+                });
             });
         });
     }
 
-    window.addEventListener("load", toggleScrollTop);
-    document.addEventListener("scroll", toggleScrollTop);
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-    const currentPath = window.location.pathname; 
-    const menuItems = document.querySelectorAll(".navbar-nav .nav-item > a"); 
-
-    if (!menuItems || menuItems.length === 0) return; 
-
-    menuItems.forEach((menuItem) => {
-        menuItem.classList.remove("active");
-        if (menuItem.parentElement) {
-            menuItem.parentElement.classList.remove("active");
-        }
-    });
-
-    menuItems.forEach((menuItem) => {
-        const menuHref = menuItem.getAttribute("href");
-
-        if (!menuHref) return; 
-        if (menuHref.startsWith("#") && window.location.pathname === "/") {
-            menuItem.classList.add("active");
-            menuItem.parentElement?.classList.add("active");
-        }
-        else if (
-            currentPath === menuHref ||
-            (menuHref !== "/" && currentPath.startsWith(menuHref)) ||
-            (menuHref === "/" && currentPath === "/")
-        ) {
-            menuItem.classList.add("active");
-            menuItem.parentElement?.classList.add("active");
-        }
-    });
-
-    menuItems.forEach((menuItem) => {
-        menuItem.addEventListener("click", function (e) {
-            menuItems.forEach((item) => {
-                item.classList.remove("active");
-                item.parentElement?.classList.remove("active");
+    function initDisclosure() {
+        document.querySelectorAll('[data-open]').forEach(function (button) {
+            var target = document.querySelector(button.getAttribute('data-open'));
+            if (!target) {
+                return;
+            }
+            button.addEventListener('click', function () {
+                target.hidden = false;
+                button.hidden = true;
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                var field = target.querySelector('input:not([type="hidden"]):not([type="file"]), textarea, select');
+                if (field) {
+                    window.setTimeout(function () {
+                        field.focus({ preventScroll: true });
+                    }, 350);
+                }
             });
-
-            this.classList.add("active");
-            this.parentElement?.classList.add("active");
-        });
-    });
-});
-
-
-function isProfileOwner() {
-    return true; 
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-    if (isProfileOwner()) {
-        setDisplay("edit-controls", "block");
-    }
-
-    const editBtn   = $id("edit-profile-btn");
-    const saveBtn   = $id("save-profile-btn");
-    const cancelBtn = $id("cancel-edit-btn");
-    const addEduBtn = $id("add-education");
-    const addPubBtn = $id("add-publication");
-
-    if (editBtn) {
-        editBtn.addEventListener("click", function () {
-            this.style.display = "none";
-            setDisplay("save-profile-btn", "inline-block");
-            setDisplay("cancel-edit-btn", "inline-block");
-
-            toggleEditMode(true);
         });
     }
 
-    if (saveBtn) {
-        saveBtn.addEventListener("click", function () {
-            saveProfileChanges();
-
-            this.style.display = "none";
-            setDisplay("cancel-edit-btn", "none");
-            setDisplay("edit-profile-btn", "inline-block");
-
-            toggleEditMode(false);
+    function initImagePreview() {
+        document.querySelectorAll('[data-preview-input]').forEach(function (input) {
+            var box = input.closest('form').querySelector('[data-preview-box]');
+            if (!box) {
+                return;
+            }
+            input.addEventListener('change', function () {
+                var file = input.files && input.files[0];
+                if (!file || !file.type.match(/^image\//)) {
+                    return;
+                }
+                var reader = new FileReader();
+                reader.onload = function (event) {
+                    var img = box.querySelector('img');
+                    if (!img) {
+                        box.innerHTML = '';
+                        img = document.createElement('img');
+                        img.alt = 'Pratinjau foto profil';
+                        box.appendChild(img);
+                    }
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
         });
     }
 
-    if (cancelBtn) {
-        cancelBtn.addEventListener("click", function () {
-            this.style.display = "none";
-            setDisplay("save-profile-btn", "none");
-            setDisplay("edit-profile-btn", "inline-block");
-
-            toggleEditMode(false);
+    function initFlash() {
+        document.querySelectorAll('.flash-stack--floating .alert').forEach(function (alert) {
+            window.setTimeout(function () {
+                if (typeof bootstrap !== 'undefined' && document.body.contains(alert)) {
+                    bootstrap.Alert.getOrCreateInstance(alert).close();
+                }
+            }, 6000);
         });
     }
 
-    if (addEduBtn) {
-        addEduBtn.addEventListener("click", function () {
-            addEducationItem();
-        });
-    }
-
-    if (addPubBtn) {
-        addPubBtn.addEventListener("click", function () {
-            addPublicationItem();
-        });
-    }
-
-    document.addEventListener("click", function (event) {
-        const target = event.target;
-        if (!target) return;
-
-        const removeEduBtn = target.closest?.(".remove-education");
-        if (removeEduBtn) {
-            removeEducationItem(removeEduBtn.closest(".education-edit-item"));
+    function initAos() {
+        if (typeof AOS !== 'undefined') {
+            AOS.init({
+                once: true,
+                duration: 700,
+                offset: 40,
+                disable: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+            });
         }
+    }
 
-        const removePubBtn = target.closest?.(".remove-publication");
-        if (removePubBtn) {
-            removePublicationItem(removePubBtn.closest(".publication-edit-item"));
-        }
+    initConfirmForms();
+
+    onReady(function () {
+        initNavbar();
+        initScrollTop();
+        initGallery();
+        initTabs();
+        initDisclosure();
+        initImagePreview();
+        initFlash();
+        initAos();
     });
-});
-
-function toggleEditMode(isEdit) {
-    setDisplay("display-header-info", isEdit ? "none" : "block");
-    setDisplay("edit-header-info", isEdit ? "block" : "none");
-    setDisplay("edit-photo-btn", isEdit ? "block" : "none");
-
-    setDisplay("display-about", isEdit ? "none" : "block");
-    setDisplay("edit-about", isEdit ? "block" : "none");
-
-    setDisplay("display-education", isEdit ? "none" : "block");
-    setDisplay("edit-education", isEdit ? "block" : "none");
-
-    setDisplay("display-research", isEdit ? "none" : "block");
-    setDisplay("edit-research", isEdit ? "block" : "none");
-
-    setDisplay("display-publications", isEdit ? "none" : "block");
-    setDisplay("edit-publications", isEdit ? "block" : "none");
-}
-
-function saveProfileChanges() {
-    console.log("Menyimpan perubahan profil...");
-
-    alert("Perubahan profil berhasil disimpan!");
-}
-
-function addEducationItem() {
-    const container = $id("education-items");
-    if (!container) return; 
-
-    const newItem = document.createElement("div");
-    newItem.className = "education-edit-item mb-3 border p-3 rounded";
-    newItem.innerHTML = `
-        <div class="form-row">
-            <div class="col-md-6 mb-2">
-                <label>Tahun</label>
-                <input type="text" class="form-control" placeholder="contoh: 2010 - 2014">
-            </div>
-            <div class="col-md-6 mb-2">
-                <label>Universitas</label>
-                <input type="text" class="form-control" placeholder="Nama Universitas">
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="col-md-12 mb-2">
-                <label>Gelar</label>
-                <input type="text" class="form-control" placeholder="contoh: Sarjana Komputer (S.Kom), Ilmu Komputer">
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="col-md-12 mb-2">
-                <label>Catatan (opsional)</label>
-                <input type="text" class="form-control" placeholder="contoh: Lulus dengan predikat Cum Laude">
-            </div>
-        </div>
-        <button class="btn btn-sm btn-danger remove-education"><i class="fas fa-trash"></i> Hapus</button>
-    `;
-    container.appendChild(newItem);
-}
-
-function removeEducationItem(item) {
-    if (!item) return; 
-
-    if (confirm("Apakah Anda yakin ingin menghapus riwayat pendidikan ini?")) {
-        item.remove();
-    }
-}
-
-function addPublicationItem() {
-    const container = $id("publication-items");
-    if (!container) return; 
-
-    const newItem = document.createElement("div");
-    newItem.className = "publication-edit-item mb-3 border p-3 rounded";
-    newItem.innerHTML = `
-        <div class="form-row">
-            <div class="col-md-4 mb-2">
-                <label>Tahun</label>
-                <input type="text" class="form-control" placeholder="contoh: 2023">
-            </div>
-            <div class="col-md-8 mb-2">
-                <label>Judul Publikasi</label>
-                <input type="text" class="form-control" placeholder="Judul publikasi ilmiah">
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="col-md-8 mb-2">
-                <label>Jurnal/Publikasi</label>
-                <input type="text" class="form-control" placeholder="contoh: Journal of Computer Science Research, Vol. 25, Issue 3">
-            </div>
-            <div class="col-md-4 mb-2">
-                <label>URL</label>
-                <input type="url" class="form-control" placeholder="https://...">
-            </div>
-        </div>
-        <button class="btn btn-sm btn-danger remove-publication"><i class="fas fa-trash"></i> Hapus</button>
-    `;
-    container.appendChild(newItem);
-}
-
-function removePublicationItem(item) {
-    if (!item) return; 
-
-    if (confirm("Apakah Anda yakin ingin menghapus publikasi ini?")) {
-        item.remove();
-    }
-}
+})();
