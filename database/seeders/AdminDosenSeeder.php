@@ -9,7 +9,6 @@ class AdminDosenSeeder extends Seeder
 {
     public function run(): void
     {
-        // Admin
         User::firstOrCreate(['email' => 'admin@example.test'], [
             'fullname'            => 'Admin Test',
             'nip'                 => '0000',
@@ -18,7 +17,6 @@ class AdminDosenSeeder extends Seeder
             'registration_status' => 'approved',
         ]);
 
-        // Content Creator test
         User::firstOrCreate(['email' => 'creator@example.test'], [
             'fullname'            => 'Creator Test',
             'nip'                 => null,
@@ -27,7 +25,6 @@ class AdminDosenSeeder extends Seeder
             'registration_status' => 'approved',
         ]);
 
-        // Dosen pending
         User::firstOrCreate(['email' => 'dosen.pending@example.test'], [
             'fullname'            => 'Dosen Pending',
             'nip'                 => '1001',
