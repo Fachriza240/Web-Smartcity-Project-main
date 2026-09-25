@@ -50,10 +50,11 @@ class NewsController extends Controller
 
         $years = News::published()
             ->whereNotNull('published_at')
-            ->selectRaw('YEAR(published_at) as tahun')
-            ->groupBy('tahun')
-            ->orderByDesc('tahun')
-            ->pluck('tahun');
+            ->pluck('published_at')
+            ->map(fn ($date) => (int) $date->format('Y'))
+            ->unique()
+            ->sortDesc()
+            ->values();
 
         return [
             'news' => $news,
