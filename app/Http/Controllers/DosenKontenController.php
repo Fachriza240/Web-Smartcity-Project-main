@@ -6,7 +6,7 @@ use App\Models\Hki;
 use App\Models\Publication;
 use App\Models\User;
 use App\Notifications\HkiAddedNotification;
-use App\Rules\SafeName;
+use App\Rules\PersonName;
 use App\Rules\SafeText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +19,8 @@ class DosenKontenController extends Controller
     {
         $user = Auth::user();
 
-        $publikasi = Publication::where('user_id', $user->id)
+        $publikasi = Publication::forDosen($user)
+            ->with('recommender:id,fullname')
             ->latest()
             ->paginate(10);
 
@@ -46,13 +47,12 @@ class DosenKontenController extends Controller
         $data['user_id']         = Auth::id();
         $data['submission_type'] = 'member';
         $data['recommended_by']  = null;
-        $data['status'] = Publication::STATUS_DRAFT;
 
         if (!$request->hasFile('pdf')) {
             return back()->withErrors(['pdf' => 'File PDF wajib diupload.'])->withInput();
         }
 
-        $data['pdf_path'] = $request->file('pdf')->store('publications/pdf', 'local');
+        $data['pdf_path'] = $request->file('pdf')->store('publications/pdf', 'public');
         unset($data['pdf']);
 
         if ($request->hasFile('thumbnail')) {
@@ -86,8 +86,8 @@ class DosenKontenController extends Controller
         $data = $this->validatePublication($request, $p);
 
         if ($request->hasFile('pdf')) {
-            $this->deleteFile($p->pdf_path, 'local');
-            $data['pdf_path'] = $request->file('pdf')->store('publications/pdf', 'local');
+            $this->deleteFile($p->pdf_path);
+            $data['pdf_path'] = $request->file('pdf')->store('publications/pdf', 'public');
         }
         unset($data['pdf']);
 
@@ -98,30 +98,17 @@ class DosenKontenController extends Controller
         }
         unset($data['thumbnail']);
 
-        $data['status'] = Publication::STATUS_DRAFT;
-
         $p->update($data);
 
         return redirect()->route('dosen.publikasi.index')
-            ->with('success', 'Publikasi berhasil diperbarui dan menunggu review admin kembali.');
-    }
-
-    public function publikasiFile(Publication $p)
-    {
-        $this->authorizeOwnerPublikasi($p);
-
-        abort_unless($p->pdf_path && Storage::disk('local')->exists($p->pdf_path), 404);
-
-        $filename = str($p->judul)->slug()->append('.pdf')->toString();
-
-        return Storage::disk('local')->download($p->pdf_path, $filename);
+            ->with('success', 'Publikasi berhasil diperbarui.');
     }
 
     public function publikasiDestroy(Publication $p)
     {
         $this->authorizeOwnerPublikasi($p);
 
-        $this->deleteFile($p->pdf_path, 'local');
+        $this->deleteFile($p->pdf_path);
         $this->deleteFile($p->thumbnail_path);
         $p->delete();
 
@@ -131,7 +118,10 @@ class DosenKontenController extends Controller
 
     public function hkiIndex()
     {
-        $hkis = Hki::where('user_id', Auth::id())->latest()->paginate(10);
+        $hkis = Hki::forDosen(Auth::user())
+            ->with('recommender:id,fullname')
+            ->latest()
+            ->paginate(10);
 
         return view('halaman-dosen.konten.hki-index', compact('hkis'));
     }
@@ -162,7 +152,6 @@ class DosenKontenController extends Controller
         $data['user_id']         = Auth::id();
         $data['submission_type'] = 'member';
         $data['recommended_by']  = null;
-        $data['status'] = Hki::STATUS_DRAFT;
 
         if ($request->hasFile('file_sertifikat')) {
             $data['file_sertifikat'] = $request->file('file_sertifikat')
@@ -206,13 +195,11 @@ class DosenKontenController extends Controller
                 ->store('hki/sertifikat', 'public');
         }
 
-        $data['status'] = Hki::STATUS_DRAFT;
-
         $h->update($data);
         $this->sendHkiNotifications($h);
 
         return redirect()->route('dosen.hki.index')
-            ->with('success', 'HKI berhasil diperbarui dan menunggu review admin kembali.');
+            ->with('success', 'HKI berhasil diperbarui.');
     }
 
     public function hkiDestroy(Hki $h)
@@ -229,19 +216,16 @@ class DosenKontenController extends Controller
     private function validatePublication(Request $request, ?Publication $pub = null): array
     {
         return $request->validate([
-            'judul'     => ['required', 'string', 'min:5', 'max:200', new SafeText()],
-            'penulis'   => ['required', 'string', 'max:255', new SafeName()],
+            'judul'     => ['required', 'string', 'min:5', 'max:200', new SafeText],
+            'penulis'   => ['required', 'string', 'min:3', 'max:255', new PersonName],
             'tahun'     => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
-            'abstrak'   => ['required', 'string', new SafeText()],
+            'abstrak'   => ['required', 'string', 'min:10', 'max:10000', new SafeText],
             'kategori'  => ['required', Rule::in(Publication::categories())],
-            'penerbit'  => ['nullable', 'string', 'max:255', new SafeText()],
-            'doi'       => [
-                'nullable', 'string', 'max:255',
-                'regex:/^10\.\d{4,9}\/\S+$/i',
-                Rule::unique('publications', 'doi')->ignore($pub?->id),
-            ],
+            'penerbit'  => ['nullable', 'string', 'min:2', 'max:200', new SafeText],
+            'doi'       => ['nullable', 'string', 'max:255', 'regex:/^[A-Za-z0-9.\/:_()\-]+$/'],
             'pdf'       => [$pub ? 'nullable' : 'required', 'file', 'mimes:pdf', 'max:20480'],
             'thumbnail' => ['nullable', 'image', 'max:4096'],
+            'status'    => ['required', Rule::in(Publication::statuses())],
         ]);
     }
 
@@ -249,14 +233,15 @@ class DosenKontenController extends Controller
     {
         return $request->validate([
             'nomor_sertifikat' => [
-                'required', 'string', 'max:255',
+                'required', 'string', 'min:3', 'max:100', 'regex:/^[A-Za-z0-9.\/\-\s]+$/',
                 Rule::unique('hkis', 'nomor_sertifikat')->ignore($hki?->id),
             ],
-            'tgl_terbit'       => ['required', 'date', 'before_or_equal:today'],
-            'judul_sertifikat' => ['required', 'string', 'min:5', 'max:200', new SafeText()],
+            'tgl_terbit'       => ['required', 'date'],
+            'judul_sertifikat' => ['required', 'string', 'min:5', 'max:200', new SafeText],
             'jenis_sertifikat' => ['required', Rule::in(Hki::JENIS)],
-            'pencipta'         => ['required', 'string', 'max:255', new SafeName()],
+            'pencipta'         => ['required', 'string', 'min:3', 'max:255', new PersonName],
             'file_sertifikat'  => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
+            'status'           => ['required', Rule::in(Hki::statuses())],
         ]);
     }
 
@@ -270,10 +255,10 @@ class DosenKontenController extends Controller
         if ($h->user_id !== Auth::id()) abort(403);
     }
 
-    private function deleteFile(?string $path, string $disk = 'public'): void
+    private function deleteFile(?string $path): void
     {
-        if ($path && Storage::disk($disk)->exists($path)) {
-            Storage::disk($disk)->delete($path);
+        if ($path && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
         }
     }
 
@@ -284,7 +269,7 @@ class DosenKontenController extends Controller
         }
 
         $names = array_map('trim', explode(',', $hki->pencipta));
-        
+
         if (count($names) > 0) {
             $usersToNotify = User::whereIn('fullname', $names)
                                  ->where('role', 'dosen')
@@ -296,7 +281,7 @@ class DosenKontenController extends Controller
                                         ->where('type', HkiAddedNotification::class)
                                         ->where('data->hki_id', $hki->id)
                                         ->exists();
-                
+
                 if (!$alreadyNotified) {
                     $user->notify(new HkiAddedNotification($hki));
                 }
@@ -309,7 +294,7 @@ class DosenKontenController extends Controller
         $notification = Auth::user()->notifications()->find($id);
         if ($notification) {
             $notification->markAsRead();
-            
+
             return redirect()->route('dosen.hki.index');
         }
         return back();

@@ -2,109 +2,107 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Http\Requests\RegisterRequest;
-use App\Http\Requests\LoginRequest;
 use App\Models\User;
+use App\Rules\PersonName;
+use App\Rules\SafeText;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function showRegister(){
-        $user = Auth::user();
-
-        if ($user && !$user->isRejected()) {
-            return redirect($user->dashboardUrl());
-        }
-
+    public function showRegister()
+    {
         return view('authorized.registrasi');
     }
 
-    public function register(RegisterRequest $request){
-        $role = $request->input('role', 'dosen');
+    public function register(Request $request)
+    {
+        $role = $request->input('role') === 'content_creator' ? 'content_creator' : 'dosen';
 
-        $data = $request->validated();
+        $rules = [
+            'fullname' => ['required', 'string', 'min:3', 'max:100', new PersonName],
+            'email' => ['required', 'string', 'email:rfc', 'max:100', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:6', 'max:64', 'confirmed'],
+            'role' => ['required', 'in:dosen,content_creator'],
+            'foto' => ['nullable', 'image', 'max:2048'],
+        ];
 
-        $existingByEmail = User::where('email', $data['email'])->first();
-
-        if ($existingByEmail && !$existingByEmail->isRejected()) {
-            return back()
-                ->withErrors(['email' => 'Email sudah terdaftar.'])
-                ->withInput($request->except('password', 'password_confirmation'));
+        if ($role === 'dosen') {
+            $rules['nip'] = ['required', 'regex:/^[0-9]+$/', 'digits_between:4,30', 'unique:users,nip'];
+            $rules['prodi'] = ['nullable', 'string', 'min:2', 'max:100', new SafeText];
+            $rules['fakultas'] = ['nullable', 'string', 'min:2', 'max:100', new SafeText];
+        } else {
+            $rules['nip'] = ['nullable', 'regex:/^[0-9]+$/', 'digits_between:4,30', 'unique:users,nip'];
         }
 
-        if (!empty($data['nip'])) {
-            $existingByNip = User::where('nip', $data['nip'])
-                ->when($existingByEmail, fn ($q) => $q->where('id', '!=', $existingByEmail->id))
-                ->first();
+        $data = $request->validate($rules);
 
-            if ($existingByNip && !$existingByNip->isRejected()) {
-                return back()
-                    ->withErrors(['nip' => 'NIP sudah terdaftar.'])
-                    ->withInput($request->except('password', 'password_confirmation'));
-            }
-        }
-
+        $data['fullname'] = preg_replace('/\s+/u', ' ', trim($data['fullname']));
+        $data['email'] = strtolower($data['email']);
         $data['role'] = $role;
-
         $data['registration_status'] = User::STATUS_PENDING;
+
+        if ($role !== 'dosen') {
+            unset($data['prodi'], $data['fakultas']);
+        }
 
         if ($request->hasFile('foto')) {
             $data['foto'] = $request->file('foto')->store('foto-users', 'public');
         }
 
-        if ($existingByEmail && $existingByEmail->isRejected()) {
-            $existingByEmail->fill($data);
-            $existingByEmail->save();
+        User::create($data);
 
-            if (Auth::check() && Auth::id() === $existingByEmail->id) {
-                Auth::logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
-            }
-        } else {
-            User::create($data);
-        }
-
-        $message = ($role === 'dosen')
+        $message = $role === 'dosen'
             ? 'Registrasi berhasil. Akun dosen Anda menunggu validasi admin.'
             : 'Registrasi berhasil. Akun Anda menunggu persetujuan admin sebelum bisa digunakan.';
 
-        return redirect('/login')->with('success', $message);
+        return redirect()->route('login')->with('success', $message);
     }
 
-    public function showLogin(){
-        if (Auth::check()) {
-            return redirect(Auth::user()->dashboardUrl());
-        }
-
+    public function showLogin()
+    {
         return view('authorized.login');
     }
 
-    public function login(LoginRequest $request){
-        $credentials = $request->validated();
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email', 'max:100'],
+            'password' => ['required', 'string', 'max:64'],
+        ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
-
-            $user = Auth::user();
-
-            return redirect($user->dashboardUrl());
+        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+            return back()
+                ->withErrors(['email' => 'Email atau password salah.'])
+                ->withInput($request->only('email'));
         }
 
-        return back()->withErrors(['email' => 'Email atau password salah.'])->withInput($request->only('email'));
+        $request->session()->regenerate();
+
+        return $this->redirectByRole(Auth::user());
     }
 
-    public function logout(Request $request){
+    public function logout(Request $request)
+    {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/');
+
+        return redirect('/')->with('success', 'Anda berhasil keluar dari akun.');
     }
 
-    // public function showProfile()
-    // {
-    //     $user = Auth::user(); 
-    //     return view('profil', compact('user'));
-    // }
+    private function redirectByRole(User $user)
+    {
+        if (in_array($user->role, ['dosen', 'content_creator'], true)
+            && $user->registration_status !== User::STATUS_APPROVED) {
+            return redirect()->route('dosen.status');
+        }
+
+        return match ($user->role) {
+            'admin' => redirect('/beranda-admin'),
+            'dosen' => redirect('/beranda-dosen'),
+            'content_creator' => redirect('/beranda-creator'),
+            default => redirect('/'),
+        };
+    }
 }

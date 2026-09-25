@@ -34,7 +34,7 @@ class PublicationController extends Controller
             ->distinct()
             ->orderByDesc('tahun')
             ->pluck('tahun');
-            
+
         $isDosen = auth()->check() && auth()->user()->role === 'dosen';
 
         return view('halaman-user.publication-user', [
@@ -55,10 +55,10 @@ class PublicationController extends Controller
     public function download(Publication $publication)
     {
         abort_unless($publication->status === Publication::STATUS_PUBLISH, 404);
-        abort_unless($publication->pdf_path && Storage::disk('local')->exists($publication->pdf_path), 404);
+        abort_unless($publication->pdf_path && Storage::disk('public')->exists($publication->pdf_path), 404);
 
         $filename = str($publication->judul)->slug()->append('.pdf')->toString();
 
-        return Storage::disk('local')->download($publication->pdf_path, $filename);
+        return Storage::disk('public')->download($publication->pdf_path, $filename);
     }
 }
