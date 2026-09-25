@@ -1,6 +1,8 @@
-<x-layout.link>
-    <x-layout.navbar></x-layout.navbar>
-    <x-halaman-user.about-user></x-halaman-user.about-user>
-    <x-halaman-user.partner-section :partners="$partners"></x-halaman-user.partner-section>
-    <x-layout.footer></x-layout.footer>
+<x-layout.link title="Tentang Kami">
+    <x-layout.navbar />
+    <main id="konten-utama">
+        <x-halaman-user.about-user />
+        <x-halaman-user.partner-section :partners="$partners" />
+    </main>
+    <x-layout.footer />
 </x-layout.link>

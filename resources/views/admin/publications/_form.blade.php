@@ -1,29 +1,24 @@
 @csrf
 
-{{-- ── Tipe Pengusul ─────────────────────────────── --}}
 <div class="mb-3">
     <label class="form-label fw-semibold">Tipe Pengusul <span class="text-danger">*</span></label>
     <div class="d-flex gap-3">
         <div class="form-check">
             <input class="form-check-input" type="radio" name="submission_type" id="pubTypeMember"
                    value="member"
-                   @checked(old('submission_type', $publication->submission_type) === 'member')
-                   onchange="togglePubSubmitter(this.value)">
+                   @checked(old('submission_type', $publication->submission_type) === 'member') data-switch>
             <label class="form-check-label" for="pubTypeMember">Member (Dosen terdaftar)</label>
         </div>
         <div class="form-check">
             <input class="form-check-input" type="radio" name="submission_type" id="pubTypeNonMember"
                    value="non_member"
-                   @checked(old('submission_type', $publication->submission_type) !== 'member')
-                   onchange="togglePubSubmitter(this.value)">
+                   @checked(old('submission_type', $publication->submission_type) !== 'member') data-switch>
             <label class="form-check-label" for="pubTypeNonMember">Non-Member (isi manual)</label>
         </div>
     </div>
 </div>
 
-{{-- Member: pilih dosen --}}
-<div id="pubMemberField" class="mb-3"
-     style="{{ old('submission_type', $publication->submission_type) !== 'member' ? 'display:none' : '' }}">
+<div id="pubMemberField" class="mb-3" data-switch-panel="member" @if (old('submission_type', $publication->submission_type) !== 'member') hidden @endif>
     <label class="form-label">Dosen Pengusul</label>
     <select name="user_id" class="form-select @error('user_id') is-invalid @enderror">
         <option value="">-- Pilih Dosen --</option>
@@ -37,9 +32,7 @@
     @error('user_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
 </div>
 
-{{-- Non-member: isi manual --}}
-<div id="pubNonMemberField" class="mb-3"
-     style="{{ old('submission_type', $publication->submission_type) === 'member' ? 'display:none' : '' }}">
+<div id="pubNonMemberField" class="mb-3" data-switch-panel="non_member" @if (old('submission_type', $publication->submission_type) === 'member') hidden @endif>
     <label class="form-label">Nama Pengusul (Manual)</label>
     <input type="text" name="recommended_by"
            class="form-control @error('recommended_by') is-invalid @enderror"
@@ -50,7 +43,6 @@
 
 <hr>
 
-{{-- ── Data Publikasi ────────────────────────────── --}}
 <div class="row">
     <div class="col-md-8 mb-3">
         <label class="form-label">Judul <span class="text-danger">*</span></label>
@@ -123,7 +115,7 @@
 <div class="row">
     <div class="col-md-6 mb-3">
         <label class="form-label">
-            PDF {{ $publication->exists ? '' : '<span class="text-danger">*</span>' }}
+            PDF @unless ($publication->exists)<span class="text-danger">*</span>@endunless
         </label>
         <input type="file" name="pdf" class="form-control @error('pdf') is-invalid @enderror"
                accept="application/pdf"
@@ -131,18 +123,17 @@
         @if($publication->pdf_path)
             <div class="small mt-2">
                 File saat ini:
-                <a href="{{ route('admin.publications.file', $publication) }}" target="_blank">Download PDF</a>
+                <a href="{{ asset('storage/' . $publication->pdf_path) }}" target="_blank">Download PDF</a>
             </div>
         @endif
         @error('pdf') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
     <div class="col-md-6 mb-3">
         <label class="form-label">Thumbnail</label>
-        <input type="file" name="thumbnail" class="form-control" accept="image/jpeg,image/png,image/gif,image/bmp,image/webp">
+        <input type="file" name="thumbnail" class="form-control" accept="image/*">
         @if($publication->thumbnail_path)
             <img src="{{ asset('storage/' . $publication->thumbnail_path) }}"
-                 alt="Thumbnail" class="mt-2"
-                 style="width:120px;height:80px;object-fit:cover;border-radius:8px;">
+                 alt="Thumbnail" class="mt-2 adm-preview adm-preview--sm">
         @endif
     </div>
 </div>
@@ -153,10 +144,3 @@
     </button>
     <a href="{{ route('admin.publications.index') }}" class="btn btn-light">Batal</a>
 </div>
-
-<script>
-function togglePubSubmitter(val) {
-    document.getElementById('pubMemberField').style.display    = val === 'member'     ? '' : 'none';
-    document.getElementById('pubNonMemberField').style.display = val === 'non_member' ? '' : 'none';
-}
-</script>

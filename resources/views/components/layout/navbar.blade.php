@@ -1,661 +1,167 @@
-<?php
-?>
+@php
+    $user = auth()->user();
+    $isDosen = $user && $user->role === 'dosen' && $user->registration_status === \App\Models\User::STATUS_APPROVED;
+    $isManager = $user && in_array($user->role, ['admin', 'content_creator'], true);
+    $area = $isDosen ? 'dosen' : 'user';
+    $dashboardUrl = match ($user?->role) {
+        'admin' => url('/beranda-admin'),
+        'content_creator' => url('/beranda-creator'),
+        default => url('/'),
+    };
+    $menu = [
+        ['label' => 'Beranda', 'url' => $isDosen ? url('/beranda-dosen') : url('/'), 'active' => $isDosen ? ['beranda-dosen'] : ['/']],
+        ['label' => 'Tentang Kami', 'url' => url("/about-{$area}"), 'active' => ["about-{$area}"]],
+        ['label' => 'Program', 'url' => url("/program-{$area}"), 'active' => ["program-{$area}"]],
+        ['label' => 'Proyek', 'url' => url("/project-{$area}"), 'active' => ["project-{$area}"]],
+        ['label' => 'Berita', 'url' => url("/news-{$area}"), 'active' => ["news-{$area}", 'news/*']],
+        ['label' => 'Publikasi', 'url' => url('/publication-user'), 'active' => ['publication-user', 'publications/*']],
+        ['label' => 'Tim', 'url' => url("/team-{$area}"), 'active' => ["team-{$area}", 'biografi-*']],
+        ['label' => 'Mitra', 'url' => url("/mitra-{$area}"), 'active' => ["mitra-{$area}"]],
+    ];
+    $socials = collect(config('smartcity.socials'))->filter(fn ($item) => ! empty($item['url']));
+    $notifications = $isDosen ? $user->notifications()->latest()->limit(10)->get() : collect();
+    $unreadCount = $isDosen ? $user->unreadNotifications()->count() : 0;
+@endphp
 
-<!-- ===== GOOGLE FONTS ===== -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-<!-- ===== NAVBAR CSS ===== -->
-<style>
-    :root {
-        --sc-primary: #3a7ab3;
-        /* biru tua  */
-        --sc-accent: #4c8dc9;
-        /* biru aksen */
-        --primary-blue: #4c8dc9;
-        --primary-dark: #3a7ab3;
-        --sc-cta: #D62828;
-        /* merah CTA (seperti AICOMS) */
-        --sc-cta-hover: #b01f1f;
-        --sc-top-bg: #3a7ab3;
-        --sc-top-text: #FFFFFF;
-        --sc-nav-font: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    /* ────────── TOP BAR ────────── */
-    .sc-topbar {
-        background: var(--sc-top-bg);
-        font-family: var(--sc-nav-font);
-        font-size: 12.5px;
-        color: var(--sc-top-text);
-        padding: 6px 0;
-        letter-spacing: 0.01em;
-    }
-
-    .sc-topbar .container {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 6px;
-    }
-
-    .sc-topbar-left {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
-
-    .sc-topbar-left span {
-        display: flex;
-        align-items: center;
-        gap: 7px;
-    }
-
-    .sc-topbar-left i {
-        color: var(--sc-top-text);
-        font-size: 12px;
-    }
-
-    .sc-topbar-right {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .sc-social-btn {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        color: #FFFFFF;
-        font-size: 11px;
-        text-decoration: none;
-        transition: background 0.2s, color 0.2s;
-    }
-
-    .sc-social-btn:hover {
-        background: var(--sc-primary);
-        color: #fff;
-        border-color: var(--sc-primary);
-    }
-
-    /* ────────── MAIN NAVBAR ────────── */
-    .navbar.sc-navbar {
-        background: #fff;
-        font-family: var(--sc-nav-font);
-        padding: 0;
-        border-bottom: 3px solid #e4edf8;
-        box-shadow: 0 3px 20px rgba(27, 63, 114, 0.08);
-        position: sticky;
-        top: 0;
-        z-index: 1030;
-        transition: box-shadow 0.3s;
-    }
-
-    .navbar.sc-navbar.scrolled {
-        box-shadow: 0 4px 28px rgba(27, 63, 114, 0.14);
-    }
-
-    .navbar.sc-navbar .container {
-        height: 100px;
-    }
-
-    /* Logo */
-    .sc-navbar .navbar-brand {
-        display: flex;
-        align-items: center;
-        gap: 11px;
-        text-decoration: none;
-        padding: 0;
-    }
-
-    .sc-navbar .navbar-brand img {
-        height: 60px;
-        width: auto;
-    }
-
-    /* Nav Links */
-    .sc-navbar .navbar-nav {
-        gap: 2px;
-    }
-
-    .sc-navbar .nav-item .nav-link {
-        font-size: 13.5px;
-        font-weight: 700;
-        color: #2c3e55;
-        padding: 8px 13px;
-        border-radius: 8px;
-        position: relative;
-        transition: color 0.2s, background 0.2s;
-        letter-spacing: 0.01em;
-    }
-
-    .sc-navbar .nav-item .nav-link:hover,
-    .sc-navbar .nav-item .nav-link.active {
-        color: var(--sc-accent);
-        background: #edf4fc;
-    }
-
-    .sc-navbar .nav-item .nav-link.active::after {
-        content: '';
-        position: absolute;
-        bottom: -3px;
-        left: 13px;
-        right: 13px;
-        height: 3px;
-        background: var(--sc-accent);
-        border-radius: 2px;
-    }
-
-    /* Right Side: Search + Login */
-    .sc-navbar-right {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    /* Search Icon Button */
-    .sc-search-toggle {
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        border: 1.5px solid #d0dff0;
-        background: #f4f8fd;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--sc-primary);
-        font-size: 14px;
-        cursor: pointer;
-        transition: background 0.2s, border-color 0.2s;
-        text-decoration: none;
-    }
-
-    .sc-search-toggle:hover {
-        background: var(--sc-accent);
-        border-color: var(--sc-accent);
-        color: #fff;
-    }
-
-    /* Expanded Search Box (opsional, muncul saat toggle diklik) */
-    .sc-search-box {
-        display: flex;
-        align-items: center;
-        background: #f4f8fd;
-        border: 1.5px solid #d0dff0;
-        border-radius: 24px;
-        padding: 0 14px;
-        height: 38px;
-        gap: 8px;
-        transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .sc-search-box:focus-within {
-        border-color: var(--sc-accent);
-        box-shadow: 0 0 0 3px rgba(33, 118, 174, 0.12);
-    }
-
-    .sc-search-box input {
-        border: none;
-        background: transparent;
-        outline: none;
-        font-family: var(--sc-nav-font);
-        font-size: 13px;
-        color: #2c3e55;
-        width: 160px;
-    }
-
-    .sc-search-box input::placeholder {
-        color: #9ab0c8;
-    }
-
-    .sc-search-box i {
-        color: #7a9bbf;
-        font-size: 13px;
-    }
-
-    .sc-search-submit {
-        border: none;
-        background: transparent;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-    }
-
-    .sc-search-submit i {
-        color: #7a9bbf;
-        font-size: 13px;
-        transition: color 0.2s;
-    }
-
-    .sc-search-submit:hover i {
-        color: var(--sc-accent);
-    }
-
-    /* Contact Us Button */
-    .sc-contact-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        background: transparent;
-        color: var(--sc-primary) !important;
-        font-family: var(--sc-nav-font);
-        font-size: 13.5px;
-        font-weight: 700;
-        padding: 8px 20px;
-        border-radius: 8px;
-        text-decoration: none;
-        letter-spacing: 0.01em;
-        border: 2px solid var(--sc-primary);
-        transition: background 0.2s, color 0.2s, transform 0.15s, box-shadow 0.2s;
-        white-space: nowrap;
-    }
-
-    .sc-contact-btn:hover {
-        background: var(--sc-primary);
-        color: #fff !important;
-        transform: translateY(-1px);
-        box-shadow: 0 5px 18px rgba(27, 63, 114, 0.22);
-    }
-
-    .sc-contact-btn i {
-        font-size: 13px;
-    }
-
-    /* Login / CTA Button */
-    .sc-login-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        background: var(--sc-accent);
-        color: #fff !important;
-        font-family: var(--sc-nav-font);
-        font-size: 13.5px;
-        font-weight: 700;
-        padding: 9px 22px;
-        border-radius: 8px;
-        text-decoration: none;
-        letter-spacing: 0.01em;
-        border: none;
-        transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-        box-shadow: 0 3px 12px rgba(33, 118, 174, 0.25);
-        white-space: nowrap;
-    }
-
-    .sc-login-btn:hover {
-        background: var(--sc-primary);
-        color: #fff !important;
-        transform: translateY(-1px);
-        box-shadow: 0 5px 18px rgba(27, 63, 114, 0.32);
-    }
-
-    .sc-login-btn i {
-        font-size: 13px;
-    }
-
-    /* Hamburger (mobile) */
-    .sc-navbar .navbar-toggler {
-        border: 1.5px solid #c8d8ec;
-        border-radius: 8px;
-        padding: 6px 10px;
-        color: var(--sc-primary);
-    }
-
-    .sc-navbar .navbar-toggler:focus {
-        box-shadow: none;
-    }
-
-    .sc-navbar .navbar-toggler-icon {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%231B3F72' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-    }
-
-    /* Divider antara nav links dan right side */
-    .sc-nav-divider {
-        width: 1px;
-        height: 28px;
-        background: #d8e8f4;
-        margin: 0 6px;
-    }
-
-    /* FORCE: Mitra Active State */
-    .sc-navbar .nav-link[href*="mitra"]:not(.active),
-    .sc-navbar .nav-link[href*="partners"]:not(.active) {
-        color: #2c3e55;
-        background: transparent;
-    }
-
-    .sc-navbar .nav-link[href*="mitra"].active,
-    .sc-navbar .nav-link[href*="partners"].active {
-        color: var(--sc-accent) !important;
-        background: #edf4fc !important;
-    }
-
-    .sc-navbar .nav-link[href*="mitra"].active::after,
-    .sc-navbar .nav-link[href*="partners"].active::after {
-        content: '' !important;
-        position: absolute !important;
-        bottom: -3px !important;
-        left: 13px !important;
-        right: 13px !important;
-        height: 3px !important;
-        background: #4c8dc9 !important;
-        border-radius: 2px !important;
-        display: block !important;
-        z-index: 10 !important;
-    }
-
-    /* Manual underline untuk Mitra */
-    .mitra-active-line {
-        position: absolute !important;
-        bottom: -3px !important;
-        left: 13px !important;
-        right: 13px !important;
-        height: 3px !important;
-        background: #4c8dc9 !important;
-        border-radius: 2px !important;
-        pointer-events: none !important;
-        z-index: 10 !important;
-    }
-
-    /* ────────── RESPONSIVE ────────── */
-    @media (max-width: 991px) {
-        .sc-topbar-left {
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .sc-navbar .container {
-            height: auto;
-            padding-top: 12px;
-            padding-bottom: 12px;
-        }
-
-        .sc-navbar .navbar-collapse {
-            padding: 12px 0 16px;
-            border-top: 1px solid #e4edf8;
-            margin-top: 10px;
-        }
-
-        .sc-navbar .nav-item .nav-link {
-            padding: 10px 8px;
-            border-radius: 0;
-            border-bottom: 1px solid #edf4fc;
-        }
-
-        .sc-navbar .nav-item .nav-link.active::after {
-            display: none;
-        }
-
-        .sc-navbar-right {
-            margin-top: 14px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .sc-search-box input {
-            width: 100%;
-        }
-
-        .sc-search-box {
-            flex: 1;
-        }
-
-        .sc-nav-divider {
-            display: none;
-        }
-    }
-</style>
-
-<!-- ===== TOP BAR ===== -->
 <div class="sc-topbar">
     <div class="container">
-        <div class="sc-topbar-left">
-            <span>
-                <i class="fas fa-map-marker-alt"></i>
-                Jl. Smart City No. 1, Indonesia
+        <div class="sc-topbar__info">
+            <span class="d-none d-lg-inline-flex">
+                <i class="bi bi-geo-alt-fill" aria-hidden="true"></i>
+                {{ config('smartcity.address_short') }}
             </span>
-            <span>
-                <i class="fas fa-envelope"></i>
-                smartcity@example.ac.id
-            </span>
+            <a href="mailto:{{ config('smartcity.email') }}" class="d-none d-sm-inline-flex">
+                <i class="bi bi-envelope-fill" aria-hidden="true"></i>
+                {{ config('smartcity.email') }}
+            </a>
+            <a href="https://wa.me/{{ config('smartcity.whatsapp') }}" target="_blank" rel="noopener">
+                <i class="bi bi-whatsapp" aria-hidden="true"></i>
+                {{ config('smartcity.phone_display') }}
+            </a>
         </div>
-        <div class="sc-topbar-right">
-            <a href="#" class="sc-social-btn" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-            <a href="#" class="sc-social-btn" title="YouTube"><i class="fab fa-youtube"></i></a>
-            <a href="#" class="sc-social-btn" title="Instagram"><i class="fab fa-instagram"></i></a>
-            <a href="#" class="sc-social-btn" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+        <div class="sc-topbar__social">
+            @foreach ($socials as $social)
+                <a href="{{ $social['url'] }}" class="sc-social-btn" target="_blank" rel="noopener" aria-label="{{ $social['label'] }}">
+                    <i class="bi {{ $social['icon'] }}" aria-hidden="true"></i>
+                </a>
+            @endforeach
         </div>
     </div>
 </div>
 
-<!-- ===== MAIN NAVBAR ===== -->
-<nav class="navbar navbar-expand-lg sc-navbar" id="scNavbar">
+<nav class="navbar navbar-expand-xl sc-navbar" id="scNavbar" aria-label="Navigasi utama">
     <div class="container">
-
-        <!-- Brand / Logo -->
-        <a class="navbar-brand" href="/">
-            <img src="{{ asset('img/logosc.png') }}" alt="Smart City Logo">
+        <a class="navbar-brand" href="{{ $menu[0]['url'] }}">
+            <img src="{{ asset('img/logosc.png') }}" alt="CoE Smart City Telkom University" width="160" height="60">
         </a>
 
-        <!-- Mobile Toggle -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <!-- Nav Items -->
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav mx-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">Beranda</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/about-user">Tentang Kami</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/program-user">Program</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/project-user">Proyek</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/news-user">Berita</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/publication-user">Publikasi</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/team-user">Tim</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('partners.user') }}"
-                        data-debug-href="{{ route('partners.user') }}">Mitra</a>
-                </li>
-            </ul>
-
-            <!-- Search Box -->
-            <form class="sc-search-box" action="{{ route('search.index') }}" method="GET" role="search">
-                <button type="submit" class="sc-search-submit" aria-label="Cari">
-                    <i class="fas fa-search"></i>
-                </button>
-                <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari..." autocomplete="off" required>
-            </form>
-
-                <div class="sc-nav-divider"></div>
-
-                <!-- Contact Us Button -->
-                <a href="{{ route('contact.index') }}" class="sc-contact-btn">
-                    <i class="fas fa-envelope"></i>
-                    Kontak Kami
+        <div class="sc-navbar__mobile-actions d-xl-none">
+            @if ($isDosen)
+                <a href="{{ route('profil.dosen') }}" class="sc-icon-btn" aria-label="Profil saya">
+                    <i class="bi bi-person-circle" aria-hidden="true"></i>
+                    @if ($unreadCount > 0)
+                        <span class="sc-badge-dot" aria-hidden="true"></span>
+                    @endif
                 </a>
-
-                <!-- Login Button -->
-                <a href="/login" class="sc-login-btn">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Login
-                </a>
-            </div>
+            @endif
+            <button class="navbar-toggler sc-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Buka atau tutup menu">
+                <span class="sc-toggler__bar"></span>
+                <span class="sc-toggler__bar"></span>
+                <span class="sc-toggler__bar"></span>
+            </button>
         </div>
 
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav sc-navbar__menu">
+                @foreach ($menu as $item)
+                    @php $active = request()->is(...$item['active']); @endphp
+                    <li class="nav-item">
+                        <a class="nav-link {{ $active ? 'active' : '' }}" href="{{ $item['url'] }}" @if ($active) aria-current="page" @endif>
+                            {{ $item['label'] }}
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+
+            <div class="sc-navbar__right">
+                <form action="{{ route('search') }}" method="GET" class="sc-search" role="search">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                    <input type="search" name="q" value="{{ request()->routeIs('search') ? request('q') : '' }}"
+                        placeholder="Cari konten..." aria-label="Cari konten" maxlength="100" minlength="2">
+                </form>
+
+                @if ($isDosen)
+                    <div class="dropdown sc-user-dropdown">
+                        <button type="button" class="sc-icon-btn" id="notifDropdown" data-bs-toggle="dropdown"
+                            data-bs-auto-close="outside" aria-expanded="false" aria-label="Notifikasi">
+                            <i class="bi bi-bell" aria-hidden="true"></i>
+                            @if ($unreadCount > 0)
+                                <span class="sc-badge-count">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
+                            @endif
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end sc-dropdown sc-notif" aria-labelledby="notifDropdown">
+                            <div class="sc-notif__head">
+                                <i class="bi bi-bell-fill" aria-hidden="true"></i> Notifikasi
+                            </div>
+                            <div class="sc-notif__list">
+                                @forelse ($notifications as $notif)
+                                    <a class="sc-notif__item {{ $notif->unread() ? 'is-unread' : '' }}" href="{{ route('dosen.notifications.read', $notif->id) }}">
+                                        <span class="sc-notif__icon"><i class="bi bi-lightbulb" aria-hidden="true"></i></span>
+                                        <span class="sc-notif__body">
+                                            <span class="sc-notif__text">Anda ditambahkan sebagai pencipta HKI:</span>
+                                            <strong class="sc-notif__title">{{ $notif->data['judul'] ?? \Illuminate\Support\Str::after($notif->data['message'] ?? '', ': ') }}</strong>
+                                            <small class="sc-notif__time"><i class="bi bi-clock" aria-hidden="true"></i> {{ $notif->created_at->diffForHumans() }}</small>
+                                        </span>
+                                    </a>
+                                @empty
+                                    <div class="sc-notif__empty">
+                                        <i class="bi bi-bell-slash" aria-hidden="true"></i>
+                                        <p>Belum ada notifikasi baru.</p>
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dropdown sc-user-dropdown">
+                        <button type="button" class="sc-avatar-btn dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menu akun">
+                            @if ($user->foto)
+                                <img src="{{ asset('storage/'.$user->foto) }}" alt="" class="sc-avatar">
+                            @else
+                                <span class="sc-avatar sc-avatar--initial">{{ mb_strtoupper(mb_substr($user->fullname, 0, 1)) }}</span>
+                            @endif
+                            <span class="sc-avatar-btn__name">{{ \Illuminate\Support\Str::words($user->fullname, 2, '') }}</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end sc-dropdown" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="{{ route('profil.dosen') }}"><i class="bi bi-person" aria-hidden="true"></i> Profil</a></li>
+                            <li><a class="dropdown-item" href="{{ route('dosen.publikasi.index') }}"><i class="bi bi-journal-text" aria-hidden="true"></i> Publikasi Saya</a></li>
+                            <li><a class="dropdown-item" href="{{ route('dosen.hki.index') }}"><i class="bi bi-award" aria-hidden="true"></i> HKI Saya</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST" id="logout-form" data-confirm="Apakah Anda yakin ingin keluar dari akun?">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Keluar</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                @elseif ($isManager)
+                    <a href="{{ route('contact') }}" class="sc-btn sc-btn--outline" aria-label="Kontak Kami">
+                        <i class="bi bi-envelope" aria-hidden="true"></i> <span class="sc-btn__label">Kontak Kami</span>
+                    </a>
+                    <a href="{{ $dashboardUrl }}" class="sc-btn sc-btn--primary">
+                        <i class="bi bi-speedometer2" aria-hidden="true"></i> Dashboard
+                    </a>
+                @else
+                    <a href="{{ route('contact') }}" aria-label="Kontak Kami" class="sc-btn sc-btn--outline {{ request()->routeIs('contact') ? 'is-active' : '' }}">
+                        <i class="bi bi-envelope" aria-hidden="true"></i> <span class="sc-btn__label">Kontak Kami</span>
+                    </a>
+                    <a href="{{ route('login') }}" class="sc-btn sc-btn--primary">
+                        <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> Login
+                    </a>
+                @endif
+            </div>
+        </div>
     </div>
 </nav>
-
-<!-- ===== JS: Scroll shadow + active nav ===== -->
-<script>
-    // Shadow saat scroll
-    const scNav = document.getElementById('scNavbar');
-    window.addEventListener('scroll', () => {
-        if (!scNav) return; 
-        scNav.classList.toggle('scrolled', window.scrollY > 10);
-    });
-
-    // Set active link berdasarkan URL saat ini
-    const currentPath = window.location.pathname;
-    let activeSet = false;
-
-    console.log('Current path (User):', currentPath);
-
-    document.querySelectorAll('.sc-navbar .nav-link').forEach(link => {
-        const href = link.getAttribute('href');
-
-        // Hapus active dari semua link terlebih dahulu
-        link.classList.remove('active');
-
-        // DEBUG: Log semua link dan href
-        console.log('Link text:', link.textContent.trim(), 'href:', href, 'data-debug-href:', link.getAttribute(
-            'data-debug-href'));
-
-        // Pencocokan sederhana - exact match first
-        if (href === currentPath) {
-            link.classList.add('active');
-            activeSet = true;
-            console.log('Active set by exact match:', href);
-        }
-    });
-
-    // FORCE: Jika di halaman publikasi, pastikan active state
-    if (currentPath === '/publication-user') {
-        const publikasiLink = document.querySelector('.sc-navbar .nav-link[href="/publication-user"]');
-        if (publikasiLink) {
-            publikasiLink.classList.add('active');
-            activeSet = true;
-            console.log('Force active: Publikasi');
-        }
-    }
-
-    // FORCE: Jika di halaman mitra, pastikan active state
-    if (currentPath === '/mitra-user' || currentPath.includes('partners')) {
-        // Cari link dengan teks "Mitra"
-        const mitraLink = Array.from(document.querySelectorAll('.sc-navbar .nav-link'))
-            .find(link => link.textContent.trim() === 'Mitra');
-        if (mitraLink) {
-            mitraLink.classList.add('active');
-            activeSet = true;
-            console.log('Force active: Mitra');
-        }
-    }
-
-    // Jika tidak ada yang cocok dan di halaman root, set beranda sebagai active
-    if (!activeSet && (currentPath === '/' || currentPath === '/beranda-dosen')) {
-        const berandaLink = document.querySelector(
-            '.sc-navbar .nav-link[href="/"], .sc-navbar .nav-link[href="/beranda-dosen"]');
-        if (berandaLink) {
-            berandaLink.classList.add('active');
-        }
-    }
-</script>
-
-<!-- ===== ENHANCED MITRA ACTIVE STATE FIX ===== -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const currentPath = window.location.pathname;
-        console.log('🔧 ENHANCED MITRA FIX - Current path:', currentPath);
-
-        // Khusus untuk halaman mitra user
-        if (currentPath === '/mitra-user') {
-            console.log('🎯 Detected mitra-user page');
-
-            // Hapus semua active terlebih dahulu
-            document.querySelectorAll('.sc-navbar .nav-link').forEach(link => {
-                link.classList.remove('active');
-                console.log('Removed active from:', link.textContent.trim());
-            });
-
-            // Cari dan aktifkan menu Mitra dengan berbagai cara
-            let mitraActivated = false;
-
-            // Metode 1: Cari berdasarkan teks "Mitra"
-            const mitraByText = Array.from(document.querySelectorAll('.sc-navbar .nav-link'))
-                .find(link => link.textContent.trim() === 'Mitra');
-
-            if (mitraByText) {
-                mitraByText.classList.add('active');
-                // Force inline styles untuk memastikan terlihat
-                mitraByText.style.setProperty('color', 'var(--sc-accent)', 'important');
-                mitraByText.style.setProperty('background', '#edf4fc', 'important');
-                mitraByText.style.setProperty('position', 'relative', 'important');
-
-                // Tambahkan garis biru dibawah secara manual
-                const existingLine = mitraByText.querySelector('.mitra-active-line');
-                if (!existingLine) {
-                    const activeLine = document.createElement('div');
-                    activeLine.className = 'mitra-active-line';
-                    activeLine.style.cssText = `
-                        position: absolute !important;
-                        bottom: -3px !important;
-                        left: 13px !important;
-                        right: 13px !important;
-                        height: 3px !important;
-                        background: var(--sc-accent) !important;
-                        border-radius: 2px !important;
-                        pointer-events: none !important;
-                    `;
-                    mitraByText.appendChild(activeLine);
-                }
-
-                mitraActivated = true;
-                console.log('✅ MITRA ACTIVATED by text with forced styles and underline!');
-            }
-
-            // Metode 2: Cari berdasarkan href yang mengandung 'partners' atau 'mitra'
-            if (!mitraActivated) {
-                const mitraByHref = Array.from(document.querySelectorAll('.sc-navbar .nav-link'))
-                    .find(link => {
-                        const href = link.getAttribute('href') || '';
-                        return href.includes('partners') || href.includes('mitra');
-                    });
-
-                if (mitraByHref) {
-                    mitraByHref.classList.add('active');
-                    mitraActivated = true;
-                    console.log('✅ MITRA ACTIVATED by href!');
-                }
-            }
-
-            // Metode 3: Force activation jika masih belum berhasil
-            if (!mitraActivated) {
-                setTimeout(() => {
-                    const allLinks = document.querySelectorAll('.sc-navbar .nav-link');
-                    console.log('Available links:', Array.from(allLinks).map(l => l.textContent
-                        .trim()));
-
-                    // Cari link terakhir (biasanya Mitra)
-                    const lastLink = allLinks[allLinks.length - 1];
-                    if (lastLink && lastLink.textContent.trim() === 'Mitra') {
-                        lastLink.classList.add('active');
-                        console.log('✅ MITRA ACTIVATED by last link!');
-                    }
-                }, 100);
-            }
-        }
-    });
-</script>

@@ -1,9 +1,9 @@
-﻿<x-layout.admin>
-    
+<x-layout.admin title="Project">
+
             <div class="content-header">
                 <div>
                     <h2 class="mb-1">Project</h2>
-                    <p class="mb-0">Kelola proyek-proyek COE Smart City.</p>
+                    <p class="mb-0">Kelola proyek-proyek CoE Smart City.</p>
                 </div>
                 <div class="header-actions">
                     <a href="{{ route('admin.projects.create') }}" class="btn btn-primary">
@@ -12,10 +12,6 @@
                     </a>
                 </div>
             </div>
-
-            @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
 
             <div class="card-admin">
                 <div class="card-body">
@@ -61,12 +57,10 @@
                                     <tr>
                                         <td>
                                             @if($project->thumbnail_path)
-                                                <img src="{{ asset('storage/' . $project->thumbnail_path) }}"
-                                                     alt="{{ $project->judul }}"
-                                                     style="width: 72px; height: 48px; object-fit: cover; border-radius: 8px;">
+                                                <img class="adm-thumb" src="{{ asset('storage/' . $project->thumbnail_path) }}"
+                                                     alt="{{ $project->judul }}">
                                             @else
-                                                <div class="bg-light d-flex align-items-center justify-content-center"
-                                                     style="width: 72px; height: 48px; border-radius: 8px;">
+                                                <div class="adm-thumb is-empty">
                                                     <i class="bi bi-kanban text-secondary"></i>
                                                 </div>
                                             @endif
@@ -95,7 +89,7 @@
                                                 </a>
                                                 <form action="{{ route('admin.projects.destroy', $project) }}"
                                                       method="POST"
-                                                      onsubmit="return confirm('Hapus project ini?')">
+                                                      data-confirm="Hapus proyek ini?">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn-icon" title="Hapus">

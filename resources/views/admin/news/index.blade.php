@@ -1,9 +1,9 @@
-﻿<x-layout.admin>
-    
+<x-layout.admin title="News">
+
             <div class="content-header">
                 <div>
                     <h2 class="mb-1">News</h2>
-                    <p class="mb-0">Kelola berita COE Smart City.</p>
+                    <p class="mb-0">Kelola berita CoE Smart City.</p>
                 </div>
                 <div class="header-actions">
                     <a href="{{ route('admin.news.create') }}" class="btn btn-primary">
@@ -11,10 +11,6 @@
                     </a>
                 </div>
             </div>
-
-            @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
 
             <div class="card-admin">
                 <div class="card-body">
@@ -62,12 +58,10 @@
                                     <tr>
                                         <td>
                                             @if($item->thumbnail_path)
-                                                <img src="{{ asset('storage/' . $item->thumbnail_path) }}"
-                                                     alt="{{ $item->judul }}"
-                                                     style="width:72px;height:48px;object-fit:cover;border-radius:8px;">
+                                                <img class="adm-thumb" src="{{ asset('storage/' . $item->thumbnail_path) }}"
+                                                     alt="{{ $item->judul }}">
                                             @else
-                                                <div class="bg-light d-flex align-items-center justify-content-center"
-                                                     style="width:72px;height:48px;border-radius:8px;">
+                                                <div class="adm-thumb is-empty">
                                                     <i class="bi bi-newspaper text-secondary"></i>
                                                 </div>
                                             @endif
@@ -96,7 +90,7 @@
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
                                                 <form action="{{ route('admin.news.destroy', $item) }}" method="POST"
-                                                      onsubmit="return confirm('Hapus berita ini?')">
+                                                      data-confirm="Hapus berita ini?">
                                                     @csrf @method('DELETE')
                                                     <button type="submit" class="btn-icon" title="Hapus">
                                                         <i class="bi bi-trash"></i>

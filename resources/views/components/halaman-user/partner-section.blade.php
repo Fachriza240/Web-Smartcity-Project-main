@@ -1,9 +1,6 @@
 @props(['partners' => collect()])
 
 <style>
-    /* ══════════════════════════════════════════════
-       [MITRA - SECTION (dipakai di Tentang Kami)]
-       ══════════════════════════════════════════════ */
     .mitra-section {
         padding: 90px 0;
         background: var(--bg-light, #f4f8fc);
@@ -121,7 +118,6 @@
         text-decoration: underline;
     }
 
-    /* Empty */
     .mitra-empty {
         text-align: center;
         padding: 40px 20px;
@@ -139,9 +135,6 @@
         font-family: "Lato", sans-serif;
     }
 
-    /* ══════════════════════════════════════════════
-       RESPONSIVE
-       ══════════════════════════════════════════════ */
     @media (max-width: 576px) {
         .mitra-grid {
             grid-template-columns: repeat(2, 1fr);
@@ -154,7 +147,7 @@
     <div class="container">
         <div data-aos="fade-up">
             <div class="mitra-section__label">Kemitraan</div>
-            <h2 class="mitra-section__heading">Mitra <span style="color: var(--primary-blue);">Strategis Kami</span></h2>
+            <h2 class="mitra-section__heading">Mitra <span class="text-blue">Strategis Kami</span></h2>
             <p class="mitra-section__subtitle">Kolaborasi dengan berbagai institusi dan industri untuk mewujudkan ekosistem kota cerdas.</p>
         </div>
 

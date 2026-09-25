@@ -1,9 +1,9 @@
-﻿<x-layout.admin>
-    
+<x-layout.admin title="Publication">
+
             <div class="content-header">
                 <div>
                     <h2 class="mb-1">Publication</h2>
-                    <p class="mb-0">Kelola publikasi ilmiah COE Smart City.</p>
+                    <p class="mb-0">Kelola publikasi ilmiah CoE Smart City.</p>
                 </div>
                 <div class="header-actions">
                     <a href="{{ route('admin.publications.create') }}" class="btn btn-primary">
@@ -12,10 +12,6 @@
                     </a>
                 </div>
             </div>
-
-            @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
 
             <div class="card-admin">
                 <div class="card-body">
@@ -67,9 +63,9 @@
                                     <tr>
                                         <td>
                                             @if($publication->thumbnail_path)
-                                                <img src="{{ asset('storage/' . $publication->thumbnail_path) }}" alt="{{ $publication->judul }}" style="width: 72px; height: 48px; object-fit: cover; border-radius: 8px;">
+                                                <img class="adm-thumb" src="{{ asset('storage/' . $publication->thumbnail_path) }}" alt="{{ $publication->judul }}">
                                             @else
-                                                <div class="bg-light d-flex align-items-center justify-content-center" style="width: 72px; height: 48px; border-radius: 8px;">
+                                                <div class="adm-thumb is-empty">
                                                     <i class="bi bi-journal-text text-secondary"></i>
                                                 </div>
                                             @endif
@@ -98,7 +94,7 @@
                                                 <a href="{{ route('admin.publications.edit', $publication) }}" class="btn-icon" title="Edit">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
-                                                <form action="{{ route('admin.publications.destroy', $publication) }}" method="POST" onsubmit="return confirm('Hapus publication ini?')">
+                                                <form action="{{ route('admin.publications.destroy', $publication) }}" method="POST" data-confirm="Hapus publikasi ini?">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn-icon" title="Hapus">

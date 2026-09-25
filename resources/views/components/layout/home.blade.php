@@ -1,18 +1,9 @@
+@php
+    $isDosenArea = auth()->check() && auth()->user()->role === 'dosen' && auth()->user()->registration_status === \App\Models\User::STATUS_APPROVED;
+    $projectUrl = url($isDosenArea ? '/project-dosen' : '/project-user');
+    $aboutUrl = url($isDosenArea ? '/about-dosen' : '/about-user');
+@endphp
 <style>
-    /* ── Root (sinkron main.css) ─────────────────── */
-    :root {
-        --primary-blue: #4c8dc9;
-        --primary-dark: #3a7ab3;
-        --text-black: #000000;
-        --text-gray: #7b7b7b;
-        --bg-white: #ffffff;
-        --bg-light: #f4f8fc;
-        --nav-height: 50px;
-    }
-
-    /* ══════════════════════════════════════════════
-       [HERO]
-       ══════════════════════════════════════════════ */
     .sc-hero {
         min-height: 80vh;
         background: #fff;
@@ -23,7 +14,6 @@
         padding-top: var(--nav-height);
     }
 
-    /* Lingkaran besar aksen kanan atas */
     .sc-hero__circle-lg {
         position: absolute;
         top: -100px;
@@ -38,7 +28,6 @@
         pointer-events: none;
     }
 
-    /* Lingkaran kecil aksen kiri bawah */
     .sc-hero__circle-sm {
         position: absolute;
         bottom: 40px;
@@ -52,7 +41,6 @@
         pointer-events: none;
     }
 
-    /* Pola titik di area kanan */
     .sc-hero__dots {
         position: absolute;
         inset: 0;
@@ -63,7 +51,6 @@
         pointer-events: none;
     }
 
-    /* Objek geometris melayang */
     .sc-hero__geo {
         position: absolute;
         border-radius: 50%;
@@ -126,7 +113,6 @@
     }
 
     @keyframes geoFloat {
-
         0%,
         100% {
             transform: translateY(0) rotate(0deg);
@@ -137,7 +123,6 @@
         }
     }
 
-    /* Grid 2 kolom hero */
     .sc-hero__grid {
         display: grid;
         grid-template-columns: 1.05fr 0.95fr;
@@ -151,7 +136,6 @@
         z-index: 2;
     }
 
-    /* Badge pill kecil */
     .sc-hero__badge {
         display: inline-flex;
         align-items: center;
@@ -178,7 +162,6 @@
     }
 
     @keyframes badgePulse {
-
         0%,
         100% {
             opacity: 1;
@@ -191,7 +174,6 @@
         }
     }
 
-    /* H1 */
     .sc-hero__h1 {
         font-size: clamp(2.4rem, 4.8vw, 3.8rem);
         font-weight: 700;
@@ -205,7 +187,6 @@
         color: var(--primary-blue);
     }
 
-    /* Garis pendek biru */
     .sc-hero__divider {
         width: 50px;
         height: 3px;
@@ -214,7 +195,6 @@
         margin: 1.25rem 0;
     }
 
-    /* Sub-judul */
     .sc-hero__subtitle {
         font-size: 1.3rem;
         font-weight: 700;
@@ -223,7 +203,6 @@
         font-family: "Spline Sans", sans-serif;
     }
 
-    /* Deskripsi */
     .sc-hero__desc {
         font-size: 16px;
         color: var(--text-gray);
@@ -233,7 +212,6 @@
         font-family: "Lato", sans-serif;
     }
 
-    /* CTA group */
     .sc-hero__cta {
         display: flex;
         align-items: center;
@@ -241,7 +219,6 @@
         flex-wrap: wrap;
     }
 
-    /* Tombol Proyek Kami */
     .sc-btn-proyek {
         display: inline-flex;
         align-items: center;
@@ -276,7 +253,6 @@
         font-size: 14px;
     }
 
-    /* Tombol WhatsApp */
     .sc-btn-wa {
         display: inline-flex;
         align-items: center;
@@ -325,7 +301,6 @@
         font-family: "Spline Sans", sans-serif;
     }
 
-    /* Kolom foto kanan */
     .sc-hero__photo-col {
         position: relative;
         display: flex;
@@ -333,7 +308,6 @@
         align-items: center;
     }
 
-    /* Blob animasi di belakang foto */
     .sc-hero__blob {
         position: absolute;
         right: -15px;
@@ -357,7 +331,6 @@
         }
     }
 
-    /* Ring aksen melingkar */
     .sc-hero__ring {
         position: absolute;
         width: 95%;
@@ -378,7 +351,6 @@
         }
     }
 
-    /* Foto tim bulat — LEBIH BESAR */
     .sc-hero__photo {
         position: relative;
         z-index: 1;
@@ -395,7 +367,6 @@
         display: block;
     }
 
-    /* Placeholder bila foto belum ada */
     .sc-hero__photo-placeholder {
         position: relative;
         z-index: 1;
@@ -425,7 +396,6 @@
         font-family: "Lato", sans-serif;
     }
 
-    /* Kartu info kecil melayang di pojok foto */
     .sc-hero__info-card {
         position: absolute;
         bottom: 8%;
@@ -460,7 +430,6 @@
     }
 
     @keyframes cardFloat {
-
         0%,
         100% {
             transform: translateY(0);
@@ -499,7 +468,6 @@
         line-height: 1.3;
     }
 
-    /* Gelombang bawah hero */
     .sc-hero__wave {
         position: absolute;
         bottom: -1px;
@@ -513,16 +481,12 @@
         display: block;
     }
 
-    /* ══════════════════════════════════════════════
-       [TENTANG KAMI]
-       ══════════════════════════════════════════════ */
     .sc-tentang {
         background: var(--bg-light);
         padding: 90px 0;
         position: relative;
     }
 
-    /* Label "• TENTANG KAMI •" */
     .sc-label {
         display: flex;
         align-items: center;
@@ -552,7 +516,6 @@
         font-family: "Spline Sans", sans-serif;
     }
 
-    /* Deskripsi lebih besar dan jelas */
     .sc-tentang__desc {
         font-size: 17px;
         line-height: 1.85;
@@ -562,7 +525,6 @@
         max-width: 700px;
     }
 
-    /* Tombol */
     .sc-btn-pelajari {
         display: inline-flex;
         align-items: center;
@@ -596,7 +558,6 @@
         font-size: 13px;
     }
 
-    /* Item aktifitas */
     .sc-akt__row {
         display: flex;
         align-items: center;
@@ -618,7 +579,6 @@
         box-shadow: 0 4px 14px rgba(76, 141, 201, 0.32);
     }
 
-    /* Teks aktifitas lebih besar */
     .sc-akt__text {
         font-size: 17px;
         font-weight: 600;
@@ -634,9 +594,6 @@
         font-size: 14px;
     }
 
-    /* ══════════════════════════════════════════════
-       [FAKTA SMART CITY]
-       ══════════════════════════════════════════════ */
     .sc-fakta {
         background: #fff;
         padding: 90px 0;
@@ -651,7 +608,6 @@
         font-family: "Spline Sans", sans-serif;
     }
 
-    /* Grid angka statistik */
     .sc-fakta__stats {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -659,7 +615,6 @@
         margin: 2.75rem 0 3.5rem;
     }
 
-    /* Angka lebih besar dan warna konsisten */
     .sc-fakta__num {
         font-size: clamp(2.8rem, 5.5vw, 4.2rem);
         font-weight: 700;
@@ -673,7 +628,6 @@
         color: var(--primary-blue);
     }
 
-    /* Label statistik lebih besar dan mudah dibaca */
     .sc-fakta__lbl {
         font-size: 12.5px;
         font-weight: 700;
@@ -692,7 +646,6 @@
         color: var(--primary-blue);
     }
 
-    /* Tab buttons */
     .sc-fakta__tabbar {
         display: flex;
         gap: 12px;
@@ -711,7 +664,6 @@
         transition: all 0.25s;
     }
 
-    /* Tab aktif = gelap, non-aktif = biru primer */
     .sc-fakta__tab.active {
         background: #222;
         color: #fff;
@@ -734,7 +686,6 @@
         display: block;
     }
 
-    /* Daftar item proyek lebih besar */
     .sc-fakta__list {
         list-style: none;
         padding: 0;
@@ -774,9 +725,6 @@
         flex-shrink: 0;
     }
 
-    /* ══════════════════════════════════════════════
-       RESPONSIVE
-       ══════════════════════════════════════════════ */
     @media (max-width: 991px) {
         .sc-hero__grid {
             grid-template-columns: 1fr;
@@ -802,15 +750,18 @@
             grid-template-columns: 1fr 1fr;
         }
     }
+
+    .sc-label--spaced {
+        margin-top: 2.75rem;
+    }
+
+    .sc-label--center {
+        justify-content: center;
+    }
 </style>
 
-
-{{-- ============================================================
-     [SECTION 1 — HERO]
-     ============================================================ --}}
 <section class="sc-hero" id="beranda">
 
-    {{-- Dekoratif latar --}}
     <div class="sc-hero__circle-lg"></div>
     <div class="sc-hero__circle-sm"></div>
     <div class="sc-hero__dots"></div>
@@ -822,7 +773,6 @@
 
     <div class="sc-hero__grid">
 
-        {{-- Kolom kiri: teks + CTA --}}
         <div data-aos="fade-up" data-aos-duration="800">
 
             <div class="sc-hero__badge">
@@ -831,53 +781,51 @@
             </div>
 
             <h1 class="sc-hero__h1">
-                Center Of Excellence<br>
+                Center of Excellence<br>
                 <span class="text-blue">Smart City</span>
             </h1>
 
             <div class="sc-hero__divider"></div>
 
-            <div class="sc-hero__subtitle">Lorem ipsum dolor sit amet</div>
+            <div class="sc-hero__subtitle">Riset, inovasi, dan kolaborasi untuk kota yang lebih cerdas</div>
 
             <p class="sc-hero__desc">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Quisque vehicula mauris nec lectus pharetra, vel ornare enim
-                facilisis. Proin vehicula urna sed quam efficitur venenatis.
+                Pusat unggulan Universitas Telkom yang mempertemukan akademisi, industri,
+                dan pemerintah untuk merancang solusi kota cerdas berbasis data,
+                Internet of Things, dan kecerdasan buatan.
             </p>
 
             <div class="sc-hero__cta">
-                <a href="/project-user" class="sc-btn-proyek">
+                <a href="{{ $projectUrl }}" class="sc-btn-proyek">
                     <span>Proyek Kami</span>
                     <span class="sc-btn-proyek__arrow">
                         <i class="bi bi-arrow-right"></i>
                     </span>
                 </a>
-                <a href="https://wa.me/628132325928" class="sc-btn-wa">
+                <a href="https://wa.me/{{ config('smartcity.whatsapp') }}" class="sc-btn-wa" target="_blank" rel="noopener">
                     <div class="sc-btn-wa__icon">
                         <i class="bi bi-whatsapp"></i>
                     </div>
                     <div>
                         <div class="sc-btn-wa__label">Hubungi Kami</div>
-                        <div class="sc-btn-wa__number">+62 813-2325-928</div>
+                        <div class="sc-btn-wa__number">{{ config('smartcity.phone_display') }}</div>
                     </div>
                 </a>
             </div>
         </div>
 
-        {{-- Kolom kanan: foto + kartu info melayang --}}
         <div class="sc-hero__photo-col" data-aos="fade-left" data-aos-duration="900" data-aos-delay="150">
 
             <div class="sc-hero__blob"></div>
             <div class="sc-hero__ring"></div>
 
-            <img src="img/fotosukses.png" alt="Tim CoE Smart City Universitas Telkom" class="sc-hero__photo"
+            <img src="{{ asset('img/fotosukses.png') }}" alt="Tim CoE Smart City Universitas Telkom" class="sc-hero__photo" width="560" height="560"
                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
             <div class="sc-hero__photo-placeholder">
                 <i class="bi bi-people-fill"></i>
                 <span>Foto Tim CoE<br>Smart City</span>
             </div>
 
-            {{-- Kartu melayang kiri bawah --}}
             <div class="sc-hero__info-card">
                 <div class="info-card__icon"><i class="bi bi-people-fill"></i></div>
                 <div>
@@ -886,7 +834,6 @@
                 </div>
             </div>
 
-            {{-- Kartu melayang kanan atas --}}
             <div class="sc-hero__info-card-2">
                 <div class="info-card__icon"><i class="bi bi-journal-richtext"></i></div>
                 <div>
@@ -898,7 +845,6 @@
         </div>
     </div>
 
-    {{-- Gelombang transisi ke section Tentang --}}
     <div class="sc-hero__wave">
         <svg viewBox="0 0 1440 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
             <path d="M0,55 C360,95 720,15 1080,60 C1260,83 1380,48 1440,58 L1440,90 L0,90 Z"
@@ -909,11 +855,6 @@
 
 </section>
 
-
-{{-- ============================================================
-     [SECTION 2 — TENTANG KAMI]
-     Tanpa gambar di kanan, full lebar, font lebih besar
-     ============================================================ --}}
 <section class="sc-tentang" id="tentang">
     <div class="container">
 
@@ -923,25 +864,24 @@
                 <div class="sc-label">Tentang Kami</div>
                 <h2 class="sc-tentang__heading">CoE Smart City</h2>
                 <p class="sc-tentang__desc">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-                    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-                    veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-                    commodo consequat.
+                    CoE Smart City adalah unit strategis Universitas Telkom yang mempercepat lahirnya riset,
+                    inovasi, dan layanan masyarakat di bidang kota cerdas. Kami mengubah hasil penelitian
+                    menjadi produk, rekomendasi kebijakan, dan pendampingan yang bisa langsung dimanfaatkan
+                    oleh pemerintah daerah, industri, dan warga.
                 </p>
 
-                <a href="/about-user" class="sc-btn-pelajari">
+                <a href="{{ $aboutUrl }}" class="sc-btn-pelajari">
                     <span>Pelajari Lebih Lanjut</span>
                     <span class="sc-btn-pelajari__arrow">
                         <i class="bi bi-arrow-right"></i>
                     </span>
                 </a>
 
-                <div class="sc-label" style="margin-top:2.75rem;">Aktifitas Kami</div>
+                <div class="sc-label sc-label--spaced">Aktivitas Kami</div>
 
             </div>
         </div>
 
-        {{-- 3 aktifitas dalam baris grid agar lebih lebar dan proporsional --}}
         <div class="row g-4 mt-1">
 
             <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
@@ -957,8 +897,8 @@
                 <div class="sc-akt__row">
                     <div class="sc-akt__icon"><i class="bi bi-display"></i></div>
                     <div class="sc-akt__text">
-                        Academic Excellence
-                        <br><small>(Riset dan Publikasi)</small>
+                        Keunggulan Akademik
+                        <br><small>Riset dan publikasi ilmiah</small>
                     </div>
                 </div>
             </div>
@@ -967,8 +907,8 @@
                 <div class="sc-akt__row">
                     <div class="sc-akt__icon"><i class="bi bi-file-earmark-text-fill"></i></div>
                     <div class="sc-akt__text">
-                        Commercialization
-                        <br><small>(Kontrak Kerjasama Komersialisasi Produk Hasil Riset)</small>
+                        Komersialisasi
+                        <br><small>Kerja sama pemanfaatan produk hasil riset</small>
                     </div>
                 </div>
             </div>
@@ -977,20 +917,14 @@
     </div>
 </section>
 
-
-{{-- ============================================================
-     [SECTION 3 — FAKTA SMART CITY]
-     Warna konsisten #4c8dc9, counter animasi, 3 tab proyek
-     ============================================================ --}}
 <section class="sc-fakta" id="fakta">
     <div class="container">
 
         <div class="text-center" data-aos="fade-up">
-            <div class="sc-label" style="justify-content:center;">Fakta Smart City</div>
+            <div class="sc-label sc-label--center">Fakta Smart City</div>
             <h2 class="sc-fakta__heading">Statistik Smart City</h2>
         </div>
 
-        {{-- Grid angka statistik --}}
         @php
             $statAnggota    = \App\Models\Team::published()->count();
             $statProject    = \App\Models\Project::published()->count();
@@ -1037,7 +971,6 @@
 
         </div>
 
-        {{-- Tab proyek --}}
         <div data-aos="fade-up" data-aos-delay="150">
 
             <div class="sc-fakta__tabbar">
@@ -1084,8 +1017,8 @@
                 <ul class="sc-fakta__list">
                     <li>Sistem Monitoring Kota Cerdas</li>
                     <li>Platform IoT Terintegrasi</li>
-                    <li>AI-Based Traffic Management</li>
-                    <li>SmartGrid Energy Solution</li>
+                    <li>Manajemen Lalu Lintas Berbasis AI</li>
+                    <li>Solusi Energi Smart Grid</li>
                 </ul>
             </div>
 
@@ -1093,19 +1026,15 @@
     </div>
 </section>
 
-
-{{-- ============================================================
-     [SECTION 4 — ABOUT] Asli dipertahankan
-     ============================================================ --}}
 <section class="about-section" id="about">
     <div class="container">
         <div class="row">
             <div class="col-lg-6" data-aos="fade-up">
                 <h2>Tentang Kami</h2>
-                <p>CoE Smart city di Universitas Telkom adalah unit strategis untuk mempercepat riset, inovasi,
+                <p>CoE Smart City di Universitas Telkom adalah unit strategis untuk mempercepat riset, inovasi,
                     bisnis, dan layanan masyarakat, serta berkontribusi pada ilmu pengetahuan, teknologi, manajemen,
-                    dan seni</p>
-                <img src="img/fotoaboutus.jpg" alt="About Image" class="about-image" data-aos="fade-up">
+                    dan seni.</p>
+                <img src="{{ asset('img/fotoaboutus.jpg') }}" alt="Kegiatan tim CoE Smart City" class="about-image" loading="lazy" data-aos="fade-up">
             </div>
             <div class="col-lg-6">
                 <div class="feature-item" data-aos="fade-up">
@@ -1116,35 +1045,31 @@
                 <div class="feature-item" data-aos="fade-up">
                     <h3>Inovasi</h3>
                     <p>CoE Smart City mendorong pengembangan teknologi dan solusi kreatif yang dapat
-                        diimplementasikan untuk meningkatkan kualitas hidup manusia dan efektivitas.</p>
+                        diimplementasikan untuk meningkatkan kualitas hidup dan efektivitas layanan kota.</p>
                 </div>
                 <div class="feature-item" data-aos="fade-up">
                     <h3>Bisnis</h3>
-                    <p>CoE Smart City mengakselerasi penelitian di berbagai bidang ilmu untuk menghasilkan penemuan
-                        dan inovasi baru yang bermanfaat bagi masyarakat dan industri.</p>
+                    <p>CoE Smart City menjembatani hasil riset dengan kebutuhan pasar melalui kemitraan industri,
+                        lisensi teknologi, dan komersialisasi produk inovasi yang berkelanjutan.</p>
                 </div>
                 <div class="feature-item" data-aos="fade-up">
                     <h3>Layanan Masyarakat</h3>
                     <p>CoE Smart City berkontribusi melalui program dan inisiatif yang dirancang untuk memberdayakan
-                        komunitas, meningkatkan kesejahteraan sosial, dan menyelesaikan masalah-masalah kawasan</p>
+                        komunitas, meningkatkan kesejahteraan sosial, dan menyelesaikan masalah-masalah kawasan.</p>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-
-{{-- ============================================================
-     [SECTION 5 — CARDS] Program dari Database
-     ============================================================ --}}
 @php
     $homePrograms = \App\Models\Program::published()->orderBy('urutan')->limit(4)->get();
     $homeGradients = ['blue-gradient', 'purple-gradient', 'cyan-gradient', 'orange-gradient'];
     $homeFallbacks = [
-        ['img' => 'card1.jpg', 'title' => 'Smart City Program',    'desc' => 'Program ini bertujuan untuk mengintegrasikan berbagai metode guna meningkatkan kualitas hidup di kota-kota modern.'],
-        ['img' => 'card2.jpg', 'title' => 'Innovation for Future', 'desc' => 'Kami mengembangkan solusi inovatif untuk meningkatkan kualitas hidup melalui teknologi dan sistem pintar di kota.'],
-        ['img' => 'card3.jpg', 'title' => 'Smart Infrastructure',  'desc' => 'Kami fokus pada pembangunan infrastruktur pintar yang menghubungkan berbagai elemen kota untuk menciptakan solusi yang lebih efisien.'],
-        ['img' => 'card4.jpg', 'title' => 'Sustainable Cities',    'desc' => 'Inisiatif kami untuk menciptakan kota yang lebih berkelanjutan dengan pemanfaatan teknologi hijau dan solusi ramah lingkungan.'],
+        ['img' => 'card1.jpg', 'title' => 'Program Kota Cerdas', 'desc' => 'Mengintegrasikan data, teknologi, dan tata kelola untuk meningkatkan kualitas hidup di kota-kota modern.'],
+        ['img' => 'card2.jpg', 'title' => 'Inovasi Masa Depan', 'desc' => 'Mengembangkan solusi inovatif berbasis sistem pintar yang siap diterapkan untuk kebutuhan kota.'],
+        ['img' => 'card3.jpg', 'title' => 'Infrastruktur Cerdas', 'desc' => 'Membangun infrastruktur terhubung yang membuat layanan kota lebih efisien, aman, dan mudah dipantau.'],
+        ['img' => 'card4.jpg', 'title' => 'Kota Berkelanjutan', 'desc' => 'Memanfaatkan teknologi hijau dan data lingkungan untuk mewujudkan kota yang ramah dan berkelanjutan.'],
     ];
 @endphp
 <section class="cards-section">
@@ -1156,11 +1081,9 @@
                         <div class="program-card">
                             <div class="card-image">
                                 @if($prog->thumbnail_path)
-                                    <img src="{{ asset('storage/'.$prog->thumbnail_path) }}" alt="{{ $prog->judul }}">
+                                    <img src="{{ asset('storage/'.$prog->thumbnail_path) }}" alt="{{ $prog->judul }}" loading="lazy">
                                 @else
-                                    <div class="d-flex align-items-center justify-content-center bg-light" style="height:200px;">
-                                        <i class="bi bi-layers text-secondary" style="font-size:3rem;"></i>
-                                    </div>
+                                    <div class="card-image__placeholder"><i class="bi bi-layers" aria-hidden="true"></i></div>
                                 @endif
                             </div>
                             <div class="card-content {{ $homeGradients[$i % 4] }}">
@@ -1175,7 +1098,7 @@
                     <div class="col-lg-3 col-md-6" data-aos="fade-up">
                         <div class="program-card">
                             <div class="card-image">
-                                <img src="img/{{ $fb['img'] }}" alt="{{ $fb['title'] }}">
+                                <img src="{{ asset('img/'.$fb['img']) }}" alt="{{ $fb['title'] }}" loading="lazy">
                             </div>
                             <div class="card-content {{ $homeGradients[$i] }}">
                                 <h3>{{ $fb['title'] }}</h3>
@@ -1189,10 +1112,6 @@
     </div>
 </section>
 
-
-{{-- ============================================================
-     [SECTION 6 — GALLERY] Project dari Database
-     ============================================================ --}}
 @php
     $homeProjects = \App\Models\Project::published()->orderByDesc('tahun')->limit(5)->get();
 @endphp
@@ -1200,7 +1119,7 @@
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
             <h2 class="gallery-title">
-                Proyek <span class="text-primary"><a href="/project-user">Kami</a></span>
+                Proyek <a href="{{ $projectUrl }}">Kami</a>
             </h2>
             <p class="gallery-subtitle">Dokumentasi proyek-proyek inovatif dalam pengembangan Smart City.</p>
         </div>
@@ -1210,7 +1129,6 @@
                     @if($homeProjects->isNotEmpty())
                         @foreach($homeProjects as $idx => $proj)
                             @php
-                                // Pakai gallery foto pertama, atau thumbnail
                                 $imgSrc = null;
                                 if (!empty($proj->gallery_paths) && count($proj->gallery_paths) > 0) {
                                     $imgSrc = asset('storage/' . $proj->gallery_paths[0]);
@@ -1221,15 +1139,12 @@
                             <div class="carousel-item {{ $idx === 0 ? 'active' : '' }}">
                                 <div class="carousel-image-container">
                                     @if($imgSrc)
-                                        <img src="{{ $imgSrc }}" class="d-block w-100" alt="{{ $proj->judul }}">
+                                        <img src="{{ $imgSrc }}" class="d-block w-100" alt="{{ $proj->judul }}" loading="lazy">
                                     @else
-                                        <div class="d-flex align-items-center justify-content-center bg-light"
-                                             style="height:400px;">
-                                            <i class="bi bi-kanban text-secondary" style="font-size:4rem;"></i>
-                                        </div>
+                                        <div class="card-image__placeholder"><i class="bi bi-kanban" aria-hidden="true"></i></div>
                                     @endif
                                     <div class="carousel-caption">
-                                        <h5>{{ $proj->judul }}</h5>
+                                        <h3>{{ $proj->judul }}</h3>
                                         <p>{{ \Illuminate\Support\Str::limit($proj->deskripsi, 100) }}</p>
                                     </div>
                                 </div>
@@ -1238,27 +1153,27 @@
                     @else
                         <div class="carousel-item active">
                             <div class="carousel-image-container">
-                                <img src="img/card1.jpg" class="d-block w-100" alt="Project">
+                                <img src="{{ asset('img/card1.jpg') }}" class="d-block w-100" alt="Dokumentasi proyek CoE Smart City" loading="lazy">
                                 <div class="carousel-caption">
-                                    <h5>Smart City Research Lab</h5>
-                                    <p>Kolaborasi tim peneliti dalam mengembangkan solusi teknologi smart city.</p>
+                                    <h3>Laboratorium Riset Kota Cerdas</h3>
+                                    <p>Kolaborasi tim peneliti dalam mengembangkan solusi teknologi kota cerdas.</p>
                                 </div>
                             </div>
                         </div>
                         <div class="carousel-item">
                             <div class="carousel-image-container">
-                                <img src="img/card2.jpg" class="d-block w-100" alt="Project">
+                                <img src="{{ asset('img/card2.jpg') }}" class="d-block w-100" alt="Dokumentasi proyek CoE Smart City" loading="lazy">
                                 <div class="carousel-caption">
-                                    <h5>Innovation Workshop</h5>
-                                    <p>Workshop pengembangan sistem monitoring berbasis IoT.</p>
+                                    <h3>Lokakarya Inovasi</h3>
+                                    <p>Lokakarya pengembangan sistem pemantauan berbasis IoT bersama mitra.</p>
                                 </div>
                             </div>
                         </div>
                         <div class="carousel-item">
                             <div class="carousel-image-container">
-                                <img src="img/card3.jpg" class="d-block w-100" alt="Project">
+                                <img src="{{ asset('img/card3.jpg') }}" class="d-block w-100" alt="Dokumentasi proyek CoE Smart City" loading="lazy">
                                 <div class="carousel-caption">
-                                    <h5>Smart City Development</h5>
+                                    <h3>Pengembangan Kota Cerdas</h3>
                                     <p>Implementasi teknologi AI dalam manajemen lalu lintas kota.</p>
                                 </div>
                             </div>
@@ -1269,23 +1184,23 @@
                 @if($homeProjects->count() > 1 || $homeProjects->isEmpty())
                     <button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev">
                         <span class="carousel-control-prev-icon"></span>
-                        <span class="visually-hidden">Sebelumnya</span>
+                        <span class="visually-hidden">Proyek sebelumnya</span>
                     </button>
                     <button class="carousel-control-next" type="button" data-bs-target="#galleryCarousel" data-bs-slide="next">
                         <span class="carousel-control-next-icon"></span>
-                        <span class="visually-hidden">Berikutnya</span>
+                        <span class="visually-hidden">Proyek berikutnya</span>
                     </button>
                     <div class="carousel-indicators">
                         @if($homeProjects->isNotEmpty())
                             @foreach($homeProjects as $idx => $proj)
                                 <button type="button" data-bs-target="#galleryCarousel"
                                         data-bs-slide-to="{{ $idx }}"
-                                        class="{{ $idx === 0 ? 'active' : '' }}"></button>
+                                        class="{{ $idx === 0 ? 'active' : '' }}" aria-label="Tampilkan proyek {{ $idx + 1 }}"></button>
                             @endforeach
                         @else
-                            <button type="button" data-bs-target="#galleryCarousel" data-bs-slide-to="0" class="active"></button>
-                            <button type="button" data-bs-target="#galleryCarousel" data-bs-slide-to="1"></button>
-                            <button type="button" data-bs-target="#galleryCarousel" data-bs-slide-to="2"></button>
+                            <button type="button" data-bs-target="#galleryCarousel" data-bs-slide-to="0" class="active" aria-label="Tampilkan proyek 1"></button>
+                            <button type="button" data-bs-target="#galleryCarousel" data-bs-slide-to="1" aria-label="Tampilkan proyek 2"></button>
+                            <button type="button" data-bs-target="#galleryCarousel" data-bs-slide-to="2" aria-label="Tampilkan proyek 3"></button>
                         @endif
                     </div>
                 @endif
@@ -1294,55 +1209,48 @@
     </div>
 </section>
 
-
-{{-- ============================================================
-     JAVASCRIPT — counter animasi + tab proyek
-     (AOS & Bootstrap sudah diinit di link.blade.php)
-     ============================================================ --}}
 <script>
-    // Counter: angka dari 0 → target saat section fakta masuk layar
     function scRunCounter(el) {
-        var target = parseInt(el.dataset.target, 10);
-        var duration = 1800;
-        var step = target / (duration / 16);
-        var current = 0;
-        var timer = setInterval(function() {
-            current += step;
-            if (current >= target) {
-                current = target;
-                clearInterval(timer);
-            }
-            el.textContent = Math.floor(current);
-        }, 16);
-    }
+            var target = parseInt(el.dataset.target, 10);
+            var duration = 1800;
+            var step = target / (duration / 16);
+            var current = 0;
+            var timer = setInterval(function() {
+                current += step;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                el.textContent = Math.floor(current);
+            }, 16);
+        }
 
-    var scCounterDone = false;
-    var scFaktaEl = document.querySelector('.sc-fakta');
-    if (scFaktaEl) {
-        new IntersectionObserver(function(entries) {
-            if (entries[0].isIntersecting && !scCounterDone) {
-                scCounterDone = true;
-                document.querySelectorAll('.js-counter').forEach(function(el) {
-                    scRunCounter(el);
+        var scCounterDone = false;
+        var scFaktaEl = document.querySelector('.sc-fakta');
+        if (scFaktaEl) {
+            new IntersectionObserver(function(entries) {
+                if (entries[0].isIntersecting && !scCounterDone) {
+                    scCounterDone = true;
+                    document.querySelectorAll('.js-counter').forEach(function(el) {
+                        scRunCounter(el);
+                    });
+                }
+            }, {
+                threshold: 0.25
+            }).observe(scFaktaEl);
+        }
+
+        document.querySelectorAll('.sc-fakta__tab').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.sc-fakta__tab').forEach(function(b) {
+                    b.classList.remove('active');
                 });
-            }
-        }, {
-            threshold: 0.25
-        }).observe(scFaktaEl);
-    }
-
-    // Tab proyek: ganti panel tanpa reload
-    document.querySelectorAll('.sc-fakta__tab').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.sc-fakta__tab').forEach(function(b) {
-                b.classList.remove('active');
+                document.querySelectorAll('.sc-fakta__pane').forEach(function(p) {
+                    p.classList.remove('active');
+                });
+                btn.classList.add('active');
+                var pane = document.getElementById(btn.dataset.pane);
+                if (pane) pane.classList.add('active');
             });
-            document.querySelectorAll('.sc-fakta__pane').forEach(function(p) {
-                p.classList.remove('active');
-            });
-            btn.classList.add('active');
-            var pane = document.getElementById(btn.dataset.pane);
-            if (pane) pane.classList.add('active');
         });
-    });
 </script>

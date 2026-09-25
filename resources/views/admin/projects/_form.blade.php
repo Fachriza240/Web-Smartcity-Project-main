@@ -40,16 +40,16 @@
 
 <div class="row">
     <div class="col-md-6 mb-3">
-        <label class="form-label">Thumbnail {{ $project->exists ? '' : '<span class="text-danger">*</span>' }}</label>
+        <label class="form-label">Thumbnail @unless ($project->exists)<span class="text-danger">*</span>@endunless</label>
         <input type="file" name="thumbnail"
                class="form-control @error('thumbnail') is-invalid @enderror"
-               accept="image/jpeg,image/png,image/gif,image/bmp,image/webp"
+               accept="image/*"
                @if(!$project->exists) required @endif>
         @if($project->thumbnail_path)
             <div class="mt-2">
-                <img src="{{ asset('storage/' . $project->thumbnail_path) }}"
-                     alt="Thumbnail" style="width: 120px; height: 80px; object-fit: cover; border-radius: 8px;">
-                <div class="small text-muted mt-1">Thumbnail saat ini. Upload baru untuk mengganti.</div>
+                <img class="adm-preview adm-preview--sm" src="{{ asset('storage/' . $project->thumbnail_path) }}"
+                     alt="Thumbnail">
+                <div class="small text-muted mt-1">Thumbnail saat ini. Unggah file baru untuk mengganti.</div>
             </div>
         @endif
         @error('thumbnail') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -69,18 +69,18 @@
 
 <div class="mb-3">
     <label class="form-label">Gallery (bisa pilih banyak foto)</label>
-        <input type="file" name="gallery[]" class="form-control @error('gallery.*') is-invalid @enderror"
-           accept="image/jpeg,image/png,image/gif,image/bmp,image/webp" multiple>
+    <input type="file" name="gallery[]"
+           class="form-control @error('gallery') is-invalid @enderror @error('gallery.*') is-invalid @enderror"
+           accept="image/*" multiple>
     @error('gallery') <div class="text-danger small">{{ $message }}</div> @enderror
     @error('gallery.*') <div class="text-danger small">{{ $message }}</div> @enderror
     @if($project->exists && !empty($project->gallery_paths))
         <div class="d-flex flex-wrap gap-2 mt-2">
             @foreach($project->gallery_paths as $img)
-                <img src="{{ asset('storage/' . $img) }}"
-                     alt="Gallery" style="width: 80px; height: 60px; object-fit: cover; border-radius: 6px;">
+                <img class="adm-preview-gallery" src="{{ asset('storage/' . $img) }}" alt="Gallery">
             @endforeach
         </div>
-        <div class="small text-muted mt-1">Gallery saat ini ({{ count($project->gallery_paths) }} foto). Upload baru untuk mengganti semua.</div>
+        <div class="small text-muted mt-1">Gallery saat ini ({{ count($project->gallery_paths) }} foto). Unggah file baru untuk mengganti semua.</div>
     @endif
 </div>
 
@@ -93,8 +93,8 @@
     @if($project->dokumen_path)
         <div class="small mt-1">
             Dokumen saat ini:
-           <a href="{{ route('project.document', $project) }}" target="_blank">Download</a>
-            <span class="text-muted">— Upload baru untuk mengganti.</span>
+            <a href="{{ asset('storage/' . $project->dokumen_path) }}" target="_blank">Download</a>
+            <span class="text-muted">Unggah file baru untuk mengganti.</span>
         </div>
     @endif
     @error('dokumen') <div class="invalid-feedback">{{ $message }}</div> @enderror

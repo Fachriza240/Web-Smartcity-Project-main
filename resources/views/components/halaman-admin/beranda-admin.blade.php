@@ -1,129 +1,48 @@
-{{-- Konten ini dirender di dalam <x-layout.admin> --}}
+@php
+    $stats = [
+        ['label' => 'Program', 'value' => \App\Models\Program::published()->count(), 'icon' => 'bi-layers', 'color' => 'icon-bg-blue', 'url' => route('admin.programs.index')],
+        ['label' => 'Proyek', 'value' => \App\Models\Project::published()->count(), 'icon' => 'bi-kanban', 'color' => 'icon-bg-green', 'url' => route('admin.projects.index')],
+        ['label' => 'Berita', 'value' => \App\Models\News::published()->count(), 'icon' => 'bi-newspaper', 'color' => 'icon-bg-yellow', 'url' => route('admin.news.index')],
+        ['label' => 'Publikasi', 'value' => \App\Models\Publication::published()->count(), 'icon' => 'bi-journal-text', 'color' => 'icon-bg-cyan', 'url' => route('admin.publications.index')],
+        ['label' => 'HKI', 'value' => \App\Models\Hki::published()->count(), 'icon' => 'bi-award', 'color' => 'icon-bg-purple', 'url' => route('admin.hki.index')],
+        ['label' => 'Tim', 'value' => \App\Models\Team::published()->count(), 'icon' => 'bi-people-fill', 'color' => 'icon-bg-blue', 'url' => route('admin.teams.index')],
+        ['label' => 'Mitra', 'value' => \App\Models\Partner::published()->count(), 'icon' => 'bi-buildings', 'color' => 'icon-bg-gray', 'url' => route('admin.partners.index')],
+        ['label' => 'Registrasi Menunggu', 'value' => \App\Models\User::where('registration_status', \App\Models\User::STATUS_PENDING)->count(), 'icon' => 'bi-person-check', 'color' => 'icon-bg-red', 'url' => route('admin.validasi.index', ['status' => 'pending']), 'action' => 'Validasi'],
+    ];
+    $shortcuts = [
+        ['label' => 'Program', 'url' => route('admin.programs.create')],
+        ['label' => 'Proyek', 'url' => route('admin.projects.create')],
+        ['label' => 'Berita', 'url' => route('admin.news.create')],
+        ['label' => 'Publikasi', 'url' => route('admin.publications.create')],
+        ['label' => 'HKI', 'url' => route('admin.hki.create')],
+        ['label' => 'Anggota Tim', 'url' => route('admin.teams.create')],
+        ['label' => 'Mitra', 'url' => route('admin.partners.create')],
+    ];
+@endphp
 
-{{-- Header --}}
 <div class="content-header">
     <div>
         <h2 class="mb-1">Dashboard Admin</h2>
-        <p class="mb-0">Selamat datang di panel admin COE Smart City.</p>
+        <p class="mb-0">Selamat datang di panel admin CoE Smart City.</p>
     </div>
     <div class="header-actions">
         <a href="{{ route('admin.settings') }}" class="btn btn-light btn-sm">
-            <i class="bi bi-gear me-1"></i> Pengaturan
+            <i class="bi bi-gear me-1" aria-hidden="true"></i> Pengaturan
         </a>
     </div>
 </div>
 
-{{-- Stats Cards --}}
-<div class="row g-3 mb-4">
-    <div class="col-sm-6 col-lg-3">
-        <div class="adm-stat">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="adm-stat__label">Program</div>
-                    <div class="adm-stat__num mt-1">{{ \App\Models\Program::where('status','Publish')->count() }}</div>
-                </div>
-                <div class="adm-stat__icon icon-bg-blue"><i class="bi bi-layers"></i></div>
-            </div>
-            <a href="{{ route('admin.programs.index') }}" class="adm-stat__link">Kelola <i class="bi bi-arrow-right"></i></a>
-        </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="adm-stat">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="adm-stat__label">Project</div>
-                    <div class="adm-stat__num mt-1">{{ \App\Models\Project::where('status','Publish')->count() }}</div>
-                </div>
-                <div class="adm-stat__icon icon-bg-green"><i class="bi bi-kanban"></i></div>
-            </div>
-            <a href="{{ route('admin.projects.index') }}" class="adm-stat__link">Kelola <i class="bi bi-arrow-right"></i></a>
-        </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="adm-stat">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="adm-stat__label">Berita</div>
-                    <div class="adm-stat__num mt-1">{{ \App\Models\News::where('status','Publish')->count() }}</div>
-                </div>
-                <div class="adm-stat__icon icon-bg-yellow"><i class="bi bi-newspaper"></i></div>
-            </div>
-            <a href="{{ route('admin.news.index') }}" class="adm-stat__link">Kelola <i class="bi bi-arrow-right"></i></a>
-        </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="adm-stat">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="adm-stat__label">Publication</div>
-                    <div class="adm-stat__num mt-1">{{ \App\Models\Publication::where('status','Publish')->count() }}</div>
-                </div>
-                <div class="adm-stat__icon icon-bg-cyan"><i class="bi bi-journal-text"></i></div>
-            </div>
-            <a href="{{ route('admin.publications.index') }}" class="adm-stat__link">Kelola <i class="bi bi-arrow-right"></i></a>
-        </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="adm-stat">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="adm-stat__label">Tim</div>
-                    <div class="adm-stat__num mt-1">{{ \App\Models\Team::where('status','Publish')->count() }}</div>
-                </div>
-                <div class="adm-stat__icon icon-bg-blue"><i class="bi bi-people-fill"></i></div>
-            </div>
-            <a href="{{ route('admin.teams.index') }}" class="adm-stat__link">Kelola <i class="bi bi-arrow-right"></i></a>
-        </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="adm-stat">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="adm-stat__label">Mitra</div>
-                    <div class="adm-stat__num mt-1">{{ \App\Models\Partner::where('status','Publish')->count() }}</div>
-                </div>
-                <div class="adm-stat__icon icon-bg-gray"><i class="bi bi-handshake"></i></div>
-            </div>
-            <a href="{{ route('admin.partners.index') }}" class="adm-stat__link">Kelola <i class="bi bi-arrow-right"></i></a>
-        </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="adm-stat">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="adm-stat__label">Registrasi Pending</div>
-                    <div class="adm-stat__num mt-1">{{ \App\Models\User::where('registration_status','pending')->count() }}</div>
-                </div>
-                <div class="adm-stat__icon icon-bg-red"><i class="bi bi-person-check"></i></div>
-            </div>
-            <a href="{{ route('admin.validasi.index') }}" class="adm-stat__link">Validasi <i class="bi bi-arrow-right"></i></a>
-        </div>
-    </div>
-</div>
+<x-admin.stats :items="$stats" />
 
-{{-- Quick Access --}}
 <div class="card-admin">
     <div class="card-body">
-        <h5 class="card-title mb-3">Quick Access</h5>
-        <div class="d-flex flex-wrap gap-2">
-            <a href="{{ route('admin.programs.create') }}" class="btn btn-sm btn-outline-primary">
-                <i class="bi bi-plus me-1"></i>Program
-            </a>
-            <a href="{{ route('admin.projects.create') }}" class="btn btn-sm btn-outline-success">
-                <i class="bi bi-plus me-1"></i>Project
-            </a>
-            <a href="{{ route('admin.news.create') }}" class="btn btn-sm btn-outline-warning">
-                <i class="bi bi-plus me-1"></i>Berita
-            </a>
-            <a href="{{ route('admin.publications.create') }}" class="btn btn-sm btn-outline-info">
-                <i class="bi bi-plus me-1"></i>Publication
-            </a>
-            <a href="{{ route('admin.teams.create') }}" class="btn btn-sm btn-outline-primary">
-                <i class="bi bi-plus me-1"></i>Tim
-            </a>
-            <a href="{{ route('admin.partners.create') }}" class="btn btn-sm btn-outline-secondary">
-                <i class="bi bi-plus me-1"></i>Mitra
-            </a>
+        <h3 class="card-title">Tambah Cepat</h3>
+        <div class="adm-shortcuts">
+            @foreach ($shortcuts as $shortcut)
+                <a href="{{ $shortcut['url'] }}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>{{ $shortcut['label'] }}
+                </a>
+            @endforeach
         </div>
     </div>
 </div>

@@ -1,112 +1,19 @@
 @props(['projects' => collect()])
 
 <style>
-    /* ══════════════════════════════════════════════
-       [PROYEK - PAGE HERO]
-       ══════════════════════════════════════════════ */
-    .proj-hero {
-        position: relative;
-        padding: 160px 0 100px;
-        background: linear-gradient(135deg, #f0f7ff 0%, #e4f0fb 50%, #f4f8fc 100%);
-        overflow: hidden;
-    }
-
-    .proj-hero__dots {
-        position: absolute;
-        inset: 0;
-        background-image: radial-gradient(rgba(76, 141, 201, 0.12) 1.5px, transparent 1.5px);
-        background-size: 30px 30px;
-        mask-image: radial-gradient(ellipse 40% 50% at 80% 30%, black 5%, transparent 75%);
-        pointer-events: none;
-    }
-
-    .proj-hero::before {
-        content: '';
-        position: absolute;
-        top: -80px;
-        right: -100px;
-        width: 500px;
-        height: 500px;
-        background: radial-gradient(circle, rgba(76, 141, 201, 0.12) 0%, transparent 70%);
-        border-radius: 50%;
-        pointer-events: none;
-    }
-
-    .proj-hero__content {
-        position: relative;
-        z-index: 2;
-        text-align: center;
-    }
-
-    .proj-hero__badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: rgba(76, 141, 201, 0.1);
-        border: 1px solid rgba(76, 141, 201, 0.3);
-        color: var(--primary-blue);
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 2.5px;
-        text-transform: uppercase;
-        padding: 8px 20px;
-        border-radius: 100px;
-        margin-bottom: 1.5rem;
-        font-family: "Spline Sans", sans-serif;
-    }
-
-    .proj-hero__badge-dot {
-        width: 7px;
-        height: 7px;
-        background: var(--primary-blue);
-        border-radius: 50%;
-        animation: projPulse 2s infinite;
-    }
-
     @keyframes projPulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: .4; transform: scale(.7); }
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: .4;
+            transform: scale(.7);
+        }
     }
 
-    .proj-hero__title {
-        font-size: clamp(2.2rem, 5vw, 3.5rem);
-        font-weight: 700;
-        color: var(--text-black);
-        margin-bottom: 1rem;
-        line-height: 1.15;
-        font-family: "Spline Sans", sans-serif;
-    }
-
-    .proj-hero__title .text-blue {
-        color: var(--primary-blue);
-    }
-
-    .proj-hero__subtitle {
-        font-size: 1.15rem;
-        color: var(--text-gray);
-        max-width: 650px;
-        margin: 0 auto;
-        line-height: 1.8;
-        font-family: "Lato", sans-serif;
-    }
-
-    .proj-hero__wave {
-        position: absolute;
-        bottom: -1px;
-        left: 0;
-        right: 0;
-        line-height: 0;
-        z-index: 3;
-    }
-
-    .proj-hero__wave svg {
-        display: block;
-        width: 100%;
-    }
-
-    /* ══════════════════════════════════════════════
-       [PROYEK - FEATURED CAROUSEL]
-       ══════════════════════════════════════════════ */
     .proj-featured {
         padding: 90px 0 50px;
         background: #fff;
@@ -198,9 +105,6 @@
         color: rgba(76, 141, 201, 0.25);
     }
 
-    /* ══════════════════════════════════════════════
-       [PROYEK - DAFTAR KARTU]
-       ══════════════════════════════════════════════ */
     .proj-list {
         padding: 50px 0 90px;
         background: #fff;
@@ -363,7 +267,6 @@
         border-color: var(--primary-blue);
     }
 
-    /* Fallback kosong */
     .proj-list__empty {
         text-align: center;
         padding: 60px 20px;
@@ -381,16 +284,9 @@
         font-family: "Lato", sans-serif;
     }
 
-    /* ══════════════════════════════════════════════
-       RESPONSIVE
-       ══════════════════════════════════════════════ */
     @media (max-width: 991px) {
         .proj-list__grid {
             grid-template-columns: repeat(2, 1fr);
-        }
-
-        .proj-hero {
-            padding: 140px 0 80px;
         }
 
         .proj-carousel-wrap .carousel-image-container,
@@ -404,51 +300,45 @@
             grid-template-columns: 1fr;
         }
 
-        .proj-hero {
-            padding: 120px 0 60px;
-        }
-
         .proj-carousel-wrap .carousel-image-container,
         .proj-carousel-placeholder {
             height: 250px;
         }
+
+        .proj-carousel-wrap .carousel-caption {
+            padding: 1rem;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        .proj-carousel-wrap .carousel-caption h5 {
+            font-size: 1rem;
+            margin-bottom: 0;
+        }
+
+        .proj-carousel-wrap .carousel-caption p {
+            display: none;
+        }
     }
 </style>
 
-<!-- ═══════════════════════════════════════
-     HERO BANNER
-     ═══════════════════════════════════════ -->
-<section class="proj-hero">
-    <div class="proj-hero__dots"></div>
-
+<section class="sc-page-hero">
     <div class="container">
-        <div class="proj-hero__content" data-aos="fade-up">
-            <div class="proj-hero__badge">
-                <span class="proj-hero__badge-dot"></span>
-                Proyek Kami
-            </div>
-            <h1 class="proj-hero__title">
-                Proyek Inovatif<br>
-                <span class="text-blue">Smart City</span>
-            </h1>
-            <p class="proj-hero__subtitle">
-                Dokumentasi proyek-proyek inovatif yang kami kembangkan dalam rangka mewujudkan ekosistem kota cerdas di Indonesia.
-            </p>
-        </div>
+        <span class="sc-page-hero__eyebrow"><span class="sc-page-hero__dot" aria-hidden="true"></span> Proyek Kami</span>
+        <h1 class="sc-page-hero__title">Proyek Inovatif<br><span class="text-blue">Smart City</span></h1>
+        <p class="sc-page-hero__lead">
+            Dokumentasi proyek-proyek inovatif yang kami kembangkan dalam rangka mewujudkan ekosistem kota cerdas di Indonesia.
+        </p>
     </div>
-
-    <div class="proj-hero__wave">
+    <div class="sc-page-hero__wave" aria-hidden="true">
         <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
-            <path fill="#ffffff"
-                d="M0,60 C360,110 720,10 1080,60 C1260,85 1380,50 1440,40 L1440,100 L0,100Z" />
+            <path fill="#ffffff" d="M0,60 C360,110 720,10 1080,60 C1260,85 1380,50 1440,40 L1440,100 L0,100Z" />
         </svg>
     </div>
 </section>
 
 @if($projects->isNotEmpty())
-    <!-- ═══════════════════════════════════════
-         PROYEK UNGGULAN (CAROUSEL)
-         ═══════════════════════════════════════ -->
     @php
         $featured = $projects->first(fn($p) => !empty($p->gallery_paths)) ?? $projects->first();
     @endphp
@@ -457,8 +347,8 @@
     <section class="proj-featured">
         <div class="container">
             <div data-aos="fade-up">
-                <div class="proj-section-label" style="justify-content: center;">Sorotan</div>
-                <h2 class="proj-featured__heading">Proyek <span style="color: var(--primary-blue);">Unggulan</span></h2>
+                <div class="proj-section-label sc-label-center">Sorotan</div>
+                <h2 class="proj-featured__heading">Proyek <span class="text-blue">Unggulan</span></h2>
                 <p class="proj-featured__subtitle">Proyek terbaru yang menjadi fokus utama pengembangan kami.</p>
             </div>
 
@@ -518,20 +408,17 @@
     </section>
     @endif
 
-    <!-- ═══════════════════════════════════════
-         DAFTAR SEMUA PROYEK
-         ═══════════════════════════════════════ -->
     <section class="proj-list">
         <div class="container">
             <div data-aos="fade-up">
-                <div class="proj-section-label" style="justify-content: center;">Daftar Proyek</div>
-                <h2 class="proj-list__heading">Semua <span style="color: var(--primary-blue);">Proyek Kami</span></h2>
+                <div class="proj-section-label sc-label-center">Daftar Proyek</div>
+                <h2 class="proj-list__heading">Semua <span class="text-blue">Proyek Kami</span></h2>
                 <p class="proj-list__subtitle">Jelajahi seluruh proyek yang sedang dan telah kami kerjakan.</p>
             </div>
 
             <div class="proj-list__grid">
                 @foreach($projects as $project)
-                    <div class="proj-card" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
+                    <div class="proj-card" id="proyek-{{ $project->id }}" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
                         <div class="proj-card__img-wrap">
                             @if($project->thumbnail_path)
                                 <img src="{{ asset('storage/' . $project->thumbnail_path) }}"
@@ -566,7 +453,7 @@
                             @endif
 
                             @if($project->dokumen_path)
-                                <a href="{{ route('project.document', $project) }}" ...
+                                <a href="{{ asset('storage/' . $project->dokumen_path) }}"
                                    target="_blank"
                                    class="proj-card__doc-btn">
                                     <i class="bi bi-file-earmark-text"></i>
@@ -581,8 +468,7 @@
     </section>
 
 @else
-    <!-- State Kosong -->
-    <section class="proj-list" style="padding: 90px 0;">
+    <section class="proj-list proj-list--empty">
         <div class="container">
             <div class="proj-list__empty" data-aos="fade-up">
                 <div class="proj-list__empty-icon">

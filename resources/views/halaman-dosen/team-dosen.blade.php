@@ -1,5 +1,7 @@
-<x-layout.link>
-    <x-layout.navbar-dosen></x-layout.navbar-dosen>
-    <x-halaman-dosen.team-dosen :staff="$staff" :interns="$interns"></x-halaman-dosen.team-dosen>
-    <x-layout.footer></x-layout.footer>
+<x-layout.link title="Tim">
+    <x-layout.navbar />
+    <main id="konten-utama">
+        <x-halaman-user.team-user :lecturers="$lecturers" :staff="$staff" :interns="$interns" />
+    </main>
+    <x-layout.footer />
 </x-layout.link>

@@ -1,7 +1,7 @@
-﻿<x-layout.admin>
-    
+<x-layout.admin title="Edit Berita">
+
             <div class="content-header">
-                <div><h2 class="mb-1">Edit Berita</h2><p class="mb-0">Perbarui berita COE Smart City.</p></div>
+                <div><h2 class="mb-1">Edit Berita</h2><p class="mb-0">Perbarui berita CoE Smart City.</p></div>
             </div>
             <div class="card-admin">
                 <div class="card-body">

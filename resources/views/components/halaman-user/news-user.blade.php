@@ -1,112 +1,19 @@
 @props(['news', 'categories', 'years'])
 
 <style>
-    /* ══════════════════════════════════════════════
-       [BERITA - PAGE HERO]
-       ══════════════════════════════════════════════ */
-    .news-hero {
-        position: relative;
-        padding: 160px 0 100px;
-        background: linear-gradient(135deg, #f0f7ff 0%, #e4f0fb 50%, #f4f8fc 100%);
-        overflow: hidden;
-    }
-
-    .news-hero__dots {
-        position: absolute;
-        inset: 0;
-        background-image: radial-gradient(rgba(76, 141, 201, 0.12) 1.5px, transparent 1.5px);
-        background-size: 30px 30px;
-        mask-image: radial-gradient(ellipse 40% 50% at 80% 30%, black 5%, transparent 75%);
-        pointer-events: none;
-    }
-
-    .news-hero::before {
-        content: '';
-        position: absolute;
-        top: -80px;
-        right: -100px;
-        width: 500px;
-        height: 500px;
-        background: radial-gradient(circle, rgba(76, 141, 201, 0.12) 0%, transparent 70%);
-        border-radius: 50%;
-        pointer-events: none;
-    }
-
-    .news-hero__content {
-        position: relative;
-        z-index: 2;
-        text-align: center;
-    }
-
-    .news-hero__badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: rgba(76, 141, 201, 0.1);
-        border: 1px solid rgba(76, 141, 201, 0.3);
-        color: var(--primary-blue);
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 2.5px;
-        text-transform: uppercase;
-        padding: 8px 20px;
-        border-radius: 100px;
-        margin-bottom: 1.5rem;
-        font-family: "Spline Sans", sans-serif;
-    }
-
-    .news-hero__badge-dot {
-        width: 7px;
-        height: 7px;
-        background: var(--primary-blue);
-        border-radius: 50%;
-        animation: newsPulse 2s infinite;
-    }
-
     @keyframes newsPulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: .4; transform: scale(.7); }
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: .4;
+            transform: scale(.7);
+        }
     }
 
-    .news-hero__title {
-        font-size: clamp(2.2rem, 5vw, 3.5rem);
-        font-weight: 700;
-        color: var(--text-black);
-        margin-bottom: 1rem;
-        line-height: 1.15;
-        font-family: "Spline Sans", sans-serif;
-    }
-
-    .news-hero__title .text-blue {
-        color: var(--primary-blue);
-    }
-
-    .news-hero__subtitle {
-        font-size: 1.15rem;
-        color: var(--text-gray);
-        max-width: 650px;
-        margin: 0 auto;
-        line-height: 1.8;
-        font-family: "Lato", sans-serif;
-    }
-
-    .news-hero__wave {
-        position: absolute;
-        bottom: -1px;
-        left: 0;
-        right: 0;
-        line-height: 0;
-        z-index: 3;
-    }
-
-    .news-hero__wave svg {
-        display: block;
-        width: 100%;
-    }
-
-    /* ══════════════════════════════════════════════
-       [BERITA - PENCARIAN]
-       ══════════════════════════════════════════════ */
     .news-search {
         padding: 60px 0 30px;
         background: #fff;
@@ -193,9 +100,6 @@
         font-family: "Lato", sans-serif;
     }
 
-    /* ══════════════════════════════════════════════
-       [BERITA - DAFTAR ARTIKEL]
-       ══════════════════════════════════════════════ */
     .news-list {
         padding: 30px 0 90px;
         background: #fff;
@@ -311,7 +215,6 @@
         margin: 0;
     }
 
-    /* Pagination */
     .news-pagination {
         display: flex;
         justify-content: center;
@@ -344,7 +247,6 @@
         color: #fff;
     }
 
-    /* Empty state */
     .news-list__empty {
         text-align: center;
         padding: 60px 20px;
@@ -360,15 +262,6 @@
         font-size: 1.1rem;
         color: var(--text-gray);
         font-family: "Lato", sans-serif;
-    }
-
-    /* ══════════════════════════════════════════════
-       RESPONSIVE
-       ══════════════════════════════════════════════ */
-    @media (max-width: 991px) {
-        .news-hero {
-            padding: 140px 0 80px;
-        }
     }
 
     @media (max-width: 768px) {
@@ -394,10 +287,6 @@
     }
 
     @media (max-width: 576px) {
-        .news-hero {
-            padding: 120px 0 60px;
-        }
-
         .news-article {
             padding: 18px;
         }
@@ -408,44 +297,26 @@
     }
 </style>
 
-<!-- ═══════════════════════════════════════
-     HERO BANNER
-     ═══════════════════════════════════════ -->
-<section class="news-hero">
-    <div class="news-hero__dots"></div>
-
+<section class="sc-page-hero">
     <div class="container">
-        <div class="news-hero__content" data-aos="fade-up">
-            <div class="news-hero__badge">
-                <span class="news-hero__badge-dot"></span>
-                Berita Terkini
-            </div>
-            <h1 class="news-hero__title">
-                Berita &amp; Informasi<br>
-                <span class="text-blue">Smart City</span>
-            </h1>
-            <p class="news-hero__subtitle">
-                Temukan berita terbaru seputar riset, inovasi, dan kegiatan CoE Smart City Universitas Telkom.
-            </p>
-        </div>
+        <span class="sc-page-hero__eyebrow"><span class="sc-page-hero__dot" aria-hidden="true"></span> Berita Terkini</span>
+        <h1 class="sc-page-hero__title">Berita &amp; Informasi<br><span class="text-blue">Smart City</span></h1>
+        <p class="sc-page-hero__lead">
+            Temukan berita terbaru seputar riset, inovasi, dan kegiatan CoE Smart City Universitas Telkom.
+        </p>
     </div>
-
-    <div class="news-hero__wave">
+    <div class="sc-page-hero__wave" aria-hidden="true">
         <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
-            <path fill="#ffffff"
-                d="M0,60 C360,110 720,10 1080,60 C1260,85 1380,50 1440,40 L1440,100 L0,100Z" />
+            <path fill="#ffffff" d="M0,60 C360,110 720,10 1080,60 C1260,85 1380,50 1440,40 L1440,100 L0,100Z" />
         </svg>
     </div>
 </section>
 
-<!-- ═══════════════════════════════════════
-     PENCARIAN & FILTER
-     ═══════════════════════════════════════ -->
 <section class="news-search">
     <div class="container">
         <form action="{{ route('news.index') }}" method="GET" data-aos="fade-up">
             <div class="news-search__bar">
-                <i class="bi bi-search" style="color: var(--primary-blue); font-size: 18px; margin-left: 8px;"></i>
+                <i class="bi bi-search sc-filter-icon" aria-hidden="true"></i>
                 <input type="text" name="search" class="news-search__input"
                        value="{{ request('search') }}" placeholder="Cari berita...">
                 <select name="kategori" class="news-search__select">
@@ -464,14 +335,11 @@
             </div>
         </form>
         <div class="news-search__info">
-            Menampilkan {{ $news->firstItem() ?? 0 }} – {{ $news->lastItem() ?? 0 }} dari {{ $news->total() }} berita
+            Menampilkan {{ $news->firstItem() ?? 0 }} sampai {{ $news->lastItem() ?? 0 }} dari {{ $news->total() }} berita
         </div>
     </div>
 </section>
 
-<!-- ═══════════════════════════════════════
-     DAFTAR BERITA
-     ═══════════════════════════════════════ -->
 <section class="news-list">
     <div class="container">
         @forelse($news as $item)
@@ -513,7 +381,6 @@
             </div>
         @endforelse
 
-        <!-- Pagination -->
         <div class="news-pagination">
             {{ $news->links() }}
         </div>

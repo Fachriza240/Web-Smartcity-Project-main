@@ -1,9 +1,9 @@
-﻿<x-layout.admin>
-    
+<x-layout.admin title="Tambah Project">
+
             <div class="content-header">
                 <div>
                     <h2 class="mb-1">Tambah Project</h2>
-                    <p class="mb-0">Tambahkan proyek baru COE Smart City.</p>
+                    <p class="mb-0">Tambahkan proyek baru CoE Smart City.</p>
                 </div>
             </div>
 

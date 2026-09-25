@@ -47,14 +47,13 @@
 </div>
 
 <div class="mb-3">
-    <label class="form-label">Foto {{ $team->exists ? '' : '<span class="text-danger">*</span>' }}</label>
+    <label class="form-label">Foto @unless ($team->exists)<span class="text-danger">*</span>@endunless</label>
     <input type="file" name="foto" class="form-control @error('foto') is-invalid @enderror"
-           accept="image/jpeg,image/png,image/gif,image/bmp,image/webp" @if(!$team->exists) required @endif>
+           accept="image/*" @if(!$team->exists) required @endif>
     @if($team->foto_path)
         <div class="mt-2">
-            <img src="{{ asset('storage/'.$team->foto_path) }}" alt="{{ $team->nama }}"
-                 style="width:80px;height:80px;object-fit:cover;border-radius:50%;">
-            <div class="small text-muted mt-1">Foto saat ini. Upload baru untuk mengganti.</div>
+            <img class="adm-avatar-lg" src="{{ asset('storage/'.$team->foto_path) }}" alt="{{ $team->nama }}">
+            <div class="small text-muted mt-1">Foto saat ini. Unggah file baru untuk mengganti.</div>
         </div>
     @endif
     @error('foto') <div class="invalid-feedback">{{ $message }}</div> @enderror

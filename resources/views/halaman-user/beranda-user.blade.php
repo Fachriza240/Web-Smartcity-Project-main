@@ -1,5 +1,7 @@
 <x-layout.link>
-    <x-layout.navbar></x-layout.navbar>
-    <x-layout.home></x-layout.home>
-    <x-layout.footer></x-layout.footer>
+    <x-layout.navbar />
+    <main id="konten-utama">
+        <x-layout.home />
+    </main>
+    <x-layout.footer />
 </x-layout.link>

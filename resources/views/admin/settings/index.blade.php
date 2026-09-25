@@ -1,6 +1,5 @@
 <x-layout.admin title="Pengaturan" subtitle="Kelola preferensi tampilan panel admin.">
 
-    {{-- ── Profil ──────────────────────────────────────────── --}}
     <div class="adm-settings-section">
         <div class="adm-settings-section__title">
             <i class="bi bi-person-circle"></i> Profil Akun
@@ -27,7 +26,7 @@
                 <span>{{ auth()->user()->email }}</span>
             </li>
             <li>
-                <span>Role</span>
+                <span>Peran</span>
                 <span>{{ ucfirst(str_replace('_', ' ', auth()->user()->role)) }}</span>
             </li>
             @if(auth()->user()->nip)
@@ -43,7 +42,6 @@
         </ul>
     </div>
 
-    {{-- ── Tampilan ─────────────────────────────────────────── --}}
     <div class="adm-settings-section">
         <div class="adm-settings-section__title">
             <i class="bi bi-palette"></i> Tampilan
@@ -52,7 +50,6 @@
             Atur preferensi visual panel admin. Perubahan disimpan di browser.
         </p>
 
-        {{-- Dark Mode Toggle --}}
         <label class="adm-dm-toggle" for="darkModeSwitch" id="darkModeLabel">
             <div class="adm-dm-toggle__left">
                 <div class="adm-dm-toggle__icon">
@@ -60,36 +57,34 @@
                     <i class="bi bi-sun-fill adm-dm-icon-dark"></i>
                 </div>
                 <div>
-                    <div class="adm-dm-toggle__label">Dark Mode</div>
+                    <div class="adm-dm-toggle__label">Mode Gelap</div>
                     <div class="adm-dm-toggle__sub" id="dmStatusText">
                         Aktifkan untuk tampilan gelap yang nyaman di malam hari.
                     </div>
                 </div>
             </div>
-            <label class="adm-switch" onclick="event.stopPropagation()">
+            <span class="adm-switch">
                 <input type="checkbox" id="darkModeSwitch">
                 <span class="adm-switch-slider"></span>
-            </label>
+            </span>
         </label>
 
-        {{-- Sidebar color hint --}}
         <div class="mt-4">
-            <div class="fw-semibold mb-2" style="font-size:13px; color:var(--adm-text-2);">
+            <div class="adm-settings-label">
                 Warna Aksen
             </div>
             <div class="adm-color-grid" id="accentGrid">
-                <div class="adm-color-dot selected" data-accent="#4c8dc9" style="background:#4c8dc9;" title="Biru (default)"></div>
-                <div class="adm-color-dot" data-accent="#7c3aed" style="background:#7c3aed;" title="Ungu"></div>
-                <div class="adm-color-dot" data-accent="#0891b2" style="background:#0891b2;" title="Cyan"></div>
-                <div class="adm-color-dot" data-accent="#16a34a" style="background:#16a34a;" title="Hijau"></div>
-                <div class="adm-color-dot" data-accent="#d97706" style="background:#d97706;" title="Amber"></div>
-                <div class="adm-color-dot" data-accent="#e11d48" style="background:#e11d48;" title="Merah"></div>
-                <div class="adm-color-dot" data-accent="#475569" style="background:#475569;" title="Abu-abu"></div>
+                <button type="button" class="adm-color-dot selected" data-accent="#4c8dc9" data-color="#4c8dc9" title="Biru (default)" aria-label="Warna aksen Biru (default)"></button>
+                <button type="button" class="adm-color-dot" data-accent="#7c3aed" data-color="#7c3aed" title="Ungu" aria-label="Warna aksen Ungu"></button>
+                <button type="button" class="adm-color-dot" data-accent="#0891b2" data-color="#0891b2" title="Cyan" aria-label="Warna aksen Cyan"></button>
+                <button type="button" class="adm-color-dot" data-accent="#16a34a" data-color="#16a34a" title="Hijau" aria-label="Warna aksen Hijau"></button>
+                <button type="button" class="adm-color-dot" data-accent="#d97706" data-color="#d97706" title="Amber" aria-label="Warna aksen Amber"></button>
+                <button type="button" class="adm-color-dot" data-accent="#e11d48" data-color="#e11d48" title="Merah" aria-label="Warna aksen Merah"></button>
+                <button type="button" class="adm-color-dot" data-accent="#475569" data-color="#475569" title="Abu-abu" aria-label="Warna aksen Abu-abu"></button>
             </div>
         </div>
     </div>
 
-    {{-- ── Sistem ───────────────────────────────────────────── --}}
     <div class="adm-settings-section">
         <div class="adm-settings-section__title">
             <i class="bi bi-info-circle"></i> Informasi Sistem
@@ -99,7 +94,7 @@
         <ul class="adm-info-list">
             <li>
                 <span>Aplikasi</span>
-                <span>COE Smart City — CMS</span>
+                <span>CoE Smart City CMS</span>
             </li>
             <li>
                 <span>Framework</span>
@@ -120,21 +115,17 @@
         </ul>
     </div>
 
-    {{-- ── Logout ───────────────────────────────────────────── --}}
     <div class="adm-settings-section">
-        <div class="adm-settings-section__title" style="color:#ef4444;">
-            <i class="bi bi-box-arrow-right" style="color:#ef4444;"></i> Sesi
+        <div class="adm-settings-section__title adm-text-danger">
+            <i class="bi bi-box-arrow-right"></i> Sesi
         </div>
         <p class="adm-settings-section__desc">Keluar dari panel admin.</p>
-        <form id="settings-logout-form" action="{{ route('logout') }}" method="POST">
+        <form action="{{ route('logout') }}" method="POST" data-confirm="Apakah Anda yakin ingin keluar dari akun?">
             @csrf
-            <button type="button" class="btn btn-sm"
-                    onclick="confirmLogoutForm('settings-logout-form')"
-                    style="background:#fef2f2;color:#ef4444;border:1px solid #fecaca;border-radius:8px;font-weight:600;padding:9px 20px;">
-                <i class="bi bi-box-arrow-right me-1"></i> Logout Sekarang
+            <button type="submit" class="adm-btn-soft adm-btn-soft--danger adm-btn-soft--lg">
+                <i class="bi bi-box-arrow-right me-1"></i> Keluar Sekarang
             </button>
         </form>
-        @include('partials.logout-confirm-modal')
     </div>
 
 </x-layout.admin>

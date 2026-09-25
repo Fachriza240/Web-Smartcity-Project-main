@@ -1,9 +1,9 @@
-﻿<x-layout.admin>
-    
+<x-layout.admin title="Edit Project">
+
             <div class="content-header">
                 <div>
                     <h2 class="mb-1">Edit Project</h2>
-                    <p class="mb-0">Perbarui data proyek COE Smart City.</p>
+                    <p class="mb-0">Perbarui data proyek CoE Smart City.</p>
                 </div>
             </div>
 

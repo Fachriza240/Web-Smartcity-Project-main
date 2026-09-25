@@ -1,5 +1,7 @@
-<x-layout.link>
-    <x-layout.navbar></x-layout.navbar>
-    <x-halaman-user.program-user :programs="$programs"></x-halaman-user.program-user>
-    <x-layout.footer></x-layout.footer>
+<x-layout.link title="Program">
+    <x-layout.navbar />
+    <main id="konten-utama">
+        <x-halaman-user.program-user :programs="$programs" />
+    </main>
+    <x-layout.footer />
 </x-layout.link>

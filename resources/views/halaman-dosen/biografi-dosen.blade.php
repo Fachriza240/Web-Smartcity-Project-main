@@ -1,5 +1,7 @@
-<x-layout.link>
-    <x-layout.navbar-dosen></x-layout.navbar-dosen>
-    <x-halaman-dosen.biografi-dosen></x-halaman-dosen.biografi-dosen>
-    <x-layout.footer></x-layout.footer>
+<x-layout.link title="Biografi Dosen">
+    <x-layout.navbar />
+    <main id="konten-utama">
+        <x-halaman-user.biografi-user :lecturer="$lecturer" :publications="$publications" :hkis="$hkis" />
+    </main>
+    <x-layout.footer />
 </x-layout.link>

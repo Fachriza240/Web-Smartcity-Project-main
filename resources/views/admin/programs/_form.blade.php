@@ -23,16 +23,15 @@
 
 <div class="row">
     <div class="col-md-6 mb-3">
-        <label class="form-label">Thumbnail {{ $program->exists ? '' : '<span class="text-danger">*</span>' }}</label>
+        <label class="form-label">Thumbnail @unless ($program->exists)<span class="text-danger">*</span>@endunless</label>
         <input type="file" name="thumbnail"
                class="form-control @error('thumbnail') is-invalid @enderror"
-               accept="image/jpeg,image/png,image/gif,image/bmp,image/webp"
+               accept="image/*"
                @if(!$program->exists) required @endif>
         @if($program->thumbnail_path)
             <div class="mt-2">
-                <img src="{{ asset('storage/' . $program->thumbnail_path) }}" alt="{{ $program->judul }}"
-                     style="width:160px;height:100px;object-fit:cover;border-radius:8px;">
-                <div class="small text-muted mt-1">Thumbnail saat ini. Upload baru untuk mengganti.</div>
+                <img class="adm-preview" src="{{ asset('storage/' . $program->thumbnail_path) }}" alt="{{ $program->judul }}">
+                <div class="small text-muted mt-1">Thumbnail saat ini. Unggah file baru untuk mengganti.</div>
             </div>
         @endif
         @error('thumbnail') <div class="invalid-feedback">{{ $message }}</div> @enderror

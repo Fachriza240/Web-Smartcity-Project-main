@@ -1,123 +1,17 @@
 <style>
-    /* ══════════════════════════════════════════════
-       [TENTANG KAMI - PAGE HERO]
-       ══════════════════════════════════════════════ */
-    .about-hero {
-        position: relative;
-        padding: 160px 0 100px;
-        background: linear-gradient(135deg, #f0f7ff 0%, #e4f0fb 50%, #f4f8fc 100%);
-        overflow: hidden;
-    }
-
-    .about-hero::before {
-        content: '';
-        position: absolute;
-        top: -80px;
-        right: -100px;
-        width: 500px;
-        height: 500px;
-        background: radial-gradient(circle, rgba(76, 141, 201, 0.12) 0%, transparent 70%);
-        border-radius: 50%;
-        pointer-events: none;
-    }
-
-    .about-hero::after {
-        content: '';
-        position: absolute;
-        bottom: -60px;
-        left: -80px;
-        width: 350px;
-        height: 350px;
-        background: radial-gradient(circle, rgba(76, 141, 201, 0.08) 0%, transparent 70%);
-        border-radius: 50%;
-        pointer-events: none;
-    }
-
-    .about-hero__dots {
-        position: absolute;
-        inset: 0;
-        background-image: radial-gradient(rgba(76, 141, 201, 0.12) 1.5px, transparent 1.5px);
-        background-size: 30px 30px;
-        mask-image: radial-gradient(ellipse 40% 50% at 80% 30%, black 5%, transparent 75%);
-        pointer-events: none;
-    }
-
-    .about-hero__content {
-        position: relative;
-        z-index: 2;
-        text-align: center;
-    }
-
-    .about-hero__badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: rgba(76, 141, 201, 0.1);
-        border: 1px solid rgba(76, 141, 201, 0.3);
-        color: var(--primary-blue);
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 2.5px;
-        text-transform: uppercase;
-        padding: 8px 20px;
-        border-radius: 100px;
-        margin-bottom: 1.5rem;
-        font-family: "Spline Sans", sans-serif;
-    }
-
-    .about-hero__badge-dot {
-        width: 7px;
-        height: 7px;
-        background: var(--primary-blue);
-        border-radius: 50%;
-        animation: aboutPulse 2s infinite;
-    }
-
     @keyframes aboutPulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: .4; transform: scale(.7); }
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: .4;
+            transform: scale(.7);
+        }
     }
 
-    .about-hero__title {
-        font-size: clamp(2.2rem, 5vw, 3.5rem);
-        font-weight: 700;
-        color: var(--text-black);
-        margin-bottom: 1rem;
-        line-height: 1.15;
-        font-family: "Spline Sans", sans-serif;
-    }
-
-    .about-hero__title .text-blue {
-        color: var(--primary-blue);
-    }
-
-    .about-hero__subtitle {
-        font-size: 1.15rem;
-        color: var(--text-gray);
-        max-width: 650px;
-        margin: 0 auto;
-        line-height: 1.8;
-        font-family: "Lato", sans-serif;
-    }
-
-    /* Gelombang bawah hero */
-    .about-hero__wave {
-        position: absolute;
-        bottom: -1px;
-        left: 0;
-        right: 0;
-        line-height: 0;
-        z-index: 3;
-    }
-
-    .about-hero__wave svg {
-        display: block;
-        width: 100%;
-    }
-
-    /* ══════════════════════════════════════════════
-       [TENTANG KAMI - DESKRIPSI SECTION]
-       ══════════════════════════════════════════════ */
     .about-desc {
         padding: 90px 0;
         background: #fff;
@@ -172,8 +66,14 @@
     }
 
     @keyframes aboutCardFloat {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-8px); }
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-8px);
+        }
     }
 
     .about-desc__floating-icon {
@@ -283,9 +183,6 @@
         font-family: "Spline Sans", sans-serif;
     }
 
-    /* ══════════════════════════════════════════════
-       [PILAR UTAMA - CARDS]
-       ══════════════════════════════════════════════ */
     .about-pillars {
         padding: 90px 0;
         background: var(--bg-light, #f4f8fc);
@@ -397,9 +294,6 @@
         font-family: "Lato", sans-serif;
     }
 
-    /* ══════════════════════════════════════════════
-       [VISI & MISI]
-       ══════════════════════════════════════════════ */
     .about-visimisi {
         padding: 90px 0;
         background: #fff;
@@ -521,9 +415,6 @@
         flex-shrink: 0;
     }
 
-    /* ══════════════════════════════════════════════
-       RESPONSIVE
-       ══════════════════════════════════════════════ */
     @media (max-width: 991px) {
         .about-desc__grid {
             grid-template-columns: 1fr;
@@ -537,19 +428,11 @@
         .about-visimisi__grid {
             grid-template-columns: 1fr;
         }
-
-        .about-hero {
-            padding: 140px 0 80px;
-        }
     }
 
     @media (max-width: 576px) {
         .about-pillars__grid {
             grid-template-columns: 1fr;
-        }
-
-        .about-hero {
-            padding: 120px 0 60px;
         }
 
         .about-desc__floating-card {
@@ -563,43 +446,24 @@
     }
 </style>
 
-<!-- ═══════════════════════════════════════
-     HERO BANNER
-     ═══════════════════════════════════════ -->
-<section class="about-hero">
-    <div class="about-hero__dots"></div>
-
+<section class="sc-page-hero">
     <div class="container">
-        <div class="about-hero__content" data-aos="fade-up">
-            <div class="about-hero__badge">
-                <span class="about-hero__badge-dot"></span>
-                Tentang Kami
-            </div>
-            <h1 class="about-hero__title">
-                Center of Excellence<br>
-                <span class="text-blue">Smart City</span>
-            </h1>
-            <p class="about-hero__subtitle">
-                Unit strategis Universitas Telkom untuk mempercepat riset, inovasi, bisnis, dan layanan masyarakat di bidang ilmu pengetahuan, teknologi, manajemen, dan seni.
-            </p>
-        </div>
+        <span class="sc-page-hero__eyebrow"><span class="sc-page-hero__dot" aria-hidden="true"></span> Tentang Kami</span>
+        <h1 class="sc-page-hero__title">Center of Excellence<br><span class="text-blue">Smart City</span></h1>
+        <p class="sc-page-hero__lead">
+            Unit strategis Universitas Telkom untuk mempercepat riset, inovasi, bisnis, dan layanan masyarakat di bidang ilmu pengetahuan, teknologi, manajemen, dan seni.
+        </p>
     </div>
-
-    <div class="about-hero__wave">
+    <div class="sc-page-hero__wave" aria-hidden="true">
         <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
-            <path fill="#ffffff"
-                d="M0,60 C360,110 720,10 1080,60 C1260,85 1380,50 1440,40 L1440,100 L0,100Z" />
+            <path fill="#ffffff" d="M0,60 C360,110 720,10 1080,60 C1260,85 1380,50 1440,40 L1440,100 L0,100Z" />
         </svg>
     </div>
 </section>
 
-<!-- ═══════════════════════════════════════
-     DESKRIPSI TENTANG COE
-     ═══════════════════════════════════════ -->
 <section class="about-desc">
     <div class="container">
         <div class="about-desc__grid">
-            <!-- Kolom Foto -->
             <div class="about-desc__img-wrap" data-aos="fade-right">
                 <img src="img/fotoaboutus.jpg" alt="Tim CoE Smart City" class="about-desc__img"
                      onerror="this.style.display='none'">
@@ -615,7 +479,6 @@
                 </div>
             </div>
 
-            <!-- Kolom Teks -->
             <div data-aos="fade-left">
                 <div class="about-desc__label">Siapa Kami</div>
                 <h2 class="about-desc__heading">
@@ -650,19 +513,15 @@
     </div>
 </section>
 
-<!-- ═══════════════════════════════════════
-     4 PILAR UTAMA
-     ═══════════════════════════════════════ -->
 <section class="about-pillars">
     <div class="container">
         <div data-aos="fade-up">
-            <div class="about-desc__label" style="justify-content: center;">Pilar Utama</div>
-            <h2 class="about-pillars__heading">Empat Pilar <span style="color: var(--primary-blue);">Unggulan Kami</span></h2>
+            <div class="about-desc__label sc-label-center">Pilar Utama</div>
+            <h2 class="about-pillars__heading">Empat Pilar <span class="text-blue">Unggulan Kami</span></h2>
             <p class="about-pillars__subtitle">Fondasi yang menopang seluruh aktivitas dan pencapaian CoE Smart City.</p>
         </div>
 
         <div class="about-pillars__grid">
-            <!-- Riset -->
             <div class="about-pillar-card" data-aos="fade-up" data-aos-delay="0">
                 <div class="about-pillar-card__icon about-pillar-card__icon--riset">
                     <i class="fas fa-flask"></i>
@@ -673,7 +532,6 @@
                 </p>
             </div>
 
-            <!-- Inovasi -->
             <div class="about-pillar-card" data-aos="fade-up" data-aos-delay="100">
                 <div class="about-pillar-card__icon about-pillar-card__icon--inovasi">
                     <i class="fas fa-lightbulb"></i>
@@ -684,7 +542,6 @@
                 </p>
             </div>
 
-            <!-- Bisnis -->
             <div class="about-pillar-card" data-aos="fade-up" data-aos-delay="200">
                 <div class="about-pillar-card__icon about-pillar-card__icon--bisnis">
                     <i class="fas fa-chart-line"></i>
@@ -695,7 +552,6 @@
                 </p>
             </div>
 
-            <!-- Layanan Masyarakat -->
             <div class="about-pillar-card" data-aos="fade-up" data-aos-delay="300">
                 <div class="about-pillar-card__icon about-pillar-card__icon--layanan">
                     <i class="fas fa-hands-helping"></i>
@@ -709,18 +565,14 @@
     </div>
 </section>
 
-<!-- ═══════════════════════════════════════
-     VISI & MISI
-     ═══════════════════════════════════════ -->
 <section class="about-visimisi">
     <div class="container">
-        <div data-aos="fade-up" style="text-align: center; margin-bottom: 3rem;">
-            <div class="about-desc__label" style="justify-content: center;">Arah &amp; Tujuan</div>
-            <h2 class="about-pillars__heading">Visi &amp; <span style="color: var(--primary-blue);">Misi Kami</span></h2>
+        <div class="about-visimisi__head" data-aos="fade-up">
+            <div class="about-desc__label sc-label-center">Arah &amp; Tujuan</div>
+            <h2 class="about-pillars__heading">Visi &amp; <span class="text-blue">Misi Kami</span></h2>
         </div>
 
         <div class="about-visimisi__grid">
-            <!-- Visi -->
             <div class="about-visimisi__card about-visimisi__card--visi" data-aos="fade-right">
                 <div class="about-visimisi__icon">
                     <i class="fas fa-eye"></i>
@@ -731,7 +583,6 @@
                 </p>
             </div>
 
-            <!-- Misi -->
             <div class="about-visimisi__card about-visimisi__card--misi" data-aos="fade-left">
                 <div class="about-visimisi__icon">
                     <i class="fas fa-bullseye"></i>

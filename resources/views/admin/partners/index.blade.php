@@ -1,17 +1,13 @@
-﻿<x-layout.admin>
-    
+<x-layout.admin title="Mitra">
+
             <div class="content-header">
-                <div><h2 class="mb-1">Mitra</h2><p class="mb-0">Kelola mitra/partner COE Smart City.</p></div>
+                <div><h2 class="mb-1">Mitra</h2><p class="mb-0">Kelola mitra/partner CoE Smart City.</p></div>
                 <div class="header-actions">
                     <a href="{{ route('admin.partners.create') }}" class="btn btn-primary">
                         <i class="bi bi-plus-lg me-2"></i>Tambah Mitra
                     </a>
                 </div>
             </div>
-
-            @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
 
             <div class="card-admin">
                 <div class="card-body">
@@ -51,12 +47,10 @@
                                     <tr>
                                         <td>
                                             @if($partner->logo_path)
-                                                <img src="{{ asset('storage/'.$partner->logo_path) }}"
-                                                     alt="{{ $partner->nama }}"
-                                                     style="height:40px;max-width:80px;object-fit:contain;">
+                                                <img class="adm-logo" src="{{ asset('storage/'.$partner->logo_path) }}"
+                                                     alt="{{ $partner->nama }}">
                                             @else
-                                                <div class="bg-light d-flex align-items-center justify-content-center"
-                                                     style="width:72px;height:40px;border-radius:8px;">
+                                                <div class="adm-thumb is-empty">
                                                     <i class="bi bi-building text-secondary"></i>
                                                 </div>
                                             @endif
@@ -88,7 +82,7 @@
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
                                                 <form action="{{ route('admin.partners.destroy', $partner) }}" method="POST"
-                                                      onsubmit="return confirm('Hapus mitra ini?')">
+                                                      data-confirm="Hapus mitra ini?">
                                                     @csrf @method('DELETE')
                                                     <button type="submit" class="btn-icon" title="Hapus"><i class="bi bi-trash"></i></button>
                                                 </form>

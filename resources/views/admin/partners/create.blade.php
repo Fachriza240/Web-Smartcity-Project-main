@@ -1,7 +1,7 @@
-﻿<x-layout.admin>
-    
+<x-layout.admin title="Tambah Mitra">
+
             <div class="content-header">
-                <div><h2 class="mb-1">Tambah Mitra</h2><p class="mb-0">Tambahkan mitra baru COE Smart City.</p></div>
+                <div><h2 class="mb-1">Tambah Mitra</h2><p class="mb-0">Tambahkan mitra baru CoE Smart City.</p></div>
             </div>
             <div class="card-admin">
                 <div class="card-body">

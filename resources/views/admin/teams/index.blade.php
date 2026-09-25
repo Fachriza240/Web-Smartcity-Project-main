@@ -1,17 +1,13 @@
-﻿<x-layout.admin>
-    
+<x-layout.admin title="Team">
+
             <div class="content-header">
-                <div><h2 class="mb-1">Team</h2><p class="mb-0">Kelola anggota tim COE Smart City.</p></div>
+                <div><h2 class="mb-1">Team</h2><p class="mb-0">Kelola anggota tim CoE Smart City.</p></div>
                 <div class="header-actions">
                     <a href="{{ route('admin.teams.create') }}" class="btn btn-primary">
                         <i class="bi bi-plus-lg me-2"></i>Tambah Anggota
                     </a>
                 </div>
             </div>
-
-            @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
 
             <div class="card-admin">
                 <div class="card-body">
@@ -60,11 +56,9 @@
                                     <tr>
                                         <td>
                                             @if($team->foto_path)
-                                                <img src="{{ asset('storage/'.$team->foto_path) }}" alt="{{ $team->nama }}"
-                                                     style="width:48px;height:48px;object-fit:cover;border-radius:50%;">
+                                                <img class="adm-avatar-sm" src="{{ asset('storage/'.$team->foto_path) }}" alt="{{ $team->nama }}">
                                             @else
-                                                <div class="bg-light d-flex align-items-center justify-content-center"
-                                                     style="width:48px;height:48px;border-radius:50%;">
+                                                <div class="adm-avatar-sm is-empty">
                                                     <i class="bi bi-person text-secondary"></i>
                                                 </div>
                                             @endif
@@ -88,7 +82,7 @@
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
                                                 <form action="{{ route('admin.teams.destroy', $team) }}" method="POST"
-                                                      onsubmit="return confirm('Hapus anggota ini?')">
+                                                      data-confirm="Hapus anggota ini?">
                                                     @csrf @method('DELETE')
                                                     <button type="submit" class="btn-icon" title="Hapus"><i class="bi bi-trash"></i></button>
                                                 </form>

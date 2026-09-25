@@ -1,7 +1,7 @@
-﻿<x-layout.admin>
-    
+<x-layout.admin title="Edit Mitra">
+
             <div class="content-header">
-                <div><h2 class="mb-1">Edit Mitra</h2><p class="mb-0">Perbarui data mitra COE Smart City.</p></div>
+                <div><h2 class="mb-1">Edit Mitra</h2><p class="mb-0">Perbarui data mitra CoE Smart City.</p></div>
             </div>
             <div class="card-admin">
                 <div class="card-body">

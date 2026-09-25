@@ -39,13 +39,12 @@
 
 <div class="mb-3">
     <label class="form-label">Logo</label>
-    <input type="file" name="logo" class="form-control @error('logo') is-invalid @enderror" accept="image/jpeg,image/png,image/gif,image/bmp,image/webp">
-    <div class="form-text">Format: JPG, PNG, GIF, WebP. Maks 4MB.</div>
+    <input type="file" name="logo" class="form-control @error('logo') is-invalid @enderror" accept="image/*">
+    <div class="form-text">Format: JPG, PNG, SVG, WebP. Maks 4MB.</div>
     @if($partner->exists && $partner->logo_path)
         <div class="mt-2">
-            <img src="{{ asset('storage/'.$partner->logo_path) }}" alt="{{ $partner->nama }}"
-                 style="height:60px;max-width:160px;object-fit:contain;background:#f8f9fa;padding:8px;border-radius:8px;">
-            <div class="small text-muted mt-1">Logo saat ini. Upload baru untuk mengganti.</div>
+            <img class="adm-logo-lg" src="{{ asset('storage/'.$partner->logo_path) }}" alt="{{ $partner->nama }}">
+            <div class="small text-muted mt-1">Logo saat ini. Unggah file baru untuk mengganti.</div>
         </div>
     @endif
     @error('logo') <div class="invalid-feedback">{{ $message }}</div> @enderror

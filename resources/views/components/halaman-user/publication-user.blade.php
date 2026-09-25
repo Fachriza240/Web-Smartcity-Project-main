@@ -1,112 +1,19 @@
 @props(['publications', 'categories', 'years'])
 
 <style>
-    /* ══════════════════════════════════════════════
-       [PUBLIKASI - PAGE HERO]
-       ══════════════════════════════════════════════ */
-    .pub-hero {
-        position: relative;
-        padding: 160px 0 100px;
-        background: linear-gradient(135deg, #f0f7ff 0%, #e4f0fb 50%, #f4f8fc 100%);
-        overflow: hidden;
-    }
-
-    .pub-hero__dots {
-        position: absolute;
-        inset: 0;
-        background-image: radial-gradient(rgba(76, 141, 201, 0.12) 1.5px, transparent 1.5px);
-        background-size: 30px 30px;
-        mask-image: radial-gradient(ellipse 40% 50% at 80% 30%, black 5%, transparent 75%);
-        pointer-events: none;
-    }
-
-    .pub-hero::before {
-        content: '';
-        position: absolute;
-        top: -80px;
-        right: -100px;
-        width: 500px;
-        height: 500px;
-        background: radial-gradient(circle, rgba(76, 141, 201, 0.12) 0%, transparent 70%);
-        border-radius: 50%;
-        pointer-events: none;
-    }
-
-    .pub-hero__content {
-        position: relative;
-        z-index: 2;
-        text-align: center;
-    }
-
-    .pub-hero__badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: rgba(76, 141, 201, 0.1);
-        border: 1px solid rgba(76, 141, 201, 0.3);
-        color: var(--primary-blue);
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 2.5px;
-        text-transform: uppercase;
-        padding: 8px 20px;
-        border-radius: 100px;
-        margin-bottom: 1.5rem;
-        font-family: "Spline Sans", sans-serif;
-    }
-
-    .pub-hero__badge-dot {
-        width: 7px;
-        height: 7px;
-        background: var(--primary-blue);
-        border-radius: 50%;
-        animation: pubPulse 2s infinite;
-    }
-
     @keyframes pubPulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: .4; transform: scale(.7); }
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: .4;
+            transform: scale(.7);
+        }
     }
 
-    .pub-hero__title {
-        font-size: clamp(2.2rem, 5vw, 3.5rem);
-        font-weight: 700;
-        color: var(--text-black);
-        margin-bottom: 1rem;
-        line-height: 1.15;
-        font-family: "Spline Sans", sans-serif;
-    }
-
-    .pub-hero__title .text-blue {
-        color: var(--primary-blue);
-    }
-
-    .pub-hero__subtitle {
-        font-size: 1.15rem;
-        color: var(--text-gray);
-        max-width: 680px;
-        margin: 0 auto;
-        line-height: 1.8;
-        font-family: "Lato", sans-serif;
-    }
-
-    .pub-hero__wave {
-        position: absolute;
-        bottom: -1px;
-        left: 0;
-        right: 0;
-        line-height: 0;
-        z-index: 3;
-    }
-
-    .pub-hero__wave svg {
-        display: block;
-        width: 100%;
-    }
-
-    /* ══════════════════════════════════════════════
-       [PUBLIKASI - PENCARIAN]
-       ══════════════════════════════════════════════ */
     .pub-search {
         padding: 60px 0 30px;
         background: #fff;
@@ -193,9 +100,6 @@
         font-family: "Lato", sans-serif;
     }
 
-    /* ══════════════════════════════════════════════
-       [PUBLIKASI - DAFTAR KARTU]
-       ══════════════════════════════════════════════ */
     .pub-list {
         padding: 30px 0 90px;
         background: #fff;
@@ -368,7 +272,6 @@
         transform: translateY(-1px);
     }
 
-    /* Pagination */
     .pub-pagination {
         display: flex;
         justify-content: center;
@@ -401,7 +304,6 @@
         color: #fff;
     }
 
-    /* Empty */
     .pub-list__empty {
         text-align: center;
         padding: 60px 20px;
@@ -417,15 +319,6 @@
         font-size: 1.1rem;
         color: var(--text-gray);
         font-family: "Lato", sans-serif;
-    }
-
-    /* ══════════════════════════════════════════════
-       RESPONSIVE
-       ══════════════════════════════════════════════ */
-    @media (max-width: 991px) {
-        .pub-hero {
-            padding: 140px 0 80px;
-        }
     }
 
     @media (max-width: 768px) {
@@ -451,10 +344,6 @@
     }
 
     @media (max-width: 576px) {
-        .pub-hero {
-            padding: 120px 0 60px;
-        }
-
         .pub-article {
             padding: 18px;
         }
@@ -465,44 +354,26 @@
     }
 </style>
 
-<!-- ═══════════════════════════════════════
-     HERO BANNER
-     ═══════════════════════════════════════ -->
-<section class="pub-hero">
-    <div class="pub-hero__dots"></div>
-
+<section class="sc-page-hero">
     <div class="container">
-        <div class="pub-hero__content" data-aos="fade-up">
-            <div class="pub-hero__badge">
-                <span class="pub-hero__badge-dot"></span>
-                Publikasi Ilmiah
-            </div>
-            <h1 class="pub-hero__title">
-                Publikasi &amp; Karya<br>
-                <span class="text-blue">Akademik</span>
-            </h1>
-            <p class="pub-hero__subtitle">
-                Kumpulan publikasi ilmiah, laporan penelitian, dan karya akademik yang dihasilkan oleh tim peneliti CoE Smart City Universitas Telkom.
-            </p>
-        </div>
+        <span class="sc-page-hero__eyebrow"><span class="sc-page-hero__dot" aria-hidden="true"></span> Publikasi Ilmiah</span>
+        <h1 class="sc-page-hero__title">Publikasi &amp; Karya<br><span class="text-blue">Akademik</span></h1>
+        <p class="sc-page-hero__lead">
+            Kumpulan publikasi ilmiah, laporan penelitian, dan karya akademik yang dihasilkan oleh tim peneliti CoE Smart City Universitas Telkom.
+        </p>
     </div>
-
-    <div class="pub-hero__wave">
+    <div class="sc-page-hero__wave" aria-hidden="true">
         <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
-            <path fill="#ffffff"
-                d="M0,60 C360,110 720,10 1080,60 C1260,85 1380,50 1440,40 L1440,100 L0,100Z" />
+            <path fill="#ffffff" d="M0,60 C360,110 720,10 1080,60 C1260,85 1380,50 1440,40 L1440,100 L0,100Z" />
         </svg>
     </div>
 </section>
 
-<!-- ═══════════════════════════════════════
-     PENCARIAN & FILTER
-     ═══════════════════════════════════════ -->
 <section class="pub-search">
     <div class="container">
         <form action="{{ route('publications.index') }}" method="GET" data-aos="fade-up">
             <div class="pub-search__bar">
-                <i class="bi bi-search" style="color: var(--primary-blue); font-size: 18px; margin-left: 8px;"></i>
+                <i class="bi bi-search sc-filter-icon" aria-hidden="true"></i>
                 <input type="text" name="search" class="pub-search__input"
                        value="{{ request('search') }}" placeholder="Cari judul, penulis, abstrak, atau DOI...">
                 <select name="kategori" class="pub-search__select">
@@ -521,14 +392,11 @@
             </div>
         </form>
         <div class="pub-search__info">
-            Menampilkan {{ $publications->firstItem() ?? 0 }} – {{ $publications->lastItem() ?? 0 }} dari {{ $publications->total() }} publikasi
+            Menampilkan {{ $publications->firstItem() ?? 0 }} sampai {{ $publications->lastItem() ?? 0 }} dari {{ $publications->total() }} publikasi
         </div>
     </div>
 </section>
 
-<!-- ═══════════════════════════════════════
-     DAFTAR PUBLIKASI
-     ═══════════════════════════════════════ -->
 <section class="pub-list">
     <div class="container">
         @forelse($publications as $publication)
@@ -581,7 +449,6 @@
             </div>
         @endforelse
 
-        <!-- Pagination -->
         <div class="pub-pagination">
             {{ $publications->links() }}
         </div>

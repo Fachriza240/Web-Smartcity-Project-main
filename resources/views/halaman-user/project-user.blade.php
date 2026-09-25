@@ -1,5 +1,7 @@
-<x-layout.link>
-    <x-layout.navbar></x-layout.navbar>
-    <x-halaman-user.project-user :projects="$projects"></x-halaman-user.project-user>
-    <x-layout.footer></x-layout.footer>
+<x-layout.link title="Proyek">
+    <x-layout.navbar />
+    <main id="konten-utama">
+        <x-halaman-user.project-user :projects="$projects" />
+    </main>
+    <x-layout.footer />
 </x-layout.link>

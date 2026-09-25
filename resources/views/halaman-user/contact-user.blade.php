@@ -1,7 +1,7 @@
-<x-layout.link title="Proyek">
+<x-layout.link title="Kontak">
     <x-layout.navbar />
     <main id="konten-utama">
-        <x-halaman-user.project-user :projects="$projects" />
+        <x-halaman-user.contact-user />
     </main>
     <x-layout.footer />
 </x-layout.link>

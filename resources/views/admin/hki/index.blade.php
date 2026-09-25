@@ -1,9 +1,9 @@
-<x-layout.admin title="HKI" subtitle="Kelola Hak Kekayaan Intelektual COE Smart City.">
+<x-layout.admin title="HKI" subtitle="Kelola Hak Kekayaan Intelektual CoE Smart City.">
 
     <div class="content-header">
         <div>
             <h2 class="mb-1">HKI</h2>
-            <p class="mb-0">Kelola Hak Kekayaan Intelektual COE Smart City.</p>
+            <p class="mb-0">Kelola Hak Kekayaan Intelektual CoE Smart City.</p>
         </div>
         <div class="header-actions">
             <a href="{{ route('admin.hki.create') }}" class="btn btn-primary">
@@ -11,10 +11,6 @@
             </a>
         </div>
     </div>
-
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
 
     <div class="card-admin">
         <div class="card-body">
@@ -96,7 +92,7 @@
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                         <form action="{{ route('admin.hki.destroy', $item) }}" method="POST"
-                                              onsubmit="return confirm('Hapus HKI ini?')">
+                                              data-confirm="Hapus HKI ini?">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="btn-icon" title="Hapus">
                                                 <i class="bi bi-trash"></i>

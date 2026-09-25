@@ -1,7 +1,7 @@
-﻿<x-layout.admin>
-    
+<x-layout.admin title="Tambah Anggota Tim">
+
             <div class="content-header">
-                <div><h2 class="mb-1">Tambah Anggota Tim</h2><p class="mb-0">Tambahkan anggota tim baru COE Smart City.</p></div>
+                <div><h2 class="mb-1">Tambah Anggota Tim</h2><p class="mb-0">Tambahkan anggota tim baru CoE Smart City.</p></div>
             </div>
             <div class="card-admin">
                 <div class="card-body">

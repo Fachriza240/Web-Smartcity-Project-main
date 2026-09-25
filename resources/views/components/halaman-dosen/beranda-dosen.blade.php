@@ -1,69 +1,42 @@
-<nav class="navbar navbar-expand-lg fixed-top">
-    <div class="container">
-        <a class="navbar-brand" href="#">
-            <img src="img/logosc.png" alt="Smart City Logo">
-        </a>
+@php
+    $user = auth()->user();
+    $publicationCount = \App\Models\Publication::forDosen($user)->count();
+    $hkiCount = \App\Models\Hki::forDosen($user)->count();
+@endphp
 
-        <!-- User avatar for mobile (visible only on small screens) -->
-        <div class="d-lg-none mobile-user-dropdown dropdown">
-            <img src="img/rayyan.jpg" class="user-avatar dropdown-toggle" id="mobileUserDropdown"
-                data-bs-toggle="dropdown" aria-expanded="false">
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mobileUserDropdown">
-                <li><a class="dropdown-item" href="/editprofile">Edit Profile</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li>
-                    <a class="dropdown-item" href="#"
-                       onclick="event.preventDefault(); confirmLogoutForm('logout-form-mobile');">
-                        Logout
-                    </a>
-                    <form id="logout-form-mobile" action="{{ route('logout') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                </li>
-            </ul>
+<section class="dsn-quick" aria-labelledby="dsn-quick-title">
+    <div class="container">
+        <div class="dsn-quick__head">
+            <h2 id="dsn-quick-title">Selamat datang, {{ $user->fullname }}</h2>
+            <p>Kelola profil, publikasi, dan HKI Anda dari satu tempat.</p>
         </div>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
-            <div class="nav-and-search">
-                <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/program">Program</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/project">Project</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/news">News</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/team-dosen">Team</a></li>
-                </ul>
-                <div class="d-flex align-items-center">
-                    <div class="search-box">
-                        <input type="text" placeholder="Search...">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <!-- User profile for desktop (visible only on large screens) -->
-                    <div class="d-none d-lg-block dropdown user-dropdown">
-                        <img src="img/rayyan.jpg" class="user-avatar dropdown-toggle" id="desktopUserDropdown"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="desktopUserDropdown">
-                            <li><a class="dropdown-item" href="/editprofile">Edit Profile</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <a class="dropdown-item" href="#"
-                                   onclick="event.preventDefault(); confirmLogoutForm('logout-form-desktop');">
-                                    Logout
-                                </a>
-                                <form id="logout-form-desktop" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                    @csrf
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+        <div class="dsn-quick__grid">
+            <a href="{{ route('profil.dosen') }}" class="dsn-quick__card">
+                <i class="bi bi-person-circle" aria-hidden="true"></i>
+                <strong>Profil Saya</strong>
+                <span>Perbarui data diri</span>
+            </a>
+            <a href="{{ route('dosen.publikasi.index') }}" class="dsn-quick__card">
+                <i class="bi bi-journal-text" aria-hidden="true"></i>
+                <strong>Publikasi Saya</strong>
+                <span>{{ $publicationCount }} entri</span>
+            </a>
+            <a href="{{ route('dosen.hki.index') }}" class="dsn-quick__card">
+                <i class="bi bi-award" aria-hidden="true"></i>
+                <strong>HKI Saya</strong>
+                <span>{{ $hkiCount }} entri</span>
+            </a>
+            <a href="{{ route('dosen.publikasi.create') }}" class="dsn-quick__card dsn-quick__card--primary">
+                <i class="bi bi-plus-circle-fill" aria-hidden="true"></i>
+                <strong>Tambah Publikasi</strong>
+                <span>Unggah publikasi baru</span>
+            </a>
+            <a href="{{ route('dosen.hki.create') }}" class="dsn-quick__card dsn-quick__card--success">
+                <i class="bi bi-plus-circle-fill" aria-hidden="true"></i>
+                <strong>Tambah HKI</strong>
+                <span>Daftarkan HKI baru</span>
+            </a>
         </div>
     </div>
-</nav>
-
-@include('partials.logout-confirm-modal')
+</section>

@@ -1,483 +1,224 @@
-@props(['user'])
+@props(['user', 'publications' => collect(), 'hkis' => collect()])
 
-{{-- ─────────────────────────────────────────────────────────
-     STYLE — ikuti main.css (profile-header, card-publication, dsb)
-     ───────────────────────────────────────────────────────── --}}
-<style>
-.prof-edit-bar {
-    background: #fff8e1;
-    border-bottom: 2px solid #ffd600;
-    padding: 10px 0;
-    position: sticky;
-    top: 0;
-    z-index: 999;
-    display: none;
-}
-.prof-edit-bar.show { display: block; }
-.prof-edit-bar .container {
-    display: flex; align-items: center;
-    justify-content: space-between; gap: 12px;
-}
-.prof-edit-bar .edit-label {
-    font-size: 13px; font-weight: 700; color: #b45309;
-    display: flex; align-items: center; gap: 6px;
-}
-.prof-edit-bar .btn-save-bar {
-    background: #22c55e; color: #fff;
-    border: none; border-radius: 8px;
-    padding: 8px 20px; font-weight: 700;
-    font-size: 13px; cursor: pointer;
-    transition: background .2s;
-}
-.prof-edit-bar .btn-save-bar:hover { background: #16a34a; }
-.prof-edit-bar .btn-cancel-bar {
-    background: transparent; color: #64748b;
-    border: 1.5px solid #e2e8f0; border-radius: 8px;
-    padding: 8px 16px; font-weight: 600;
-    font-size: 13px; cursor: pointer;
-    transition: all .2s;
-}
-.prof-edit-bar .btn-cancel-bar:hover { border-color: #94a3b8; color: #0f172a; }
+@php
+    $bio = collect(preg_split('/\R+/', (string) $user->bio))->map(fn ($p) => trim($p))->filter();
+    $fields = collect(preg_split('/[,;\n]+/', (string) $user->bidang_penelitian))->map(fn ($p) => trim($p))->filter();
+    $editOpen = $errors->any();
+@endphp
 
-/* avatar overlay */
-.prof-avatar-container { position: relative; display: inline-block; }
-.prof-avatar-overlay {
-    position: absolute; inset: 0; border-radius: 50%;
-    background: rgba(0,0,0,.45);
-    display: none; align-items: center;
-    justify-content: center; flex-direction: column;
-    cursor: pointer; gap: 3px;
-}
-.edit-mode .prof-avatar-overlay { display: flex; }
-.prof-avatar-overlay span {
-    color: #fff; font-size: 11px; font-weight: 600;
-    text-align: center; line-height: 1.2;
-}
-.prof-avatar-overlay i { font-size: 22px; color: #fff; }
-
-/* inline edit field */
-.edit-field {
-    display: none;
-    background: rgba(255,255,255,.15);
-    border: 1.5px solid rgba(255,255,255,.4);
-    border-radius: 8px;
-    color: #fff;
-    padding: 6px 12px;
-    font-size: inherit;
-    font-family: inherit;
-    width: 100%;
-    margin-bottom: 6px;
-    outline: none;
-}
-.edit-field::placeholder { color: rgba(255,255,255,.5); }
-.edit-field:focus { border-color: #fff; background: rgba(255,255,255,.25); }
-.edit-mode .edit-field { display: block; }
-.edit-mode .view-text  { display: none; }
-
-/* body edit field */
-.body-edit-field {
-    display: none;
-    width: 100%;
-    padding: 9px 13px;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 14px;
-    font-family: inherit;
-    color: #0f172a;
-    background: #f8fafc;
-    outline: none;
-    transition: border-color .2s, box-shadow .2s;
-    resize: vertical;
-}
-.body-edit-field:focus {
-    border-color: #4c8dc9;
-    box-shadow: 0 0 0 3px rgba(76,141,201,.12);
-    background: #fff;
-}
-.edit-mode .body-edit-field { display: block; }
-.edit-mode .body-view-text  { display: none; }
-
-/* section-title-profile sudah ada di main.css */
-.edit-profile-btn {
-    margin-top: 1rem;
-    background: rgba(255,255,255,.15);
-    border: 2px solid rgba(255,255,255,.5);
-    color: #fff;
-    padding: 8px 22px;
-    border-radius: 25px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-}
-.edit-profile-btn:hover { background: rgba(255,255,255,.28); }
-.edit-profile-btn.hide-on-edit { }
-.edit-mode .hide-on-edit { display: none !important; }
-
-/* success alert */
-.prof-success {
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
-    color: #16a34a;
-    border-radius: 10px;
-    padding: 12px 18px;
-    font-size: 13px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 20px;
-}
-</style>
-
-{{-- ─── STICKY EDIT BAR ───────────────────────────────── --}}
-<div class="prof-edit-bar" id="editBar">
+<section class="sc-bio-hero">
     <div class="container">
-        <div class="edit-label">
-            <i class="bi bi-pencil-fill"></i>
-            Mode Edit aktif — perubahan belum disimpan
-        </div>
-        <div class="d-flex gap-2">
-            <button type="button" class="btn-cancel-bar" onclick="cancelEdit()">
-                Batal
-            </button>
-            <button type="submit" form="profForm" class="btn-save-bar">
-                <i class="bi bi-save-fill me-1"></i> Simpan Perubahan
-            </button>
-        </div>
-    </div>
-</div>
-
-<form action="{{ route('profil.dosen.update') }}" method="POST"
-      enctype="multipart/form-data" id="profForm">
-@csrf
-@method('PUT')
-
-{{-- ─── PROFILE HEADER ────────────────────────────────── --}}
-<div class="profile-header" id="profileHeader">
-    <div class="container profile-header-content">
-
-        @if(session('success'))
-            <div class="prof-success">
-                <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
+        <div class="sc-bio-hero__grid">
+            <div class="sc-bio-hero__photo">
+                @if ($user->foto)
+                    <img src="{{ asset('storage/'.$user->foto) }}" alt="Foto {{ $user->fullname }}">
+                @else
+                    <span aria-hidden="true">{{ mb_strtoupper(mb_substr($user->fullname, 0, 1)) }}</span>
+                @endif
             </div>
-        @endif
-        @if($errors->any())
-            <div class="prof-success" style="background:#fef2f2;border-color:#fecaca;color:#dc2626;">
-                <i class="bi bi-exclamation-circle-fill"></i> {{ $errors->first() }}
-            </div>
-        @endif
-
-        <div class="row align-items-center">
-
-            {{-- Foto --}}
-            <div class="col-md-3 text-center">
-                <div class="prof-avatar-container">
-                    @if($user->foto)
-                        <img src="{{ asset('storage/'.$user->foto) }}"
-                             alt="{{ $user->fullname }}"
-                             class="rounded-circle img-fluid profile-image"
-                             id="avatarPreview">
-                    @else
-                        <div class="rounded-circle profile-image d-flex align-items-center justify-content-center"
-                             style="background:rgba(255,255,255,.15);border:3px solid rgba(255,255,255,.3);"
-                             id="avatarPreview">
-                            <i class="bi bi-person-fill" style="font-size:3.5rem;color:rgba(255,255,255,.7);"></i>
-                        </div>
-                    @endif
-                    <label for="fotoInput" class="prof-avatar-overlay" title="Ganti foto">
-                        <i class="bi bi-camera-fill"></i>
-                        <span>Ganti<br>Foto</span>
-                    </label>
-                        <input type="file" name="foto" id="fotoInput" accept="image/jpeg,image/png,image/gif,image/bmp,image/webp"
-                           style="display:none;" onchange="previewFoto(this)">
-                </div>
-            </div>
-
-            {{-- Info header --}}
-            <div class="col-md-9">
-
-                {{-- Nama --}}
-                <h1 style="color:white;">
-                    <span class="view-text">{{ $user->fullname }}</span>
-                    <input type="text" name="fullname" class="edit-field"
-                           value="{{ old('fullname', $user->fullname) }}"
-                           placeholder="Nama Lengkap" required style="font-size:1.5rem;">
-                </h1>
-
-                {{-- Jabatan / Prodi --}}
-                <h4 class="mb-2" style="color:white;">
-                    <span class="view-text">{{ $user->prodi ?? 'Program Studi belum diisi' }}</span>
-                    <input type="text" name="prodi" class="edit-field"
-                           value="{{ old('prodi', $user->prodi) }}"
-                           placeholder="Program Studi" style="font-size:1.1rem;">
-                </h4>
-
-                {{-- Fakultas --}}
-                <p class="lead mb-0" style="color:white;">
-                    <span class="view-text">
-                        {{ $user->fakultas ? $user->fakultas . ' — Universitas Telkom' : 'Fakultas belum diisi' }}
-                    </span>
-                    <input type="text" name="fakultas" class="edit-field"
-                           value="{{ old('fakultas', $user->fakultas) }}"
-                           placeholder="Fakultas" style="font-size:1rem;">
+            <div>
+                <h1 class="sc-bio-hero__name">{{ $user->fullname }}</h1>
+                <p class="sc-bio-hero__role">{{ $user->prodi ?: 'Program studi belum diisi' }}</p>
+                <p class="sc-bio-hero__unit">
+                    <i class="bi bi-building" aria-hidden="true"></i>
+                    {{ $user->fakultas ? $user->fakultas.', Telkom University' : 'Fakultas belum diisi' }}
                 </p>
-
-                {{-- Social icons (view) --}}
-                <div class="mt-4 social-icons-profile view-text">
-                    @if($user->email)
-                        <a href="mailto:{{ $user->email }}" title="{{ $user->email }}">
-                            <i class="fas fa-envelope"></i>
-                        </a>
-                    @endif
+                <div class="prf-hero__actions">
+                    <button type="button" class="sc-btn sc-btn--light" id="btnStartEdit" data-open="#profilEdit" @if ($editOpen) hidden @endif>
+                        <i class="bi bi-pencil-fill" aria-hidden="true"></i> Edit Profil
+                    </button>
+                    <a href="{{ route('biografi.dosen', $user->id) }}" class="sc-btn sc-btn--outline-light">
+                        <i class="bi bi-eye" aria-hidden="true"></i> Lihat Halaman Publik
+                    </a>
                 </div>
-
-                {{-- Edit tombol --}}
-                <button type="button" onclick="startEdit()"
-                        class="edit-profile-btn hide-on-edit" id="btnStartEdit">
-                    <i class="bi bi-pencil-fill"></i> Edit Profil
-                </button>
             </div>
         </div>
     </div>
-</div>
+</section>
 
-{{-- ─── MAIN CONTENT ───────────────────────────────────── --}}
-<div class="container" style="padding-top: 2rem; padding-bottom: 3rem;">
-    <div class="row">
+<section class="sc-section sc-bio">
+    <div class="container">
+        <div class="sc-panel prf-edit" id="profilEdit" @unless ($editOpen) hidden @endunless>
+            <h2 class="sc-panel__title">Edit Profil</h2>
 
-        {{-- ── Kolom Kiri ──────────────────────────────── --}}
-        <div class="col-lg-4 mb-4">
+            @if ($errors->any())
+                <div class="dsn-alert" role="alert">
+                    <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+                    <span>Periksa kembali isian yang ditandai merah.</span>
+                </div>
+            @endif
 
-            {{-- Tentang Saya --}}
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h3 class="section-title-profile">Tentang Saya</h3>
+            <form action="{{ route('profil.dosen.update') }}" method="POST" enctype="multipart/form-data" id="profForm" novalidate data-validate>
+                @csrf
+                @method('PUT')
 
-                    <div class="body-view-text">
-                        @if($user->bio ?? null)
-                            @foreach(explode("\n", $user->bio) as $para)
-                                @if(trim($para))
-                                    <p class="about-me">{{ $para }}</p>
-                                @endif
+                <div class="prf-edit__grid">
+                    <div class="prf-edit__photo">
+                        <div class="prf-avatar" data-preview-box>
+                            @if ($user->foto)
+                                <img src="{{ asset('storage/'.$user->foto) }}" alt="Pratinjau foto profil" data-preview-img>
+                            @else
+                                <span data-preview-initial>{{ mb_strtoupper(mb_substr($user->fullname, 0, 1)) }}</span>
+                            @endif
+                        </div>
+                        <label for="fotoInput" class="sc-btn sc-btn--ghost sc-btn--sm">
+                            <i class="bi bi-camera" aria-hidden="true"></i> Ganti Foto
+                        </label>
+                        <input type="file" name="foto" id="fotoInput" class="visually-hidden" accept="image/jpeg,image/png,image/webp" data-preview-input>
+                        <small class="form-text text-center">JPG, PNG, atau WEBP, maksimal 4 MB.</small>
+                        <div class="field-error">@error('foto'){{ $message }}@enderror</div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6" data-field>
+                            <label for="fullname" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
+                            <input type="text" id="fullname" name="fullname" class="form-control @error('fullname') is-invalid @enderror"
+                                value="{{ old('fullname', $user->fullname) }}" autocomplete="name"
+                                data-label="Nama lengkap" data-rules="required|min:3|max:100|name">
+                            <div class="field-error" data-error-for="fullname">@error('fullname'){{ $message }}@enderror</div>
+                        </div>
+                        <div class="col-md-6" data-field>
+                            <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                            <input type="email" id="email" name="email" class="form-control @error('email') is-invalid @enderror"
+                                value="{{ old('email', $user->email) }}" autocomplete="email"
+                                data-label="Email" data-rules="required|email|max:100">
+                            <div class="field-error" data-error-for="email">@error('email'){{ $message }}@enderror</div>
+                        </div>
+                        <div class="col-md-4" data-field>
+                            <label for="nip" class="form-label">NIP</label>
+                            <input type="text" id="nip" name="nip" inputmode="numeric" class="form-control @error('nip') is-invalid @enderror"
+                                value="{{ old('nip', $user->nip) }}" placeholder="Nomor Induk Pegawai"
+                                data-label="NIP" data-rules="digits:4,30">
+                            <div class="field-error" data-error-for="nip">@error('nip'){{ $message }}@enderror</div>
+                        </div>
+                        <div class="col-md-4" data-field>
+                            <label for="prodi" class="form-label">Program Studi</label>
+                            <input type="text" id="prodi" name="prodi" class="form-control @error('prodi') is-invalid @enderror"
+                                value="{{ old('prodi', $user->prodi) }}" placeholder="Contoh: Sistem Informasi"
+                                data-label="Program studi" data-rules="min:2|max:100|safe">
+                            <div class="field-error" data-error-for="prodi">@error('prodi'){{ $message }}@enderror</div>
+                        </div>
+                        <div class="col-md-4" data-field>
+                            <label for="fakultas" class="form-label">Fakultas</label>
+                            <input type="text" id="fakultas" name="fakultas" class="form-control @error('fakultas') is-invalid @enderror"
+                                value="{{ old('fakultas', $user->fakultas) }}" placeholder="Contoh: Fakultas Ilmu Terapan"
+                                data-label="Fakultas" data-rules="min:2|max:100|safe">
+                            <div class="field-error" data-error-for="fakultas">@error('fakultas'){{ $message }}@enderror</div>
+                        </div>
+                        <div class="col-12" data-field>
+                            <label for="bidang_penelitian" class="form-label">Bidang Penelitian</label>
+                            <input type="text" id="bidang_penelitian" name="bidang_penelitian" class="form-control @error('bidang_penelitian') is-invalid @enderror"
+                                value="{{ old('bidang_penelitian', $user->bidang_penelitian) }}" placeholder="Contoh: Internet of Things, Kecerdasan Buatan"
+                                data-label="Bidang penelitian" data-rules="max:500|safe">
+                            <div class="form-text">Pisahkan beberapa bidang dengan koma.</div>
+                            <div class="field-error" data-error-for="bidang_penelitian">@error('bidang_penelitian'){{ $message }}@enderror</div>
+                        </div>
+                        <div class="col-12" data-field>
+                            <label for="bio" class="form-label">Tentang Saya</label>
+                            <textarea id="bio" name="bio" rows="5" class="form-control @error('bio') is-invalid @enderror"
+                                placeholder="Ceritakan latar belakang, pengalaman, dan fokus riset Anda"
+                                data-label="Biografi" data-rules="max:2000|safe">{{ old('bio', $user->bio) }}</textarea>
+                            <div class="field-error" data-error-for="bio">@error('bio'){{ $message }}@enderror</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dsn-form-actions">
+                    <button type="submit" class="sc-btn sc-btn--primary">
+                        <i class="bi bi-save-fill" aria-hidden="true"></i> Simpan Perubahan
+                    </button>
+                    <a href="{{ route('profil.dosen') }}" class="sc-btn sc-btn--ghost">Batal</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="sc-bio__grid">
+            <aside class="sc-bio__aside">
+                <div class="sc-panel">
+                    <h2 class="sc-panel__title">Informasi Akun</h2>
+                    <dl class="prf-info">
+                        <div>
+                            <dt>Email</dt>
+                            <dd>{{ $user->email }}</dd>
+                        </div>
+                        <div>
+                            <dt>NIP</dt>
+                            <dd>{{ $user->nip ?: '-' }}</dd>
+                        </div>
+                        <div>
+                            <dt>Peran</dt>
+                            <dd><span class="dsn-pill">Dosen</span></dd>
+                        </div>
+                    </dl>
+                </div>
+                <div class="sc-panel">
+                    <h2 class="sc-panel__title">Bidang Penelitian</h2>
+                    @if ($fields->isNotEmpty())
+                        <ul class="sc-chips">
+                            @foreach ($fields as $field)
+                                <li>{{ $field }}</li>
                             @endforeach
-                        @else
-                            <p class="about-me text-muted">Belum ada deskripsi. Klik <em>Edit Profil</em> untuk menambahkan.</p>
-                        @endif
-                    </div>
-
-                    <textarea name="bio" class="body-edit-field" rows="6"
-                              placeholder="Tulis deskripsi singkat tentang diri Anda...">{{ old('bio', $user->bio ?? '') }}</textarea>
+                        </ul>
+                    @else
+                        <p class="sc-panel__muted">Belum diisi. Klik Edit Profil untuk menambahkan.</p>
+                    @endif
                 </div>
-            </div>
+            </aside>
 
-            {{-- Informasi Akun --}}
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h3 class="section-title-profile">Informasi Akun</h3>
-
-                    <ul class="list-unstyled mb-0">
-                        <li class="mb-3">
-                            <strong style="font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#888;">Email</strong>
-                            <div class="body-view-text" style="font-size:14px;color:#333;">{{ $user->email }}</div>
-                            <input type="email" name="email" class="body-edit-field mt-1"
-                                   value="{{ old('email', $user->email) }}" required>
-                        </li>
-                        <li class="mb-3">
-                            <strong style="font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#888;">NIP</strong>
-                            <div class="body-view-text" style="font-size:14px;color:#333;">{{ $user->nip ?? '-' }}</div>
-                            <input type="text" name="nip" class="body-edit-field mt-1"
-                                   value="{{ old('nip', $user->nip) }}" placeholder="Nomor Induk Pegawai">
-                        </li>
-                        <li>
-                            <strong style="font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#888;">Role</strong>
-                            <div style="font-size:14px;color:#333;margin-top:4px;">
-                                <span class="badge"
-                                      style="background:#dbeafe;color:#1d4ed8;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">
-                                    Dosen
-                                </span>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-        </div>
-
-        {{-- ── Kolom Kanan ─────────────────────────────── --}}
-        <div class="col-lg-8">
-
-            {{-- Bidang Penelitian --}}
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h3 class="section-title-profile">Bidang Penelitian</h3>
-
-                    <div class="body-view-text">
-                        @if($user->bidang_penelitian ?? null)
-                            <p class="research-interests mb-3">{{ $user->bidang_penelitian }}</p>
-                        @else
-                            <p class="text-muted" style="font-size:14px;">Belum diisi.</p>
-                        @endif
-                    </div>
-
-                    <textarea name="bidang_penelitian" class="body-edit-field" rows="4"
-                              placeholder="Deskripsikan bidang penelitian Anda...">{{ old('bidang_penelitian', $user->bidang_penelitian ?? '') }}</textarea>
-                </div>
-            </div>
-
-            {{-- Publikasi dari DB --}}
-            @php
-                $myPubs = \App\Models\Publication::published()
-                    ->where(function($q) use ($user) {
-                        $q->where('user_id', $user->id)
-                          ->orWhere('penulis', 'like', '%'.$user->fullname.'%');
-                    })
-                    ->orderByDesc('tahun')
-                    ->limit(6)
-                    ->get();
-            @endphp
-
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h3 class="section-title-profile">Publikasi Penelitian</h3>
-
-                    <div class="row">
-                    @forelse($myPubs as $pub)
-                        <div class="col-md-6 mb-4">
-                            <div class="card card-publication h-100">
-                                <div class="card-body">
-                                    <span class="publication-year">{{ $pub->tahun }}</span>
-                                    <h5 class="publication-title">{{ $pub->judul }}</h5>
-                                    <p class="journal-name">{{ $pub->penulis }}
-                                        @if($pub->penerbit) · {{ $pub->penerbit }} @endif
-                                    </p>
-                                    <a href="{{ route('publications.show', $pub) }}"
-                                       class="btn btn-sm btn-view" target="_blank">
-                                        Lihat Publikasi
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+            <div class="sc-bio__main">
+                <div class="sc-panel">
+                    <h2 class="sc-panel__title">Tentang Saya</h2>
+                    @forelse ($bio as $paragraph)
+                        <p class="sc-bio__text">{{ $paragraph }}</p>
                     @empty
-                        <div class="col-12">
-                            <p class="text-muted" style="font-size:14px;">
-                                Belum ada publikasi yang terdaftar atas nama Anda.
-                            </p>
-                        </div>
+                        <p class="sc-panel__muted">Belum ada deskripsi. Klik Edit Profil untuk menambahkan.</p>
                     @endforelse
-                    </div>
+                </div>
 
-                    @if($myPubs->isNotEmpty())
-                        <div class="text-center mt-2">
-                            <a href="{{ route('publications.index') }}" class="btn btn-view">
-                                Lihat Semua Publikasi
-                            </a>
-                        </div>
+                <div class="sc-panel">
+                    <div class="prf-panel-head">
+                        <h2 class="sc-panel__title">Publikasi</h2>
+                        <a href="{{ route('dosen.publikasi.index') }}" class="prf-link">Kelola <i class="bi bi-arrow-right-short" aria-hidden="true"></i></a>
+                    </div>
+                    @if ($publications->isNotEmpty())
+                        <ul class="sc-list">
+                            @foreach ($publications as $item)
+                                <li class="sc-list__item">
+                                    <span class="sc-list__year">{{ $item->tahun }}</span>
+                                    <div>
+                                        <h3 class="sc-list__title"><a href="{{ route('publications.show', $item) }}">{{ $item->judul }}</a></h3>
+                                        <p class="sc-list__meta">{{ $item->kategori }}{{ $item->penerbit ? ', '.$item->penerbit : '' }}</p>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <p class="sc-panel__muted">Belum ada publikasi yang dipublikasikan atas nama Anda.</p>
+                    @endif
+                </div>
+
+                <div class="sc-panel">
+                    <div class="prf-panel-head">
+                        <h2 class="sc-panel__title">HKI</h2>
+                        <a href="{{ route('dosen.hki.index') }}" class="prf-link">Kelola <i class="bi bi-arrow-right-short" aria-hidden="true"></i></a>
+                    </div>
+                    @if ($hkis->isNotEmpty())
+                        <ul class="sc-list">
+                            @foreach ($hkis as $item)
+                                <li class="sc-list__item">
+                                    <span class="sc-list__year">{{ $item->jenis_sertifikat }}</span>
+                                    <div>
+                                        <h3 class="sc-list__title">{{ $item->judul_sertifikat }}</h3>
+                                        <p class="sc-list__meta">No. {{ $item->nomor_sertifikat }}{{ $item->tgl_terbit ? ', terbit '.$item->tgl_terbit->translatedFormat('d F Y') : '' }}</p>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <p class="sc-panel__muted">Belum ada HKI yang dipublikasikan atas nama Anda.</p>
                     @endif
                 </div>
             </div>
-
-            {{-- HKI dari DB --}}
-            @php
-                $myHkis = \App\Models\Hki::published()
-                    ->where(function($q) use ($user) {
-                        $q->where('user_id', $user->id)
-                          ->orWhere('pencipta', 'like', '%'.$user->fullname.'%');
-                    })
-                    ->orderByDesc('tgl_terbit')
-                    ->limit(6)
-                    ->get();
-            @endphp
-
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h3 class="section-title-profile">HKI</h3>
-
-                    @forelse($myHkis as $hki)
-                        <div class="publication-item">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <div class="publication-year" style="font-size:13px;color:#4c8dc9;font-weight:700;">
-                                        {{ $hki->jenis_sertifikat }}
-                                    </div>
-                                    <h5 class="publication-title mt-1">{{ $hki->judul_sertifikat }}</h5>
-                                    <p class="journal-name mb-1">No. {{ $hki->nomor_sertifikat }}</p>
-                                    <p class="journal-name">
-                                        Terbit: {{ $hki->tgl_terbit?->format('d M Y') }}
-                                    </p>
-                                    @if($hki->file_sertifikat)
-                                        <a href="{{ asset('storage/'.$hki->file_sertifikat) }}"
-                                           target="_blank" class="btn btn-sm btn-view mt-1">
-                                            Lihat Sertifikat
-                                        </a>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-                        <p class="text-muted" style="font-size:14px;">
-                            Belum ada HKI yang terdaftar atas nama Anda.
-                        </p>
-                    @endforelse
-                </div>
-            </div>
-
         </div>
     </div>
-</div>
-
-</form>
-
-<script>
-var _editMode = false;
-
-function startEdit() {
-    _editMode = true;
-    document.getElementById('profileHeader').classList.add('edit-mode');
-    document.getElementById('editBar').classList.add('show');
-
-    // Body edit fields
-    document.querySelectorAll('.body-edit-field').forEach(function(el) {
-        el.style.display = 'block';
-    });
-    document.querySelectorAll('.body-view-text').forEach(function(el) {
-        el.style.display = 'none';
-    });
-
-    // Scroll ke atas agar bar terlihat
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function cancelEdit() {
-    window.location.reload();
-}
-
-function previewFoto(input) {
-    if (input.files && input.files[0]) {
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            var wrap = document.getElementById('avatarPreview');
-            if (wrap.tagName === 'IMG') {
-                wrap.src = e.target.result;
-            } else {
-                // placeholder div — ganti dengan img
-                var img = document.createElement('img');
-                img.src = e.target.result;
-                img.alt = 'Preview';
-                img.id = 'avatarPreview';
-                img.className = 'rounded-circle img-fluid profile-image';
-                wrap.parentNode.replaceChild(img, wrap);
-            }
-        };
-        reader.readAsDataURL(input.files[0]);
-    }
-}
-
-// Jika ada error validasi, langsung buka mode edit
-@if($errors->any())
-document.addEventListener('DOMContentLoaded', startEdit);
-@endif
-</script>
+</section>

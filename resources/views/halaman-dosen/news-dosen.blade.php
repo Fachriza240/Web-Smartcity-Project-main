@@ -1,5 +1,7 @@
-<x-layout.link>
-    <x-layout.navbar-dosen></x-layout.navbar-dosen>
-    <x-halaman-dosen.news-dosen :news="$news" :categories="$categories" :years="$years"></x-halaman-dosen.news-dosen>
-    <x-layout.footer></x-layout.footer>
+<x-layout.link title="Berita">
+    <x-layout.navbar />
+    <main id="konten-utama">
+        <x-halaman-user.news-user :news="$news" :categories="$categories" :years="$years" />
+    </main>
+    <x-layout.footer />
 </x-layout.link>
