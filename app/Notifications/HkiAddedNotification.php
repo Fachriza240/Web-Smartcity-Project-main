@@ -2,21 +2,22 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 use App\Models\Hki;
+use App\Models\User;
+use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Notification;
+
 
 class HkiAddedNotification extends Notification
 {
     use Queueable;
 
-    protected $hki;
+    public const MESSAGE = 'Anda ditambahkan sebagai pencipta HKI: ';
 
-    public function __construct(Hki $hki)
-    {
-        $this->hki = $hki;
+    public function __construct(
+        protected Hki $hki,
+        protected ?User $actor = null,
+    ) {
     }
 
     public function via(object $notifiable): array
@@ -24,20 +25,14 @@ class HkiAddedNotification extends Notification
         return ['database'];
     }
 
-    public function toMail(object $notifiable): MailMessage
-    {
-        return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
-    }
-
     public function toArray(object $notifiable): array
     {
         return [
-            'hki_id' => $this->hki->id,
-            'judul'  => $this->hki->judul_sertifikat,
-            'message'=> 'Anda telah ditambahkan menjadi pencipta HKI: ' . $this->hki->judul_sertifikat,
+            'hki_id'  => $this->hki->id,
+            'judul'   => $this->hki->judul_sertifikat,
+            'nomor'   => $this->hki->nomor_sertifikat,
+            'oleh'    => $this->actor?->fullname,
+            'message' => self::MESSAGE.$this->hki->judul_sertifikat,
         ];
     }
 }

@@ -72,13 +72,9 @@
                     <div class="field-error" data-error-for="kategori">@error('kategori'){{ $message }}@enderror</div>
                 </div>
                 <div class="col-md-6">
-                    <label for="status" class="form-label">Status</label>
-                    <select id="status" name="status" class="form-select">
-                        @foreach ($statuses as $s)
-                            <option value="{{ $s }}" @selected(old('status', $publication->status) === $s)>{{ $s }}</option>
-                        @endforeach
-                    </select>
-                    <div class="form-text">Status Publish berlaku setelah disetujui admin.</div>
+                    <span class="form-label d-block">Status</span>
+                    <span class="dsn-status {{ $publication->status === 'Publish' ? 'is-publish' : '' }}">{{ $publication->status ?? 'Draft' }}</span>
+                    <div class="form-text">Status hanya bisa diubah admin setelah publikasi direview.</div>
                 </div>
 
                 <div class="col-md-6" data-field>

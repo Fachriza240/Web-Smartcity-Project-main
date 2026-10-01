@@ -88,13 +88,9 @@
                     <div class="field-error">@error('file_sertifikat'){{ $message }}@enderror</div>
                 </div>
                 <div class="col-md-6">
-                    <label for="status" class="form-label">Status</label>
-                    <select id="status" name="status" class="form-select">
-                        @foreach ($statuses as $s)
-                            <option value="{{ $s }}" @selected(old('status', $hki->status) === $s)>{{ $s }}</option>
-                        @endforeach
-                    </select>
-                    <div class="form-text">Status Publish perlu disetujui admin.</div>
+                    <span class="form-label d-block">Status</span>
+                    <span class="dsn-status {{ $hki->status === 'Publish' ? 'is-publish' : '' }}">{{ $hki->status ?? 'Draft' }}</span>
+                    <div class="form-text">Status hanya bisa diubah admin setelah HKI direview.</div>
                 </div>
             </div>
 

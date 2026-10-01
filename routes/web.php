@@ -14,6 +14,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BiografiController;
 use App\Http\Controllers\DosenKontenController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\ProjectController;
@@ -64,22 +65,28 @@ Route::middleware('approved')->group(function () {
     Route::get('/profil-dosen', [ProfileController::class, 'show'])->name('profil.dosen');
     Route::put('/profil-dosen', [ProfileController::class, 'update'])->name('profil.dosen.update');
 
-    Route::controller(DosenKontenController::class)->prefix('dosen')->name('dosen.')->group(function () {
-        Route::get('/publikasi', 'publikasiIndex')->name('publikasi.index');
-        Route::get('/publikasi/create', 'publikasiCreate')->name('publikasi.create');
-        Route::post('/publikasi', 'publikasiStore')->name('publikasi.store');
-        Route::get('/publikasi/{p}/edit', 'publikasiEdit')->name('publikasi.edit');
-        Route::put('/publikasi/{p}', 'publikasiUpdate')->name('publikasi.update');
-        Route::delete('/publikasi/{p}', 'publikasiDestroy')->name('publikasi.destroy');
+    Route::prefix('dosen')->name('dosen.')->middleware('role:dosen')->group(function () {
+        Route::controller(DosenKontenController::class)->group(function () {
+            Route::get('/publikasi', 'publikasiIndex')->name('publikasi.index');
+            Route::get('/publikasi/create', 'publikasiCreate')->name('publikasi.create');
+            Route::post('/publikasi', 'publikasiStore')->name('publikasi.store');
+            Route::get('/publikasi/{p}/edit', 'publikasiEdit')->name('publikasi.edit');
+            Route::put('/publikasi/{p}', 'publikasiUpdate')->name('publikasi.update');
+            Route::delete('/publikasi/{p}', 'publikasiDestroy')->name('publikasi.destroy');
 
-        Route::get('/hki', 'hkiIndex')->name('hki.index');
-        Route::get('/hki/create', 'hkiCreate')->name('hki.create');
-        Route::post('/hki', 'hkiStore')->name('hki.store');
-        Route::get('/hki/{h}/edit', 'hkiEdit')->name('hki.edit');
-        Route::put('/hki/{h}', 'hkiUpdate')->name('hki.update');
-        Route::delete('/hki/{h}', 'hkiDestroy')->name('hki.destroy');
+            Route::get('/hki', 'hkiIndex')->name('hki.index');
+            Route::get('/hki/create', 'hkiCreate')->name('hki.create');
+            Route::post('/hki', 'hkiStore')->name('hki.store');
+            Route::get('/hki/{h}/edit', 'hkiEdit')->name('hki.edit');
+            Route::put('/hki/{h}', 'hkiUpdate')->name('hki.update');
+            Route::delete('/hki/{h}', 'hkiDestroy')->name('hki.destroy');
+        });
 
-        Route::get('/notifications/{id}/read', 'markNotificationAsRead')->name('notifications.read');
+        Route::controller(NotificationController::class)->group(function () {
+            Route::get('/notifications', 'index')->name('notifications.index');
+            Route::post('/notifications/read-all', 'readAll')->name('notifications.read-all');
+            Route::get('/notifications/{id}/read', 'read')->whereUuid('id')->name('notifications.read');
+        });
     });
 });
 

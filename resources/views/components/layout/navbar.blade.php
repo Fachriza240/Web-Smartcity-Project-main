@@ -19,8 +19,9 @@
         ['label' => 'Mitra', 'url' => url("/mitra-{$area}"), 'active' => ["mitra-{$area}"]],
     ];
     $socials = collect(config('smartcity.socials'))->filter(fn ($item) => ! empty($item['url']));
-    $notifications = $isDosen ? $user->notifications()->latest()->limit(10)->get() : collect();
+    $notifications = $isDosen ? $user->notifications()->limit(10)->get() : collect();
     $unreadCount = $isDosen ? $user->unreadNotifications()->count() : 0;
+    $unreadLabel = $unreadCount > 9 ? '9+' : $unreadCount;
 @endphp
 
 <div class="sc-topbar">
@@ -57,11 +58,15 @@
 
         <div class="sc-navbar__mobile-actions d-xl-none">
             @if ($isDosen)
+                <a href="{{ route('dosen.notifications.index') }}" class="sc-icon-btn" data-notif-mobile
+                    aria-label="Notifikasi{{ $unreadCount > 0 ? ', '.$unreadCount.' belum dibaca' : '' }}">
+                    <i class="bi bi-bell" aria-hidden="true"></i>
+                    @if ($unreadCount > 0)
+                        <span class="sc-badge-count" aria-hidden="true">{{ $unreadLabel }}</span>
+                    @endif
+                </a>
                 <a href="{{ route('profil.dosen') }}" class="sc-icon-btn" aria-label="Profil saya">
                     <i class="bi bi-person-circle" aria-hidden="true"></i>
-                    @if ($unreadCount > 0)
-                        <span class="sc-badge-dot" aria-hidden="true"></span>
-                    @endif
                 </a>
             @endif
             <button class="navbar-toggler sc-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -92,28 +97,28 @@
                 </form>
 
                 @if ($isDosen)
-                    <div class="dropdown sc-user-dropdown">
+                    <div class="dropdown sc-user-dropdown d-none d-xl-block">
                         <button type="button" class="sc-icon-btn" id="notifDropdown" data-bs-toggle="dropdown"
-                            data-bs-auto-close="outside" aria-expanded="false" aria-label="Notifikasi">
+                            data-bs-auto-close="outside" aria-expanded="false"
+                            aria-label="Notifikasi{{ $unreadCount > 0 ? ', '.$unreadCount.' belum dibaca' : '' }}">
                             <i class="bi bi-bell" aria-hidden="true"></i>
                             @if ($unreadCount > 0)
-                                <span class="sc-badge-count">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
+                                <span class="sc-badge-count" aria-hidden="true">{{ $unreadLabel }}</span>
                             @endif
                         </button>
                         <div class="dropdown-menu dropdown-menu-end sc-dropdown sc-notif" aria-labelledby="notifDropdown">
                             <div class="sc-notif__head">
-                                <i class="bi bi-bell-fill" aria-hidden="true"></i> Notifikasi
+                                <span class="sc-notif__head-title"><i class="bi bi-bell-fill" aria-hidden="true"></i> Notifikasi</span>
+                                @if ($unreadCount > 0)
+                                    <form action="{{ route('dosen.notifications.read-all') }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="sc-notif__readall">Tandai semua dibaca</button>
+                                    </form>
+                                @endif
                             </div>
                             <div class="sc-notif__list">
                                 @forelse ($notifications as $notif)
-                                    <a class="sc-notif__item {{ $notif->unread() ? 'is-unread' : '' }}" href="{{ route('dosen.notifications.read', $notif->id) }}">
-                                        <span class="sc-notif__icon"><i class="bi bi-lightbulb" aria-hidden="true"></i></span>
-                                        <span class="sc-notif__body">
-                                            <span class="sc-notif__text">Anda ditambahkan sebagai pencipta HKI:</span>
-                                            <strong class="sc-notif__title">{{ $notif->data['judul'] ?? \Illuminate\Support\Str::after($notif->data['message'] ?? '', ': ') }}</strong>
-                                            <small class="sc-notif__time"><i class="bi bi-clock" aria-hidden="true"></i> {{ $notif->created_at->diffForHumans() }}</small>
-                                        </span>
-                                    </a>
+                                    <x-halaman-dosen.notifikasi-item :notif="$notif" />
                                 @empty
                                     <div class="sc-notif__empty">
                                         <i class="bi bi-bell-slash" aria-hidden="true"></i>
@@ -121,6 +126,7 @@
                                     </div>
                                 @endforelse
                             </div>
+                            <a href="{{ route('dosen.notifications.index') }}" class="sc-notif__foot">Lihat semua notifikasi</a>
                         </div>
                     </div>
 
@@ -137,6 +143,14 @@
                             <li><a class="dropdown-item" href="{{ route('profil.dosen') }}"><i class="bi bi-person" aria-hidden="true"></i> Profil</a></li>
                             <li><a class="dropdown-item" href="{{ route('dosen.publikasi.index') }}"><i class="bi bi-journal-text" aria-hidden="true"></i> Publikasi Saya</a></li>
                             <li><a class="dropdown-item" href="{{ route('dosen.hki.index') }}"><i class="bi bi-award" aria-hidden="true"></i> HKI Saya</a></li>
+                            <li>
+                                <a class="dropdown-item" href="{{ route('dosen.notifications.index') }}">
+                                    <i class="bi bi-bell" aria-hidden="true"></i> Notifikasi
+                                    @if ($unreadCount > 0)
+                                        <span class="sc-notif__pill">{{ $unreadLabel }}</span>
+                                    @endif
+                                </a>
+                            </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST" id="logout-form" data-confirm="Apakah Anda yakin ingin keluar dari akun?">

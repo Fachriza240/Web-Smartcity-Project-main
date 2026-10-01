@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Hki;
 use App\Models\User;
-use App\Notifications\HkiAddedNotification;
 use App\Rules\PersonName;
 use App\Rules\SafeText;
+use App\Services\HkiNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -31,16 +31,11 @@ class HkiController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        $dosens = User::where('role', 'dosen')
-            ->where('registration_status', 'approved')
-            ->orderBy('fullname')
-            ->get(['id', 'fullname', 'nip', 'prodi', 'fakultas']);
-
         return view('admin.hki.index', [
             'hkis'     => $hkis,
             'statuses' => Hki::statuses(),
             'jenis'    => Hki::JENIS,
-            'dosens'   => $dosens,
+            'dosens'   => $this->approvedDosens(),
         ]);
     }
 
@@ -48,20 +43,15 @@ class HkiController extends Controller
     {
         $this->authorizeAdmin();
 
-        $dosens = User::where('role', 'dosen')
-            ->where('registration_status', 'approved')
-            ->orderBy('fullname')
-            ->get(['id', 'fullname', 'nip', 'prodi', 'fakultas']);
-
         return view('admin.hki.create', [
             'hki'      => new Hki(['status' => Hki::STATUS_DRAFT, 'submission_type' => 'non_member']),
             'statuses' => Hki::statuses(),
             'jenis'    => Hki::JENIS,
-            'dosens'   => $dosens,
+            'dosens'   => $this->approvedDosens(),
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, HkiNotifier $notifier)
     {
         $this->authorizeAdmin();
 
@@ -70,10 +60,9 @@ class HkiController extends Controller
         if ($request->hasFile('file_sertifikat')) {
             $data['file_sertifikat'] = $request->file('file_sertifikat')->store('hki/sertifikat', 'public');
         }
-        unset($data['file_sertifikat_upload']);
 
         $hki = Hki::create($data);
-        $this->sendHkiNotifications($hki);
+        $notifier->sync($hki, Auth::user());
 
         return redirect()->route('admin.hki.index')->with('success', 'HKI berhasil ditambahkan.');
     }
@@ -82,41 +71,37 @@ class HkiController extends Controller
     {
         $this->authorizeAdmin();
 
-        $dosens = User::where('role', 'dosen')
-            ->where('registration_status', 'approved')
-            ->orderBy('fullname')
-            ->get(['id', 'fullname', 'nip', 'prodi', 'fakultas']);
-
         return view('admin.hki.edit', [
             'hki'      => $hki,
             'statuses' => Hki::statuses(),
             'jenis'    => Hki::JENIS,
-            'dosens'   => $dosens,
+            'dosens'   => $this->approvedDosens(),
         ]);
     }
 
-    public function update(Request $request, Hki $hki)
+    public function update(Request $request, Hki $hki, HkiNotifier $notifier)
     {
         $this->authorizeAdmin();
 
         $data = $this->validatedData($request, $hki);
+        $penciptaLama = $hki->pencipta;
 
         if ($request->hasFile('file_sertifikat')) {
             $this->deleteFile($hki->file_sertifikat);
             $data['file_sertifikat'] = $request->file('file_sertifikat')->store('hki/sertifikat', 'public');
         }
-        unset($data['file_sertifikat_upload']);
 
         $hki->update($data);
-        $this->sendHkiNotifications($hki);
+        $notifier->sync($hki, Auth::user(), $penciptaLama);
 
         return redirect()->route('admin.hki.index')->with('success', 'HKI berhasil diperbarui.');
     }
 
-    public function destroy(Hki $hki)
+    public function destroy(Hki $hki, HkiNotifier $notifier)
     {
         $this->authorizeAdmin();
 
+        $notifier->forget($hki);
         $this->deleteFile($hki->file_sertifikat);
         $hki->delete();
 
@@ -147,6 +132,14 @@ class HkiController extends Controller
         return $data;
     }
 
+    private function approvedDosens()
+    {
+        return User::where('role', 'dosen')
+            ->where('registration_status', User::STATUS_APPROVED)
+            ->orderBy('fullname')
+            ->get(['id', 'fullname', 'nip', 'prodi', 'fakultas']);
+    }
+
     private function authorizeAdmin(): void
     {
         if (!Auth::check() || Auth::user()->role !== 'admin') {
@@ -158,32 +151,6 @@ class HkiController extends Controller
     {
         if ($path && Storage::disk('public')->exists($path)) {
             Storage::disk('public')->delete($path);
-        }
-    }
-
-    private function sendHkiNotifications(Hki $hki): void
-    {
-        if (empty($hki->pencipta)) {
-            return;
-        }
-
-        $names = array_map('trim', explode(',', $hki->pencipta));
-
-        if (count($names) > 0) {
-            $usersToNotify = User::whereIn('fullname', $names)
-                                 ->where('role', 'dosen')
-                                 ->get();
-
-            foreach ($usersToNotify as $user) {
-                $alreadyNotified = $user->notifications()
-                                        ->where('type', HkiAddedNotification::class)
-                                        ->where('data->hki_id', $hki->id)
-                                        ->exists();
-
-                if (!$alreadyNotified) {
-                    $user->notify(new HkiAddedNotification($hki));
-                }
-            }
         }
     }
 }

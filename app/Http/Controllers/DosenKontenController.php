@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Hki;
 use App\Models\Publication;
 use App\Models\User;
-use App\Notifications\HkiAddedNotification;
 use App\Rules\PersonName;
 use App\Rules\SafeText;
+use App\Services\HkiNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -47,6 +47,7 @@ class DosenKontenController extends Controller
         $data['user_id']         = Auth::id();
         $data['submission_type'] = 'member';
         $data['recommended_by']  = null;
+        $data['status']          = Publication::STATUS_DRAFT;
 
         if (!$request->hasFile('pdf')) {
             return back()->withErrors(['pdf' => 'File PDF wajib diupload.'])->withInput();
@@ -128,11 +129,6 @@ class DosenKontenController extends Controller
 
     public function hkiCreate()
     {
-        $dosens = User::where('role', 'dosen')
-            ->where('registration_status', 'approved')
-            ->orderBy('fullname')
-            ->get(['id', 'fullname', 'nip', 'prodi', 'fakultas']);
-
         return view('halaman-dosen.konten.hki-form', [
             'hki'      => new Hki([
                 'status'          => Hki::STATUS_DRAFT,
@@ -142,16 +138,17 @@ class DosenKontenController extends Controller
             'jenis'    => Hki::JENIS,
             'statuses' => Hki::statuses(),
             'mode'     => 'create',
-            'dosens'   => $dosens,
+            'dosens'   => $this->approvedDosens(),
         ]);
     }
 
-    public function hkiStore(Request $request)
+    public function hkiStore(Request $request, HkiNotifier $notifier)
     {
         $data = $this->validateHki($request);
         $data['user_id']         = Auth::id();
         $data['submission_type'] = 'member';
         $data['recommended_by']  = null;
+        $data['status']          = Hki::STATUS_DRAFT;
 
         if ($request->hasFile('file_sertifikat')) {
             $data['file_sertifikat'] = $request->file('file_sertifikat')
@@ -159,7 +156,7 @@ class DosenKontenController extends Controller
         }
 
         $hki = Hki::create($data);
-        $this->sendHkiNotifications($hki);
+        $notifier->sync($hki, Auth::user());
 
         return redirect()->route('dosen.hki.index')
             ->with('success', 'HKI berhasil ditambahkan. Menunggu review admin untuk dipublikasikan.');
@@ -169,25 +166,21 @@ class DosenKontenController extends Controller
     {
         $this->authorizeOwnerHki($h);
 
-        $dosens = User::where('role', 'dosen')
-            ->where('registration_status', 'approved')
-            ->orderBy('fullname')
-            ->get(['id', 'fullname', 'nip', 'prodi', 'fakultas']);
-
         return view('halaman-dosen.konten.hki-form', [
             'hki'      => $h,
             'jenis'    => Hki::JENIS,
             'statuses' => Hki::statuses(),
             'mode'     => 'edit',
-            'dosens'   => $dosens,
+            'dosens'   => $this->approvedDosens(),
         ]);
     }
 
-    public function hkiUpdate(Request $request, Hki $h)
+    public function hkiUpdate(Request $request, Hki $h, HkiNotifier $notifier)
     {
         $this->authorizeOwnerHki($h);
 
         $data = $this->validateHki($request, $h);
+        $penciptaLama = $h->pencipta;
 
         if ($request->hasFile('file_sertifikat')) {
             $this->deleteFile($h->file_sertifikat);
@@ -196,16 +189,17 @@ class DosenKontenController extends Controller
         }
 
         $h->update($data);
-        $this->sendHkiNotifications($h);
+        $notifier->sync($h, Auth::user(), $penciptaLama);
 
         return redirect()->route('dosen.hki.index')
             ->with('success', 'HKI berhasil diperbarui.');
     }
 
-    public function hkiDestroy(Hki $h)
+    public function hkiDestroy(Hki $h, HkiNotifier $notifier)
     {
         $this->authorizeOwnerHki($h);
 
+        $notifier->forget($h);
         $this->deleteFile($h->file_sertifikat);
         $h->delete();
 
@@ -225,7 +219,6 @@ class DosenKontenController extends Controller
             'doi'       => ['nullable', 'string', 'max:255', 'regex:/^[A-Za-z0-9.\/:_()\-]+$/'],
             'pdf'       => [$pub ? 'nullable' : 'required', 'file', 'mimes:pdf', 'max:20480'],
             'thumbnail' => ['nullable', 'image', 'max:4096'],
-            'status'    => ['required', Rule::in(Publication::statuses())],
         ]);
     }
 
@@ -241,18 +234,25 @@ class DosenKontenController extends Controller
             'jenis_sertifikat' => ['required', Rule::in(Hki::JENIS)],
             'pencipta'         => ['required', 'string', 'min:3', 'max:255', new PersonName],
             'file_sertifikat'  => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
-            'status'           => ['required', Rule::in(Hki::statuses())],
         ]);
+    }
+
+    private function approvedDosens()
+    {
+        return User::where('role', 'dosen')
+            ->where('registration_status', User::STATUS_APPROVED)
+            ->orderBy('fullname')
+            ->get(['id', 'fullname', 'nip', 'prodi', 'fakultas']);
     }
 
     private function authorizeOwnerPublikasi(Publication $p): void
     {
-        if ($p->user_id !== Auth::id()) abort(403);
+        if ((int) $p->user_id !== (int) Auth::id()) abort(403);
     }
 
     private function authorizeOwnerHki(Hki $h): void
     {
-        if ($h->user_id !== Auth::id()) abort(403);
+        if ((int) $h->user_id !== (int) Auth::id()) abort(403);
     }
 
     private function deleteFile(?string $path): void
@@ -260,43 +260,5 @@ class DosenKontenController extends Controller
         if ($path && Storage::disk('public')->exists($path)) {
             Storage::disk('public')->delete($path);
         }
-    }
-
-    private function sendHkiNotifications(Hki $hki): void
-    {
-        if (empty($hki->pencipta)) {
-            return;
-        }
-
-        $names = array_map('trim', explode(',', $hki->pencipta));
-
-        if (count($names) > 0) {
-            $usersToNotify = User::whereIn('fullname', $names)
-                                 ->where('role', 'dosen')
-                                 ->where('id', '!=', Auth::id())
-                                 ->get();
-
-            foreach ($usersToNotify as $user) {
-                $alreadyNotified = $user->notifications()
-                                        ->where('type', HkiAddedNotification::class)
-                                        ->where('data->hki_id', $hki->id)
-                                        ->exists();
-
-                if (!$alreadyNotified) {
-                    $user->notify(new HkiAddedNotification($hki));
-                }
-            }
-        }
-    }
-
-    public function markNotificationAsRead($id)
-    {
-        $notification = Auth::user()->notifications()->find($id);
-        if ($notification) {
-            $notification->markAsRead();
-
-            return redirect()->route('dosen.hki.index');
-        }
-        return back();
     }
 }
