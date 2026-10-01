@@ -1,0 +1,113 @@
+.sc-notif__head {
+    justify-content: space-between;
+}
+
+.sc-notif__head-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sc-notif__head form {
+    margin: 0;
+}
+
+.sc-notif__readall {
+    border: 0;
+    background: transparent;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-family: var(--font-nav);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    cursor: pointer;
+}
+
+.sc-notif__readall:hover,
+.sc-notif__readall:focus-visible {
+    background: var(--primary-soft);
+    color: var(--primary-deep);
+}
+
+.sc-notif__item {
+    color: inherit;
+}
+
+.sc-notif__item:hover .sc-notif__title {
+    color: var(--primary-deep);
+}
+
+.sc-notif__dot {
+    width: 9px;
+    height: 9px;
+    margin-left: auto;
+    align-self: center;
+    border-radius: 50%;
+    background: var(--primary-blue);
+    flex-shrink: 0;
+}
+
+.sc-notif__foot {
+    display: block;
+    padding: 11px 16px;
+    text-align: center;
+    font-family: var(--font-nav);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    text-decoration: none;
+    background: #f8fafc;
+}
+
+.sc-notif__foot:hover {
+    background: var(--primary-soft);
+    color: var(--primary-deep);
+}
+
+.sc-notif__pill {
+    margin-left: auto;
+    min-width: 20px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--danger);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.sc-notif-page {
+    max-width: 860px;
+}
+
+.sc-notif-page .sc-notif__item {
+    padding: 16px 20px;
+}
+
+.sc-notif-page .sc-notif__item:last-child {
+    border-bottom: 0;
+}
+
+.sc-notif-page .sc-notif__text {
+    font-size: 13.5px;
+}
+
+.sc-notif-page .sc-notif__title {
+    font-size: 15px;
+}
+
+.sc-notif-page .sc-notif__time {
+    font-size: 12.5px;
+}
+
+@media (max-width: 575.98px) {
+    .sc-notif-page .sc-notif__item {
+        padding: 14px 16px;
+    }
+
+    .sc-notif-page .dsn-area__head form,
+    .sc-notif-page .dsn-area__head .sc-btn {
+        width: 100%;
+    }
+}
