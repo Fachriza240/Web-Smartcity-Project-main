@@ -81,13 +81,8 @@
                 </div>
                 <div class="col-md-6">
                     <span class="form-label d-block">Status</span>
-                    @if ($isCreate || $publication->status === 'Publish')
-                        <span class="dsn-status is-publish">Publish</span>
-                        <div class="form-text">{{ $isCreate ? 'Publikasi langsung tampil di halaman publik setelah disimpan.' : 'Publikasi ini tampil di halaman publik.' }}</div>
-                    @else
-                        <span class="dsn-status">{{ $publication->status }}</span>
-                        <div class="form-text">Publikasi ini sedang disembunyikan admin dari halaman publik.</div>
-                    @endif
+                    <span class="dsn-status is-publish">Publish</span>
+                    <div class="form-text">Publikasi langsung tampil di halaman publik setelah disimpan.</div>
                 </div>
 
                 <div class="col-md-6" data-field>

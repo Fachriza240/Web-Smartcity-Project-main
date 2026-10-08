@@ -36,6 +36,15 @@ class Publication extends Model
         'status',
     ];
 
+    protected static function booted(): void
+    {
+        static::saving(function (Publication $publication) {
+            if ($publication->submission_type === 'member') {
+                $publication->status = self::STATUS_PUBLISH;
+            }
+        });
+    }
+
     public function recommender()
     {
         return $this->belongsTo(User::class, 'user_id');

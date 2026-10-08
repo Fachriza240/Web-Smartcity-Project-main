@@ -120,13 +120,14 @@ class HkiController extends Controller
             'user_id'           => ['nullable', 'required_if:submission_type,member', Rule::exists('users', 'id')->where('role', 'dosen')],
             'recommended_by'    => ['nullable', 'string', 'min:3', 'max:100', new PersonName],
             'file_sertifikat'   => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:10240'],
-            'status'            => ['required', Rule::in(Hki::statuses())],
+            'status'            => ['nullable', 'required_if:submission_type,non_member', Rule::in(Hki::statuses())],
         ]);
 
         if ($data['submission_type'] === 'non_member') {
             $data['user_id'] = null;
         } else {
             $data['recommended_by'] = null;
+            $data['status'] = Hki::STATUS_PUBLISH;
         }
 
         return $data;

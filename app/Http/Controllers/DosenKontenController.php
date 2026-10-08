@@ -36,7 +36,6 @@ class DosenKontenController extends Controller
                 'user_id'         => Auth::id(),
             ]),
             'categories' => Publication::categories(),
-            'statuses'   => Publication::statuses(),
             'mode'       => 'create',
         ]);
     }
@@ -75,7 +74,6 @@ class DosenKontenController extends Controller
         return view('halaman-dosen.konten.publikasi-form', [
             'publication' => $p,
             'categories'  => Publication::categories(),
-            'statuses'    => Publication::statuses(),
             'mode'        => 'edit',
         ]);
     }
@@ -85,6 +83,8 @@ class DosenKontenController extends Controller
         $this->authorizeOwnerPublikasi($p);
 
         $data = $this->validatePublication($request, $p);
+        $data['submission_type'] = 'member';
+        $data['status']          = Publication::STATUS_PUBLISH;
 
         if ($request->hasFile('pdf')) {
             $this->deleteFile($p->pdf_path);
@@ -136,7 +136,6 @@ class DosenKontenController extends Controller
                 'user_id'         => Auth::id(),
             ]),
             'jenis'    => Hki::JENIS,
-            'statuses' => Hki::statuses(),
             'mode'     => 'create',
             'dosens'   => $this->approvedDosens(),
         ]);
@@ -169,7 +168,6 @@ class DosenKontenController extends Controller
         return view('halaman-dosen.konten.hki-form', [
             'hki'      => $h,
             'jenis'    => Hki::JENIS,
-            'statuses' => Hki::statuses(),
             'mode'     => 'edit',
             'dosens'   => $this->approvedDosens(),
         ]);
@@ -180,6 +178,8 @@ class DosenKontenController extends Controller
         $this->authorizeOwnerHki($h);
 
         $data = $this->validateHki($request, $h);
+        $data['submission_type'] = 'member';
+        $data['status']          = Hki::STATUS_PUBLISH;
         $penciptaLama = $h->pencipta;
 
         if ($request->hasFile('file_sertifikat')) {

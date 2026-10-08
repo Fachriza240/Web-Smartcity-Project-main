@@ -92,14 +92,21 @@
         </select>
         @error('kategori')<div class="invalid-feedback d-block" data-error-for="kategori">{{ $message }}</div>@enderror
     </div>
-    <div class="col-md-6 mb-3" data-field>
-        <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
-        <select id="status" name="status" class="form-select @error('status') is-invalid @enderror" required data-label="Status" data-rules="required">
-            @foreach ($statuses as $status)
-                <option value="{{ $status }}" @selected(old('status', $publication->status) === $status)>{{ $status }}</option>
-            @endforeach
-        </select>
-        @error('status')<div class="invalid-feedback d-block" data-error-for="status">{{ $message }}</div>@enderror
+    <div class="col-md-6 mb-3">
+        <div data-switch-panel="member" @unless ($isMember) hidden @endunless>
+            <span class="form-label d-block">Status</span>
+            <span class="badge bg-success">Publish</span>
+            <div class="form-text">Publikasi milik dosen langsung dipublikasikan tanpa status Draft.</div>
+        </div>
+        <div data-switch-panel="non_member" data-field @if ($isMember) hidden @endif>
+            <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
+            <select id="status" name="status" class="form-select @error('status') is-invalid @enderror" data-label="Status" data-rules="required">
+                @foreach ($statuses as $status)
+                    <option value="{{ $status }}" @selected(old('status', $publication->status) === $status)>{{ $status }}</option>
+                @endforeach
+            </select>
+            @error('status')<div class="invalid-feedback d-block" data-error-for="status">{{ $message }}</div>@enderror
+        </div>
     </div>
 </div>
 

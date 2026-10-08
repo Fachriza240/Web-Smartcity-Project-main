@@ -276,18 +276,90 @@ class NotifikasiHkiTest extends TestCase
         $this->get(route('biografi.user', $a->id))->assertOk()->assertSee('Aplikasi Pemantau Banjir Kota');
     }
 
-    public function test_edit_oleh_dosen_tidak_mengubah_status_yang_ditetapkan_admin(): void
+    public function test_edit_oleh_dosen_tetap_publish(): void
     {
         $a = $this->user('Dosen A');
         $this->user('Dosen B');
-        $admin = $this->user('Admin Satu', 'admin');
 
         $this->actingAs($a)->post('/dosen/hki', $this->hki());
         $hki = Hki::firstOrFail();
-        $this->actingAs($admin)->put("/admin/hki/{$hki->id}", $this->adminHki($a, ['status' => 'Publish']));
 
-        $this->actingAs($a)->put("/dosen/hki/{$hki->id}", $this->hki(['status' => 'Draft']));
+        $this->actingAs($a)->put("/dosen/hki/{$hki->id}", $this->hki(['status' => 'Draft']))
+            ->assertRedirect(route('dosen.hki.index'));
 
         $this->assertSame(Hki::STATUS_PUBLISH, $hki->fresh()->status);
+    }
+
+    public function test_admin_tidak_bisa_menjadikan_konten_dosen_draft(): void
+    {
+        Storage::fake('public');
+        $a = $this->user('Dosen A');
+        $admin = $this->user('Admin Satu', 'admin');
+
+        $this->actingAs($admin)->post('/admin/hki', $this->adminHki($a, ['status' => 'Draft']))
+            ->assertRedirect(route('admin.hki.index'));
+        $hki = Hki::firstOrFail();
+        $this->assertSame(Hki::STATUS_PUBLISH, $hki->status);
+
+        $this->actingAs($admin)->put("/admin/hki/{$hki->id}", $this->adminHki($a, ['status' => 'Draft']))
+            ->assertRedirect(route('admin.hki.index'));
+        $this->assertSame(Hki::STATUS_PUBLISH, $hki->fresh()->status);
+
+        $this->actingAs($admin)->post('/admin/hki', $this->adminHki($a, ['nomor_sertifikat' => 'EC00202400002']))
+            ->assertSessionHasNoErrors();
+        $this->assertSame(0, Hki::where('status', Hki::STATUS_DRAFT)->count());
+
+        $payload = [
+            'submission_type' => 'member',
+            'user_id' => $a->id,
+            'judul' => 'Sistem Parkir Cerdas Kota',
+            'penulis' => 'Dosen A',
+            'tahun' => 2024,
+            'abstrak' => 'Ringkasan penelitian sistem parkir cerdas.',
+            'kategori' => Publication::CATEGORY_JOURNAL,
+            'status' => 'Draft',
+            'pdf' => UploadedFile::fake()->create('makalah.pdf', 20, 'application/pdf'),
+        ];
+
+        $this->actingAs($admin)->post('/admin/publications', $payload)
+            ->assertRedirect(route('admin.publications.index'));
+        $publication = Publication::firstOrFail();
+        $this->assertSame(Publication::STATUS_PUBLISH, $publication->status);
+
+        unset($payload['pdf'], $payload['status']);
+        $this->actingAs($admin)->put("/admin/publications/{$publication->id}", $payload)
+            ->assertSessionHasNoErrors();
+        $this->assertSame(Publication::STATUS_PUBLISH, $publication->fresh()->status);
+
+        $publication->forceFill(['status' => Publication::STATUS_DRAFT])->save();
+        $this->assertSame(Publication::STATUS_PUBLISH, $publication->fresh()->status);
+
+        $this->actingAs($admin)->post('/admin/hki', $this->hki([
+            'nomor_sertifikat' => 'EC00202400003',
+            'submission_type' => 'non_member',
+            'recommended_by' => 'Pengusul Luar',
+            'status' => 'Draft',
+        ]))->assertSessionHasNoErrors();
+        $this->assertSame(Hki::STATUS_DRAFT, Hki::where('nomor_sertifikat', 'EC00202400003')->value('status'));
+
+        $this->actingAs($admin)->post('/admin/hki', $this->hki([
+            'nomor_sertifikat' => 'EC00202400004',
+            'submission_type' => 'non_member',
+            'recommended_by' => 'Pengusul Luar',
+        ]))->assertSessionHasErrors('status');
+    }
+
+    public function test_form_dosen_dan_admin_tidak_menawarkan_draft_untuk_konten_dosen(): void
+    {
+        $a = $this->user('Dosen A');
+        $admin = $this->user('Admin Satu', 'admin');
+
+        $this->actingAs($a)->get(route('dosen.publikasi.create'))->assertOk()->assertDontSee('value="Draft"', false);
+        $this->actingAs($a)->get(route('dosen.hki.create'))->assertOk()->assertDontSee('value="Draft"', false);
+
+        $this->actingAs($admin)->get(route('admin.hki.create'))->assertOk()
+            ->assertSee('HKI milik dosen langsung dipublikasikan tanpa status Draft.');
+        $this->actingAs($admin)->get(route('admin.publications.create'))->assertOk()
+            ->assertSee('Publikasi milik dosen langsung dipublikasikan tanpa status Draft.');
     }
 }

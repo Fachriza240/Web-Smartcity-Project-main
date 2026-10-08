@@ -42,6 +42,15 @@ class Hki extends Model
         'tgl_terbit' => 'date',
     ];
 
+    protected static function booted(): void
+    {
+        static::saving(function (Hki $hki) {
+            if ($hki->submission_type === 'member') {
+                $hki->status = self::STATUS_PUBLISH;
+            }
+        });
+    }
+
     public function recommender()
     {
         return $this->belongsTo(User::class, 'user_id');

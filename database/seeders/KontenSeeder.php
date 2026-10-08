@@ -401,8 +401,8 @@ class KontenSeeder extends Seeder
                 'kategori' => Publication::CATEGORY_CONFERENCE,
                 'penerbit' => null,
                 'doi' => null,
-                'status' => Publication::STATUS_DRAFT,
-                'abstrak' => 'Draft penelitian mengenai celah keamanan pada jaringan sensor nirkabel dan usulan mekanisme autentikasi ringan untuk perangkat dengan daya terbatas. Publikasi ini sedang disembunyikan Admin dari halaman publik.',
+                'status' => Publication::STATUS_PUBLISH,
+                'abstrak' => 'Penelitian ini memetakan celah keamanan pada jaringan sensor nirkabel dan mengusulkan mekanisme autentikasi ringan untuk perangkat dengan daya terbatas. Hasil pengujian menunjukkan mekanisme tersebut mampu menahan serangan penyadapan tanpa menambah beban energi secara berarti.',
             ],
             [
                 'judul' => 'Studi Implementasi Smart City di Indonesia',
@@ -508,14 +508,15 @@ class KontenSeeder extends Seeder
             ],
             [
                 'judul' => 'Sistem Rekomendasi Rute Transportasi Publik',
-                'pemilik' => $dosenB,
-                'penulis' => 'Dosen B Penerima',
+                'pemilik' => null,
+                'pengusul' => 'Dinas Perhubungan Kota',
+                'penulis' => 'Tim Riset Dinas Perhubungan',
                 'tahun' => 2026,
                 'kategori' => Publication::CATEGORY_JOURNAL,
                 'penerbit' => null,
                 'doi' => null,
                 'status' => Publication::STATUS_DRAFT,
-                'abstrak' => 'Draft penelitian tentang sistem rekomendasi rute transportasi publik yang mempertimbangkan waktu tempuh, biaya, dan kepadatan penumpang. Publikasi ini sedang disembunyikan Admin dari halaman publik.',
+                'abstrak' => 'Usulan penelitian dari mitra eksternal tentang sistem rekomendasi rute transportasi publik yang mempertimbangkan waktu tempuh, biaya, dan kepadatan penumpang. Publikasi ini diinput Admin dan belum dipublikasikan ke halaman publik.',
             ],
         ];
 
@@ -628,7 +629,7 @@ class KontenSeeder extends Seeder
                 'jenis' => 'Hak Cipta',
                 'pencipta' => 'Dosen B Penerima',
                 'pemilik' => $dosenB,
-                'status' => Hki::STATUS_DRAFT,
+                'status' => Hki::STATUS_PUBLISH,
             ],
         ];
 

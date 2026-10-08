@@ -151,13 +151,14 @@ class PublicationController extends Controller
             'doi'             => ['nullable', 'string', 'max:255', 'regex:/^[A-Za-z0-9.\/:_()\-]+$/'],
             'pdf'             => [$publication ? 'nullable' : 'required', 'file', 'mimes:pdf', 'max:20480'],
             'thumbnail'       => ['nullable', 'image', 'max:4096'],
-            'status'          => ['required', Rule::in(Publication::statuses())],
+            'status'          => ['nullable', 'required_if:submission_type,non_member', Rule::in(Publication::statuses())],
         ]);
 
         if ($data['submission_type'] === 'non_member') {
             $data['user_id'] = null;
         } else {
             $data['recommended_by'] = null;
+            $data['status'] = Publication::STATUS_PUBLISH;
         }
 
         return $data;

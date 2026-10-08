@@ -82,8 +82,8 @@ class SeederLengkapTest extends TestCase
             'berita' => [11, 10],
             'mitra' => [6, 5],
             'tim' => [8, 7],
-            'publikasi' => [12, 10],
-            'hki' => [8, 6],
+            'publikasi' => [12, 11],
+            'hki' => [8, 7],
         ], $this->jumlahKonten());
 
         $disk = Storage::disk('public');
@@ -114,7 +114,9 @@ class SeederLengkapTest extends TestCase
 
         $this->assertSame([1, 2, 0], [$dosenA->notifications()->count(), $dosenB->notifications()->count(), $dosenC->notifications()->count()]);
         $this->assertSame([5, 4], [Publication::forDosen($dosenA)->count(), Hki::forDosen($dosenA)->count()]);
-        $this->assertSame([6, 5], [Publication::forDosen($dosenB)->count(), Hki::forDosen($dosenB)->count()]);
+        $this->assertSame([5, 5], [Publication::forDosen($dosenB)->count(), Hki::forDosen($dosenB)->count()]);
+        $this->assertSame(0, Publication::where('submission_type', 'member')->where('status', Publication::STATUS_DRAFT)->count());
+        $this->assertSame(0, Hki::where('submission_type', 'member')->where('status', Hki::STATUS_DRAFT)->count());
         $this->assertSame([0, 0], [Publication::forDosen($dosenC)->count(), Hki::forDosen($dosenC)->count()]);
     }
 
@@ -243,7 +245,7 @@ class SeederLengkapTest extends TestCase
             ->assertSee('5 entri')->assertSee('4 entri')->assertSee('1 notifikasi belum dibaca');
 
         $this->actingAs($this->akun('dosenB@smartcity.ac.id'))->get('/beranda-dosen')->assertOk()
-            ->assertSee('6 entri')->assertSee('5 entri')->assertSee('2 notifikasi belum dibaca');
+            ->assertSee('5 entri')->assertDontSee('6 entri')->assertSee('2 notifikasi belum dibaca');
 
         $this->actingAs($this->akun('dosenC@smartcity.ac.id'))->get('/beranda-dosen')->assertOk()
             ->assertSee('Belum ada data publikasi dan HKI')->assertSee('Kelola Publikasi');
