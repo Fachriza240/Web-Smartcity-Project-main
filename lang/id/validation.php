@@ -29,10 +29,43 @@ return [
     'numeric' => ':attribute harus berupa angka.',
     'regex' => 'Format :attribute tidak valid.',
     'required' => ':attribute wajib diisi.',
+    'required_if' => ':attribute wajib diisi.',
     'string' => ':attribute harus berupa teks.',
     'unique' => ':attribute sudah terdaftar.',
-    'uploaded' => ':attribute gagal diunggah.',
+    'uploaded' => ':attribute gagal diunggah. Pastikan ukuran file tidak melebihi batas maksimum.',
     'url' => ':attribute harus berupa URL yang valid.',
+
+    'custom' => [
+        'password' => [
+            'max' => 'Password melebihi batas maksimum 64 karakter.',
+        ],
+        'user_id' => [
+            'required_if' => 'Pilih dosen pengusul untuk tipe pengusul Member.',
+        ],
+        'file_sertifikat' => [
+            'mimes' => 'Format file sertifikat tidak didukung. File sertifikat harus berupa file bertipe: pdf, doc, docx.',
+            'max' => 'Ukuran file sertifikat melebihi batas maksimum 10 MB (maksimal 10240 kilobyte).',
+        ],
+        'pdf' => [
+            'mimes' => 'Format file PDF tidak didukung. File PDF harus berupa file bertipe: pdf.',
+            'max' => 'Ukuran file PDF melebihi batas maksimum 20 MB (maksimal 20480 kilobyte).',
+        ],
+        'thumbnail' => [
+            'max' => 'Ukuran thumbnail melebihi batas maksimum 4 MB (maksimal 4096 kilobyte).',
+        ],
+        'foto' => [
+            'max' => 'Ukuran foto melebihi batas maksimum 4 MB (maksimal 4096 kilobyte).',
+        ],
+        'logo' => [
+            'max' => 'Ukuran logo melebihi batas maksimum 4 MB (maksimal 4096 kilobyte).',
+        ],
+        'gallery.*' => [
+            'max' => 'Ukuran foto galeri melebihi batas maksimum 4 MB (maksimal 4096 kilobyte).',
+        ],
+        'dokumen' => [
+            'max' => 'Ukuran dokumen melebihi batas maksimum 20 MB (maksimal 20480 kilobyte).',
+        ],
+    ],
 
     'attributes' => [
         'fullname' => 'Nama lengkap',
@@ -80,8 +113,10 @@ return [
         'file_sertifikat' => 'File sertifikat',
         'submission_type' => 'Tipe pengajuan',
         'user_id' => 'Dosen',
-        'recommended_by' => 'Direkomendasikan oleh',
+        'recommended_by' => 'Nama pengusul',
         'role' => 'Peran',
+        'alasan' => 'Alasan penolakan',
+        'token' => 'Token reset password',
         'q' => 'Kata kunci',
     ],
 ];
