@@ -47,14 +47,6 @@ class HkiNotifier
         $this->notificationsOf($hki)->delete();
     }
 
-    /**
-     * Pencocokan nama dibuat sama dengan scope forDosen() di MatchesPersonList
-     * (dipisah koma, tidak peka huruf besar/kecil), sehingga dosen yang
-     * dikirimi notifikasi pasti juga melihat HKI tersebut di menu "HKI Saya".
-     * Nama bergelar yang mengandung koma, misalnya "Dr. Budi, S.T., M.T.", tetap cocok.
-     *
-     * @return Collection<int, User> dikunci dengan id user
-     */
     private function listedDosen(?string $pencipta): Collection
     {
         $list = $this->normalize($pencipta);
