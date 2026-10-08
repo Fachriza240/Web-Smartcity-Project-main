@@ -12,9 +12,12 @@ use App\Http\Controllers\Admin\TeamController as AdminTeamController;
 use App\Http\Controllers\Admin\ValidationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BiografiController;
+use App\Http\Controllers\DormantAccountController;
 use App\Http\Controllers\DosenKontenController;
+use App\Http\Controllers\LoginConfirmationController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\ProjectController;
@@ -42,15 +45,39 @@ Route::get('/cari', [SearchController::class, 'index'])->name('search');
 Route::middleware('guest')->group(function () {
     Route::get('/registrasi', [AuthController::class, 'showRegister'])->name('registrasi');
     Route::post('/registrasi', [AuthController::class, 'register']);
+    Route::get('/lupa-password', [PasswordResetController::class, 'request'])->name('password.request');
+    Route::post('/lupa-password', [PasswordResetController::class, 'email'])->name('password.email');
+    Route::get('/reset-password/{token}', [PasswordResetController::class, 'edit'])->name('password.reset');
+    Route::post('/reset-password', [PasswordResetController::class, 'update'])->name('password.update');
 });
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.masuk');
+
+Route::controller(DormantAccountController::class)->prefix('login/keaktifan')->name('login.keaktifan.')->group(function () {
+    Route::get('/', 'show')->name('tampil');
+    Route::post('/', 'confirm')->name('konfirmasi');
+    Route::post('/batal', 'cancel')->name('batal');
+});
+
+Route::controller(LoginConfirmationController::class)->prefix('login/konfirmasi')->name('login.konfirmasi.')->group(function () {
+    Route::get('/', 'show')->name('menunggu');
+    Route::get('/status', 'status')->name('status');
+    Route::post('/lanjut', 'continue')->name('lanjut');
+    Route::post('/kirim-ulang', 'resend')->name('kirim-ulang');
+    Route::post('/batal', 'cancel')->name('batal');
+    Route::get('/{token}/{aksi}', 'review')->where(['token' => '[A-Za-z0-9]{64}', 'aksi' => 'ini-saya|bukan-saya'])->name('tinjau');
+    Route::post('/{token}/ini-saya', 'approve')->where('token', '[A-Za-z0-9]{64}')->name('setujui');
+    Route::post('/{token}/bukan-saya', 'reject')->where('token', '[A-Za-z0-9]{64}')->name('tolak');
+});
+
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
-Route::get('/dosen/status', fn () => view('halaman-dosen.status-pending'))
-    ->middleware('auth')
-    ->name('dosen.status');
+Route::middleware('auth')->group(function () {
+    Route::get('/dosen/status', fn () => view('halaman-dosen.status-pending'))->name('dosen.status');
+    Route::get('/registrasi/perbaikan', [AuthController::class, 'showPerbaikan'])->name('registrasi.perbaikan');
+    Route::put('/registrasi/perbaikan', [AuthController::class, 'updatePerbaikan'])->name('registrasi.perbaikan.update');
+});
 
 Route::middleware('approved')->group(function () {
     Route::get('/beranda-dosen', fn () => view('halaman-dosen.beranda-dosen'))->middleware('role:dosen')->name('beranda.dosen');
@@ -108,6 +135,8 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/validasi-registrasi', [ValidationController::class, 'index'])->name('validasi.index');
     Route::post('/validasi-registrasi/{id}/approve', [ValidationController::class, 'approve'])->name('validasi.approve');
     Route::post('/validasi-registrasi/{id}/reject', [ValidationController::class, 'reject'])->name('validasi.reject');
+    Route::post('/validasi-registrasi/{id}/nonaktifkan', [ValidationController::class, 'deactivate'])->name('validasi.deactivate');
+    Route::post('/validasi-registrasi/{id}/aktifkan', [ValidationController::class, 'activate'])->name('validasi.activate');
 
     Route::resource('/publications', AdminPublicationController::class)->except(['show']);
 
