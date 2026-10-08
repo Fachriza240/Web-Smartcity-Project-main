@@ -247,13 +247,16 @@ class NotifikasiHkiTest extends TestCase
         $this->actingAs($this->user('Kreator', 'content_creator'))->get(route('dosen.notifications.index'))->assertForbidden();
     }
 
-    public function test_dosen_tidak_bisa_langsung_publish_tanpa_review_admin(): void
+    public function test_input_dosen_langsung_publish_tanpa_draft(): void
     {
         Storage::fake('public');
         $a = $this->user('Dosen A');
 
-        $this->actingAs($a)->post('/dosen/hki', $this->hki(['status' => 'Publish']));
-        $this->assertSame(Hki::STATUS_DRAFT, Hki::firstOrFail()->status);
+        $this->actingAs($a)->post('/dosen/hki', $this->hki(['status' => 'Draft']))
+            ->assertRedirect(route('dosen.hki.index'))
+            ->assertSessionHas('success', 'HKI berhasil ditambahkan. HKI langsung dipublikasikan dan tampil di halaman publik.');
+
+        $this->assertSame(Hki::STATUS_PUBLISH, Hki::firstOrFail()->status);
 
         $this->actingAs($a)->post('/dosen/publikasi', [
             'judul' => 'Sistem Parkir Cerdas Kota',
@@ -261,11 +264,16 @@ class NotifikasiHkiTest extends TestCase
             'tahun' => 2024,
             'abstrak' => 'Ringkasan penelitian sistem parkir cerdas.',
             'kategori' => Publication::CATEGORY_JOURNAL,
-            'status' => 'Publish',
+            'status' => 'Draft',
             'pdf' => UploadedFile::fake()->create('makalah.pdf', 20, 'application/pdf'),
-        ])->assertRedirect(route('dosen.publikasi.index'));
+        ])->assertRedirect(route('dosen.publikasi.index'))
+            ->assertSessionHas('success', 'Publikasi berhasil ditambahkan. Publikasi langsung dipublikasikan dan tampil di halaman publik.');
 
-        $this->assertSame(Publication::STATUS_DRAFT, Publication::firstOrFail()->status);
+        $publication = Publication::firstOrFail();
+        $this->assertSame(Publication::STATUS_PUBLISH, $publication->status);
+
+        $this->get(route('publications.show', $publication))->assertOk()->assertSee('Sistem Parkir Cerdas Kota');
+        $this->get(route('biografi.user', $a->id))->assertOk()->assertSee('Aplikasi Pemantau Banjir Kota');
     }
 
     public function test_edit_oleh_dosen_tidak_mengubah_status_yang_ditetapkan_admin(): void
