@@ -60,7 +60,7 @@
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" value="{{ old('email') }}"
                         placeholder="nama@contoh.com" autocomplete="email" required
-                        data-label="Email" data-rules="required|email|max:100"
+                        data-label="Email" data-rules="required|email|min:6|max:254"
                         class="@error('email') is-error @enderror" aria-describedby="error-email">
                     <span class="auth-error" id="error-email" data-error-for="email">@error('email'){{ $message }}@enderror</span>
                 </div>
@@ -98,8 +98,8 @@
                     <div class="auth-field">
                         <label for="password">Password</label>
                         <div class="auth-input-wrap">
-                            <input type="password" id="password" name="password" placeholder="6 sampai 64 karakter"
-                                autocomplete="new-password" required data-label="Password" data-rules="required|min:6|max:64"
+                            <input type="password" id="password" name="password" placeholder="8 sampai 64 karakter"
+                                autocomplete="new-password" required data-label="Password" data-rules="required|min:8|max:64"
                                 class="@error('password') is-error @enderror" aria-describedby="error-password">
                             <button type="button" class="auth-eye" data-toggle-password="password" aria-label="Tampilkan password">
                                 <i class="bi bi-eye-slash" aria-hidden="true"></i>

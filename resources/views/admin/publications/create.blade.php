@@ -1,8 +1,8 @@
-<x-layout.admin title="Tambah Publication">
+<x-layout.admin title="Tambah Publikasi">
 
             <div class="content-header">
                 <div>
-                    <h2 class="mb-1">Tambah Publication</h2>
+                    <h2 class="mb-1">Tambah Publikasi</h2>
                     <p class="mb-0">Tambahkan publikasi ilmiah CoE Smart City.</p>
                 </div>
             </div>

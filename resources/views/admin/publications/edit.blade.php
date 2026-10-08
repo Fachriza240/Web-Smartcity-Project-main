@@ -1,8 +1,8 @@
-<x-layout.admin title="Edit Publication">
+<x-layout.admin title="Edit Publikasi">
 
             <div class="content-header">
                 <div>
-                    <h2 class="mb-1">Edit Publication</h2>
+                    <h2 class="mb-1">Edit Publikasi</h2>
                     <p class="mb-0">Perbarui data publikasi ilmiah CoE Smart City.</p>
                 </div>
             </div>

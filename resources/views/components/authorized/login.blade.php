@@ -19,6 +19,15 @@
                 </div>
             @endif
 
+            @foreach (['warning', 'error', 'info'] as $type)
+                @if (session($type))
+                    <div class="auth-alert auth-alert-error" role="alert">
+                        <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+                        <span>{{ session($type) }}</span>
+                    </div>
+                @endif
+            @endforeach
+
             @error('email')
                 <div class="auth-alert auth-alert-error" role="alert">
                     <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
@@ -33,7 +42,7 @@
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" value="{{ old('email') }}"
                         placeholder="nama@contoh.com" autocomplete="email" required
-                        data-label="Email" data-rules="required|email|max:100"
+                        data-label="Email" data-rules="required|email|min:6|max:254"
                         class="@error('email') is-error @enderror" aria-describedby="error-email">
                     <span class="auth-error" id="error-email" data-error-for="email"></span>
                 </div>
@@ -42,7 +51,7 @@
                     <label for="password">Password</label>
                     <div class="auth-input-wrap">
                         <input type="password" id="password" name="password" placeholder="Masukkan password"
-                            autocomplete="current-password" required data-label="Password" data-rules="required|max:64"
+                            autocomplete="current-password" required data-label="Password" data-rules="required|min:8|max:64"
                             class="@error('password') is-error @enderror" aria-describedby="error-password">
                         <button type="button" class="auth-eye" data-toggle-password="password" aria-label="Tampilkan password">
                             <i class="bi bi-eye-slash" aria-hidden="true"></i>
@@ -55,7 +64,7 @@
                     <label class="auth-meta-left">
                         <input type="checkbox" name="remember" value="1" @checked(old('remember'))> Ingat saya
                     </label>
-                    <a href="{{ route('contact') }}">Lupa password?</a>
+                    <a href="{{ route('password.request') }}">Lupa password?</a>
                 </div>
 
                 <button type="submit" class="auth-btn">Masuk</button>

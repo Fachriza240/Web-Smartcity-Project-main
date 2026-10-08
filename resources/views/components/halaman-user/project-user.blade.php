@@ -474,7 +474,7 @@
                 <div class="proj-list__empty-icon">
                     <i class="bi bi-kanban"></i>
                 </div>
-                <p class="proj-list__empty-text">Belum ada proyek yang tersedia saat ini.</p>
+                <p class="proj-list__empty-text">Data belum tersedia.</p>
             </div>
         </div>
     </section>

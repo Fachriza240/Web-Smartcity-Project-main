@@ -323,7 +323,7 @@
                 <div class="prog-list__empty-icon">
                     <i class="bi bi-layers"></i>
                 </div>
-                <p class="prog-list__empty-text">Belum ada program yang tersedia saat ini.</p>
+                <p class="prog-list__empty-text">Data belum tersedia.</p>
             </div>
         @endif
     </div>

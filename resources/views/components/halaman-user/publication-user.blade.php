@@ -445,7 +445,7 @@
                 <div class="pub-list__empty-icon">
                     <i class="bi bi-journal-text"></i>
                 </div>
-                <p class="pub-list__empty-text">Belum ada publikasi yang tersedia saat ini.</p>
+                <p class="pub-list__empty-text">Data belum tersedia.</p>
             </div>
         @endforelse
 

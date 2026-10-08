@@ -16,13 +16,21 @@
 
         <div class="dsn-note">
             <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
-            <span>HKI yang Anda tambahkan masuk sebagai <strong>Draft</strong> dan akan tampil di halaman publik setelah direview admin.</span>
+            <span>HKI yang Anda tambahkan akan langsung berstatus <strong>Publish</strong> dan tampil di halaman publik tanpa menunggu review admin.</span>
         </div>
 
         @if ($errors->any())
             <div class="dsn-alert" role="alert">
                 <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
                 <span>Periksa kembali isian yang ditandai merah.</span>
+            </div>
+        @endif
+
+        @if (session('retry'))
+            <div class="dsn-alert" role="alert">
+                <i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>
+                <span>{{ session('error') }}</span>
+                <button type="button" class="sc-btn sc-btn--ghost sc-btn--sm ms-auto" data-retry>Coba Lagi</button>
             </div>
         @endif
 
@@ -78,24 +86,30 @@
 
                 <div class="col-md-6">
                     <label for="file_sertifikat" class="form-label">File Sertifikat</label>
-                    <input type="file" id="file_sertifikat" name="file_sertifikat" class="form-control @error('file_sertifikat') is-invalid @enderror" accept=".pdf,.jpg,.jpeg,.png">
+                    <input type="file" id="file_sertifikat" name="file_sertifikat" class="form-control @error('file_sertifikat') is-invalid @enderror" accept=".pdf,.doc,.docx"
+                        data-label="File sertifikat" data-rules="file:pdf,doc,docx|filesize:10240">
                     <div class="form-text">
-                        PDF atau gambar, maksimal 10 MB.
+                        Format PDF, DOC, atau DOCX, maksimal 10 MB.
                         @if ($hki->exists && $hki->file_sertifikat)
                             File saat ini: <a href="{{ asset('storage/'.$hki->file_sertifikat) }}" target="_blank" rel="noopener">lihat file</a>. Unggah file baru untuk mengganti.
                         @endif
                     </div>
-                    <div class="field-error">@error('file_sertifikat'){{ $message }}@enderror</div>
+                    <div class="field-error" data-error-for="file_sertifikat">@error('file_sertifikat'){{ $message }}@enderror</div>
                 </div>
                 <div class="col-md-6">
                     <span class="form-label d-block">Status</span>
-                    <span class="dsn-status {{ $hki->status === 'Publish' ? 'is-publish' : '' }}">{{ $hki->status ?? 'Draft' }}</span>
-                    <div class="form-text">Status hanya bisa diubah admin setelah HKI direview.</div>
+                    @if ($isCreate || $hki->status === 'Publish')
+                        <span class="dsn-status is-publish">Publish</span>
+                        <div class="form-text">{{ $isCreate ? 'HKI langsung tampil di halaman publik setelah disimpan.' : 'HKI ini tampil di halaman publik.' }}</div>
+                    @else
+                        <span class="dsn-status">{{ $hki->status }}</span>
+                        <div class="form-text">HKI ini sedang disembunyikan admin dari halaman publik.</div>
+                    @endif
                 </div>
             </div>
 
             <div class="dsn-form-actions">
-                <button type="submit" class="sc-btn sc-btn--primary">
+                <button type="submit" class="sc-btn sc-btn--primary" data-confirm-submit="Apakah Anda yakin ingin menyimpan data HKI ini?">
                     <i class="bi bi-save" aria-hidden="true"></i> {{ $isCreate ? 'Simpan HKI' : 'Perbarui HKI' }}
                 </button>
                 <a href="{{ route('dosen.hki.index') }}" class="sc-btn sc-btn--ghost">Batal</a>

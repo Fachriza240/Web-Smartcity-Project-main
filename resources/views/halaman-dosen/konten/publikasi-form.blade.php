@@ -13,13 +13,21 @@
 
         <div class="dsn-note">
             <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
-            <span>Publikasi yang Anda tambahkan masuk sebagai <strong>Draft</strong> dan akan tampil di halaman publik setelah direview admin.</span>
+            <span>Publikasi yang Anda tambahkan akan langsung berstatus <strong>Publish</strong> dan tampil di halaman publik tanpa menunggu review admin.</span>
         </div>
 
         @if ($errors->any())
             <div class="dsn-alert" role="alert">
                 <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
                 <span>Periksa kembali isian yang ditandai merah.</span>
+            </div>
+        @endif
+
+        @if (session('retry'))
+            <div class="dsn-alert" role="alert">
+                <i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>
+                <span>{{ session('error') }}</span>
+                <button type="button" class="sc-btn sc-btn--ghost sc-btn--sm ms-auto" data-retry>Coba Lagi</button>
             </div>
         @endif
 
@@ -57,7 +65,7 @@
                 <div class="col-12" data-field>
                     <label for="abstrak" class="form-label">Abstrak <span class="text-danger">*</span></label>
                     <textarea id="abstrak" name="abstrak" rows="6" class="form-control @error('abstrak') is-invalid @enderror"
-                        placeholder="Ringkasan isi publikasi" data-label="Abstrak" data-rules="required|min:10|max:10000|safe">{{ old('abstrak', $publication->abstrak) }}</textarea>
+                        placeholder="Ringkasan isi publikasi" data-label="Abstrak" data-rules="required|min:20|max:5000|safe">{{ old('abstrak', $publication->abstrak) }}</textarea>
                     <div class="field-error" data-error-for="abstrak">@error('abstrak'){{ $message }}@enderror</div>
                 </div>
 
@@ -73,8 +81,13 @@
                 </div>
                 <div class="col-md-6">
                     <span class="form-label d-block">Status</span>
-                    <span class="dsn-status {{ $publication->status === 'Publish' ? 'is-publish' : '' }}">{{ $publication->status ?? 'Draft' }}</span>
-                    <div class="form-text">Status hanya bisa diubah admin setelah publikasi direview.</div>
+                    @if ($isCreate || $publication->status === 'Publish')
+                        <span class="dsn-status is-publish">Publish</span>
+                        <div class="form-text">{{ $isCreate ? 'Publikasi langsung tampil di halaman publik setelah disimpan.' : 'Publikasi ini tampil di halaman publik.' }}</div>
+                    @else
+                        <span class="dsn-status">{{ $publication->status }}</span>
+                        <div class="form-text">Publikasi ini sedang disembunyikan admin dari halaman publik.</div>
+                    @endif
                 </div>
 
                 <div class="col-md-6" data-field>
@@ -95,28 +108,30 @@
 
                 <div class="col-md-6">
                     <label for="pdf" class="form-label">File PDF @if ($isCreate)<span class="text-danger">*</span>@endif</label>
-                    <input type="file" id="pdf" name="pdf" class="form-control @error('pdf') is-invalid @enderror" accept="application/pdf">
+                    <input type="file" id="pdf" name="pdf" class="form-control @error('pdf') is-invalid @enderror" accept=".pdf,application/pdf"
+                        data-label="File PDF" data-rules="{{ $isCreate ? 'required|' : '' }}file:pdf|filesize:20480">
                     <div class="form-text">
                         Format PDF, maksimal 20 MB.
                         @if ($publication->pdf_path)
                             File saat ini: <a href="{{ asset('storage/'.$publication->pdf_path) }}" target="_blank" rel="noopener">lihat PDF</a>
                         @endif
                     </div>
-                    <div class="field-error">@error('pdf'){{ $message }}@enderror</div>
+                    <div class="field-error" data-error-for="pdf">@error('pdf'){{ $message }}@enderror</div>
                 </div>
                 <div class="col-md-6">
                     <label for="thumbnail" class="form-label">Thumbnail</label>
-                    <input type="file" id="thumbnail" name="thumbnail" class="form-control @error('thumbnail') is-invalid @enderror" accept="image/*">
-                    <div class="form-text">Gambar JPG, PNG, atau WEBP, maksimal 4 MB.</div>
+                    <input type="file" id="thumbnail" name="thumbnail" class="form-control @error('thumbnail') is-invalid @enderror" accept="image/*"
+                        data-label="Thumbnail" data-rules="file:jpg,jpeg,png,webp,gif,bmp|filesize:4096">
+                    <div class="form-text">Gambar JPG, PNG, WEBP, GIF, atau BMP, maksimal 4 MB.</div>
                     @if ($publication->thumbnail_path)
                         <img src="{{ asset('storage/'.$publication->thumbnail_path) }}" alt="Thumbnail saat ini" class="dsn-thumb-preview">
                     @endif
-                    <div class="field-error">@error('thumbnail'){{ $message }}@enderror</div>
+                    <div class="field-error" data-error-for="thumbnail">@error('thumbnail'){{ $message }}@enderror</div>
                 </div>
             </div>
 
             <div class="dsn-form-actions">
-                <button type="submit" class="sc-btn sc-btn--primary">
+                <button type="submit" class="sc-btn sc-btn--primary" data-confirm-submit="Apakah Anda yakin ingin menyimpan publikasi ini?">
                     <i class="bi bi-save" aria-hidden="true"></i> {{ $isCreate ? 'Simpan Publikasi' : 'Perbarui Publikasi' }}
                 </button>
                 <a href="{{ route('dosen.publikasi.index') }}" class="sc-btn sc-btn--ghost">Batal</a>

@@ -212,7 +212,7 @@
         @else
             <div class="sc-partners-empty" data-aos="fade-up">
                 <i class="bi bi-people"></i>
-                <h3>Belum Ada Mitra</h3>
+                <h3>Data belum tersedia</h3>
                 <p>Data mitra strategis akan ditampilkan di sini setelah ditambahkan melalui panel admin.</p>
             </div>
         @endif

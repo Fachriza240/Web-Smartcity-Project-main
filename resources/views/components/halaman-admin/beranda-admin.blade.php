@@ -18,6 +18,7 @@
         ['label' => 'Anggota Tim', 'url' => route('admin.teams.create')],
         ['label' => 'Mitra', 'url' => route('admin.partners.create')],
     ];
+    $laporan = \App\Models\SuspiciousLoginReport::with('user')->latest()->limit(5)->get();
 @endphp
 
 <div class="content-header">
@@ -44,5 +45,47 @@
                 </a>
             @endforeach
         </div>
+    </div>
+</div>
+
+<div class="card-admin">
+    <div class="card-body">
+        <div class="adm-card-head">
+            <h3 class="card-title mb-0">Laporan Aktivitas Login Mencurigakan</h3>
+        </div>
+        @if ($laporan->isEmpty())
+            <p class="adm-muted mb-0">Belum ada laporan aktivitas login mencurigakan.</p>
+        @else
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Waktu</th>
+                            <th>Email</th>
+                            <th>Perangkat</th>
+                            <th>Alamat IP</th>
+                            <th>Status Akun</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($laporan as $item)
+                            <tr>
+                                <td class="small">{{ $item->login_at?->translatedFormat('d M Y, H:i') ?? '-' }} WIB</td>
+                                <td class="small adm-break">{{ $item->email }}</td>
+                                <td class="small">{{ $item->device ?: '-' }}</td>
+                                <td class="small">{{ $item->ip_address ?: '-' }}</td>
+                                <td>
+                                    @if ($item->user?->isLocked())
+                                        <span class="badge bg-danger">Dikunci sampai {{ $item->user->locked_until->format('H:i') }} WIB</span>
+                                    @else
+                                        <span class="badge bg-secondary">Tidak dikunci</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
     </div>
 </div>

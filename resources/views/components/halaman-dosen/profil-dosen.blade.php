@@ -3,7 +3,7 @@
 @php
     $bio = collect(preg_split('/\R+/', (string) $user->bio))->map(fn ($p) => trim($p))->filter();
     $fields = collect(preg_split('/[,;\n]+/', (string) $user->bidang_penelitian))->map(fn ($p) => trim($p))->filter();
-    $editOpen = $errors->any();
+    $editOpen = $errors->any() || session()->hasOldInput();
 @endphp
 
 <section class="sc-bio-hero">
@@ -48,6 +48,14 @@
                 </div>
             @endif
 
+            @if (session('retry'))
+                <div class="dsn-alert" role="alert">
+                    <i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>
+                    <span>{{ session('error') }}</span>
+                    <button type="button" class="sc-btn sc-btn--ghost sc-btn--sm ms-auto" data-retry>Coba Lagi</button>
+                </div>
+            @endif
+
             <form action="{{ route('profil.dosen.update') }}" method="POST" enctype="multipart/form-data" id="profForm" novalidate data-validate>
                 @csrf
                 @method('PUT')
@@ -64,9 +72,10 @@
                         <label for="fotoInput" class="sc-btn sc-btn--ghost sc-btn--sm">
                             <i class="bi bi-camera" aria-hidden="true"></i> Ganti Foto
                         </label>
-                        <input type="file" name="foto" id="fotoInput" class="visually-hidden" accept="image/jpeg,image/png,image/webp" data-preview-input>
+                        <input type="file" name="foto" id="fotoInput" class="visually-hidden" accept="image/jpeg,image/png,image/webp" data-preview-input
+                            data-label="Foto" data-rules="file:jpg,jpeg,png,webp|filesize:4096">
                         <small class="form-text text-center">JPG, PNG, atau WEBP, maksimal 4 MB.</small>
-                        <div class="field-error">@error('foto'){{ $message }}@enderror</div>
+                        <div class="field-error" data-error-for="foto">@error('foto'){{ $message }}@enderror</div>
                     </div>
 
                     <div class="row g-3">
@@ -81,7 +90,7 @@
                             <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
                             <input type="email" id="email" name="email" class="form-control @error('email') is-invalid @enderror"
                                 value="{{ old('email', $user->email) }}" autocomplete="email"
-                                data-label="Email" data-rules="required|email|max:100">
+                                data-label="Email" data-rules="required|email|min:6|max:254">
                             <div class="field-error" data-error-for="email">@error('email'){{ $message }}@enderror</div>
                         </div>
                         <div class="col-md-4" data-field>
@@ -124,7 +133,7 @@
                 </div>
 
                 <div class="dsn-form-actions">
-                    <button type="submit" class="sc-btn sc-btn--primary">
+                    <button type="submit" class="sc-btn sc-btn--primary" data-confirm-submit="Apakah Anda yakin ingin menyimpan perubahan profil?">
                         <i class="bi bi-save-fill" aria-hidden="true"></i> Simpan Perubahan
                     </button>
                     <a href="{{ route('profil.dosen') }}" class="sc-btn sc-btn--ghost">Batal</a>

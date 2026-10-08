@@ -98,7 +98,7 @@
                     aria-selected="{{ $loop->first ? 'true' : 'false' }}" tabindex="{{ $loop->first ? '0' : '-1' }}">
                     <i class="bi {{ $group['icon'] }}" aria-hidden="true"></i>
                     {{ $group['label'] }}
-                    <span class="sc-tab__count">{{ count($group['members']) ?: count($group['placeholder']) }}</span>
+                    <span class="sc-tab__count">{{ count($group['members']) }}</span>
                 </button>
             @endforeach
         </div>
@@ -110,6 +110,13 @@
             @endphp
             <div class="sc-team-panel" id="{{ $group['id'] }}" role="tabpanel" aria-labelledby="{{ $group['id'] }}-tab"
                 data-tab-panel="tim" @unless ($loop->first) hidden @endunless>
+                @if ($isSample)
+                    <div class="sc-empty mb-4">
+                        <i class="bi bi-people" aria-hidden="true"></i>
+                        <h3>Data belum tersedia</h3>
+                        <p>Data {{ mb_strtolower($group['label']) }} akan ditampilkan di sini setelah ditambahkan. Kartu di bawah ini hanya contoh tampilan.</p>
+                    </div>
+                @endif
                 <div class="sc-team-grid">
                     @foreach ($members as $member)
                         @php

@@ -377,7 +377,7 @@
                 <div class="news-list__empty-icon">
                     <i class="bi bi-newspaper"></i>
                 </div>
-                <p class="news-list__empty-text">Belum ada berita yang dipublikasikan saat ini.</p>
+                <p class="news-list__empty-text">Data belum tersedia.</p>
             </div>
         @endforelse
 

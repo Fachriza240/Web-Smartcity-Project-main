@@ -5,6 +5,7 @@
         ['label' => 'Berita', 'value' => \App\Models\News::published()->count(), 'icon' => 'bi-newspaper', 'color' => 'icon-bg-yellow', 'url' => route('admin.news.index')],
         ['label' => 'Mitra', 'value' => \App\Models\Partner::published()->count(), 'icon' => 'bi-buildings', 'color' => 'icon-bg-gray', 'url' => route('admin.partners.index')],
     ];
+    $totalData = \App\Models\Program::count() + \App\Models\Project::count() + \App\Models\News::count() + \App\Models\Partner::count();
     $latestNews = \App\Models\News::latest()->limit(5)->get();
 @endphp
 
@@ -23,6 +24,13 @@
     </div>
 </div>
 
+@if ($totalData === 0)
+    <div class="alert alert-info d-flex align-items-start gap-2" role="status">
+        <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+        <span>Belum terdapat data. Silakan tambahkan konten baru melalui menu Program, Proyek, Berita, atau Mitra.</span>
+    </div>
+@endif
+
 <x-admin.stats :items="$stats" />
 
 <div class="card-admin">
@@ -32,7 +40,7 @@
             <a href="{{ route('admin.news.index') }}" class="adm-stat__link">Lihat semua <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
         </div>
         @if ($latestNews->isEmpty())
-            <p class="adm-muted mb-0">Belum ada berita. Mulai dengan menulis berita pertama.</p>
+            <p class="adm-muted mb-0">Belum terdapat data berita. Mulai dengan menulis berita pertama.</p>
         @else
             <ul class="adm-simple-list">
                 @foreach ($latestNews as $item)
