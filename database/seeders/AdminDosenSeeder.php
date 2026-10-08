@@ -12,7 +12,7 @@ class AdminDosenSeeder extends Seeder
         User::firstOrCreate(['email' => 'admin@example.test'], [
             'fullname'            => 'Admin Test',
             'nip'                 => '0000',
-            'password'            => 'secret',
+            'password'            => 'password',
             'role'                => 'admin',
             'registration_status' => 'approved',
         ]);
@@ -20,7 +20,7 @@ class AdminDosenSeeder extends Seeder
         User::firstOrCreate(['email' => 'creator@example.test'], [
             'fullname'            => 'Creator Test',
             'nip'                 => null,
-            'password'            => 'secret',
+            'password'            => 'password',
             'role'                => 'content_creator',
             'registration_status' => 'approved',
         ]);
@@ -28,7 +28,7 @@ class AdminDosenSeeder extends Seeder
         User::firstOrCreate(['email' => 'dosen.pending@example.test'], [
             'fullname'            => 'Dosen Pending',
             'nip'                 => '1001',
-            'password'            => 'secret',
+            'password'            => 'password',
             'role'                => 'dosen',
             'registration_status' => 'pending',
         ]);
