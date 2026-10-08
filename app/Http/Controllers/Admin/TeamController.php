@@ -111,7 +111,7 @@ class TeamController extends Controller
             'jabatan'   => ['required', 'string', 'min:2', 'max:100', new SafeText],
             'bidang'    => ['nullable', 'string', 'min:2', 'max:150', new SafeText],
             'foto'      => [$team ? 'nullable' : 'required', 'image', 'max:4096'],
-            'email'     => ['nullable', 'email:rfc', 'max:100'],
+            'email'     => ['nullable', 'email:rfc', 'min:6', 'max:254'],
             'telepon'   => ['nullable', 'string', 'regex:/^[0-9+\-\s()]{6,20}$/'],
             'linkedin'  => ['nullable', 'url', 'max:500'],
             'instagram' => ['nullable', 'string', 'regex:/^@?[A-Za-z0-9._]{1,30}$/'],

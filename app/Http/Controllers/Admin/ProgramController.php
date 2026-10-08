@@ -92,7 +92,7 @@ class ProgramController extends Controller
     {
         return $request->validate([
             'judul'     => ['required', 'string', 'min:3', 'max:100', new SafeText],
-            'deskripsi' => ['required', 'string', 'min:10', 'max:5000', new SafeText(false)],
+            'deskripsi' => ['required', 'string', 'min:20', 'max:5000', new SafeText(false)],
             'thumbnail' => [$program ? 'nullable' : 'required', 'image', 'max:4096'],
             'urutan'    => ['nullable', 'integer', 'min:0', 'max:9999'],
             'status'    => ['required', Rule::in(Program::statuses())],

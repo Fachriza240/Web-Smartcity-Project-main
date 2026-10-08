@@ -9,6 +9,7 @@ use App\Rules\SafeText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class ProfileController extends Controller
 {
@@ -35,10 +36,15 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
+        $email = $request->input('email');
+        if (is_string($email)) {
+            $request->merge(['email' => mb_strtolower(trim($email))]);
+        }
+
         $data = $request->validate([
             'fullname' => ['required', 'string', 'min:3', 'max:100', new PersonName],
-            'email' => ['required', 'string', 'email:rfc', 'max:100', 'unique:users,email,'.$user->id],
-            'nip' => ['nullable', 'regex:/^[0-9]+$/', 'digits_between:4,30', 'unique:users,nip,'.$user->id],
+            'email' => ['required', 'string', 'email:rfc', 'min:6', 'max:254', Rule::unique('users', 'email')->ignore($user->id)],
+            'nip' => ['nullable', 'regex:/^[0-9]+$/', 'digits_between:4,30', Rule::unique('users', 'nip')->ignore($user->id)],
             'prodi' => ['nullable', 'string', 'min:2', 'max:100', new SafeText],
             'fakultas' => ['nullable', 'string', 'min:2', 'max:100', new SafeText],
             'bio' => ['nullable', 'string', 'max:2000', new SafeText],
@@ -47,7 +53,6 @@ class ProfileController extends Controller
         ]);
 
         $data['fullname'] = preg_replace('/\s+/u', ' ', trim($data['fullname']));
-        $data['email'] = strtolower($data['email']);
         unset($data['foto']);
 
         if ($request->hasFile('foto')) {

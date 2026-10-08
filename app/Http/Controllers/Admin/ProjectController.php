@@ -100,9 +100,9 @@ class ProjectController extends Controller
     private function validatedData(Request $request, ?Project $project = null): array
     {
         return $request->validate([
-            'judul' => ['required', 'string', 'min:5', 'max:200', new SafeText],
+            'judul' => ['required', 'string', 'min:3', 'max:100', new SafeText],
             'thumbnail' => [$project ? 'nullable' : 'required', 'image', 'max:4096'],
-            'deskripsi' => ['required', 'string', 'min:10', 'max:10000', new SafeText(false)],
+            'deskripsi' => ['required', 'string', 'min:20', 'max:5000', new SafeText(false)],
             'kategori' => ['nullable', 'string', 'min:2', 'max:100', new SafeText],
             'partner' => ['nullable', 'string', 'min:2', 'max:200', new SafeText],
             'tahun' => ['nullable', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],

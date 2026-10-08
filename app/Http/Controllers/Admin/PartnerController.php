@@ -101,8 +101,8 @@ class PartnerController extends Controller
     private function validatedData(Request $request, ?Partner $partner = null): array
     {
         return $request->validate([
-            'nama'      => ['required', 'string', 'min:2', 'max:150', new SafeText],
-            'deskripsi' => ['nullable', 'string', 'max:2000', new SafeText(false)],
+            'nama'      => ['required', 'string', 'min:3', 'max:100', new SafeText],
+            'deskripsi' => ['nullable', 'string', 'min:20', 'max:5000', new SafeText(false)],
             'logo'      => ['nullable', 'image', 'max:4096'],
             'website'   => ['nullable', 'url', 'max:500'],
             'status'    => ['required', Rule::in(Partner::statuses())],

@@ -117,9 +117,9 @@ class HkiController extends Controller
             'jenis_sertifikat'  => ['required', Rule::in(Hki::JENIS)],
             'pencipta'          => ['required', 'string', 'min:3', 'max:255', new PersonName],
             'submission_type'   => ['required', 'in:member,non_member'],
-            'user_id'           => ['nullable', 'exists:users,id'],
+            'user_id'           => ['nullable', 'required_if:submission_type,member', Rule::exists('users', 'id')->where('role', 'dosen')],
             'recommended_by'    => ['nullable', 'string', 'min:3', 'max:100', new PersonName],
-            'file_sertifikat'   => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
+            'file_sertifikat'   => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:10240'],
             'status'            => ['required', Rule::in(Hki::statuses())],
         ]);
 

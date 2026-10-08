@@ -26,6 +26,10 @@ class NotificationController extends Controller
 
         $notification->markAsRead();
 
+        if (($notification->data['jenis'] ?? null) === 'registrasi') {
+            return redirect()->route('dosen.status');
+        }
+
         return redirect()->route('dosen.hki.index');
     }
 

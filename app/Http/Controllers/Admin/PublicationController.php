@@ -140,12 +140,12 @@ class PublicationController extends Controller
     {
         $data = $request->validate([
             'submission_type' => ['required', 'in:member,non_member'],
-            'user_id'         => ['nullable', 'exists:users,id'],
+            'user_id'         => ['nullable', 'required_if:submission_type,member', Rule::exists('users', 'id')->where('role', 'dosen')],
             'recommended_by'  => ['nullable', 'string', 'min:3', 'max:100', new PersonName],
             'judul'           => ['required', 'string', 'min:5', 'max:200', new SafeText],
             'penulis'         => ['required', 'string', 'min:3', 'max:255', new PersonName],
             'tahun'           => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
-            'abstrak'         => ['required', 'string', 'min:10', 'max:10000', new SafeText],
+            'abstrak'         => ['required', 'string', 'min:20', 'max:5000', new SafeText],
             'kategori'        => ['required', Rule::in(Publication::categories())],
             'penerbit'        => ['nullable', 'string', 'min:2', 'max:200', new SafeText],
             'doi'             => ['nullable', 'string', 'max:255', 'regex:/^[A-Za-z0-9.\/:_()\-]+$/'],

@@ -96,9 +96,9 @@ class NewsController extends Controller
     private function validatedData(Request $request, ?News $news = null): array
     {
         return $request->validate([
-            'judul'     => ['required', 'string', 'min:5', 'max:200', new SafeText],
-            'kategori'  => ['nullable', 'string', 'min:2', 'max:100', new SafeText],
-            'konten'    => ['required', 'string', 'min:10', 'max:65000', new SafeText(false)],
+            'judul'     => ['required', 'string', 'min:3', 'max:100', new SafeText],
+            'kategori'  => ['nullable', Rule::in(News::categories())],
+            'konten'    => ['required', 'string', 'min:20', 'max:5000', new SafeText(false)],
             'thumbnail' => [$news ? 'nullable' : 'required', 'image', 'max:4096'],
             'status'    => ['required', Rule::in(News::statuses())],
         ]);

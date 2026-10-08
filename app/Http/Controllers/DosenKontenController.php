@@ -31,7 +31,7 @@ class DosenKontenController extends Controller
     {
         return view('halaman-dosen.konten.publikasi-form', [
             'publication' => new Publication([
-                'status'          => Publication::STATUS_DRAFT,
+                'status'          => Publication::STATUS_PUBLISH,
                 'submission_type' => 'member',
                 'user_id'         => Auth::id(),
             ]),
@@ -47,7 +47,7 @@ class DosenKontenController extends Controller
         $data['user_id']         = Auth::id();
         $data['submission_type'] = 'member';
         $data['recommended_by']  = null;
-        $data['status']          = Publication::STATUS_DRAFT;
+        $data['status']          = Publication::STATUS_PUBLISH;
 
         if (!$request->hasFile('pdf')) {
             return back()->withErrors(['pdf' => 'File PDF wajib diupload.'])->withInput();
@@ -65,7 +65,7 @@ class DosenKontenController extends Controller
         Publication::create($data);
 
         return redirect()->route('dosen.publikasi.index')
-            ->with('success', 'Publikasi berhasil ditambahkan. Menunggu review admin untuk dipublikasikan.');
+            ->with('success', 'Publikasi berhasil ditambahkan. Publikasi langsung dipublikasikan dan tampil di halaman publik.');
     }
 
     public function publikasiEdit(Publication $p)
@@ -131,7 +131,7 @@ class DosenKontenController extends Controller
     {
         return view('halaman-dosen.konten.hki-form', [
             'hki'      => new Hki([
-                'status'          => Hki::STATUS_DRAFT,
+                'status'          => Hki::STATUS_PUBLISH,
                 'submission_type' => 'member',
                 'user_id'         => Auth::id(),
             ]),
@@ -148,7 +148,7 @@ class DosenKontenController extends Controller
         $data['user_id']         = Auth::id();
         $data['submission_type'] = 'member';
         $data['recommended_by']  = null;
-        $data['status']          = Hki::STATUS_DRAFT;
+        $data['status']          = Hki::STATUS_PUBLISH;
 
         if ($request->hasFile('file_sertifikat')) {
             $data['file_sertifikat'] = $request->file('file_sertifikat')
@@ -159,7 +159,7 @@ class DosenKontenController extends Controller
         $notifier->sync($hki, Auth::user());
 
         return redirect()->route('dosen.hki.index')
-            ->with('success', 'HKI berhasil ditambahkan. Menunggu review admin untuk dipublikasikan.');
+            ->with('success', 'HKI berhasil ditambahkan. HKI langsung dipublikasikan dan tampil di halaman publik.');
     }
 
     public function hkiEdit(Hki $h)
@@ -213,7 +213,7 @@ class DosenKontenController extends Controller
             'judul'     => ['required', 'string', 'min:5', 'max:200', new SafeText],
             'penulis'   => ['required', 'string', 'min:3', 'max:255', new PersonName],
             'tahun'     => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
-            'abstrak'   => ['required', 'string', 'min:10', 'max:10000', new SafeText],
+            'abstrak'   => ['required', 'string', 'min:20', 'max:5000', new SafeText],
             'kategori'  => ['required', Rule::in(Publication::categories())],
             'penerbit'  => ['nullable', 'string', 'min:2', 'max:200', new SafeText],
             'doi'       => ['nullable', 'string', 'max:255', 'regex:/^[A-Za-z0-9.\/:_()\-]+$/'],
@@ -233,7 +233,7 @@ class DosenKontenController extends Controller
             'judul_sertifikat' => ['required', 'string', 'min:5', 'max:200', new SafeText],
             'jenis_sertifikat' => ['required', Rule::in(Hki::JENIS)],
             'pencipta'         => ['required', 'string', 'min:3', 'max:255', new PersonName],
-            'file_sertifikat'  => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
+            'file_sertifikat'  => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:10240'],
         ]);
     }
 
