@@ -12,7 +12,8 @@ class EnsureRole
         $user = $request->user();
 
         if (! $user) {
-            return redirect()->route('login');
+            return redirect()->guest(route('login'))
+                ->with('warning', 'Sesi Anda telah berakhir, silakan login kembali.');
         }
 
         abort_unless(in_array($user->role, $roles, true), 403);

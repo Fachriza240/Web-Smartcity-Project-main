@@ -13,7 +13,8 @@ class EnsureUserApproved
         $user = $request->user();
 
         if (! $user) {
-            return redirect()->route('login');
+            return redirect()->guest(route('login'))
+                ->with('warning', 'Sesi Anda telah berakhir, silakan login kembali.');
         }
 
         if ($user->role === 'admin') {
