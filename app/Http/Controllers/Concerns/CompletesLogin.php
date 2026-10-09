@@ -15,7 +15,7 @@ trait CompletesLogin
 {
     protected function proceedLogin(Request $request, User $user, bool $remember = false)
     {
-        if (! config('login.email_confirmation')) {
+        if (! config('login.email_confirmation') || $user->role !== 'dosen') {
             return $this->completeLogin($request, $user, $remember);
         }
 

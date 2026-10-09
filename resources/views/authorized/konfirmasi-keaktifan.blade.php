@@ -15,7 +15,11 @@
             <div class="auth-status__info">
                 <i class="bi bi-calendar-event" aria-hidden="true"></i>
                 Aktivitas login terakhir: {{ $terakhir?->translatedFormat('d F Y, H:i') ?? '-' }} WIB.
-                Setelah Anda memilih Ya, proses login dilanjutkan dengan konfirmasi melalui email.
+                @if ($user->role === 'dosen')
+                    Setelah Anda memilih Ya, proses login dilanjutkan dengan konfirmasi melalui email.
+                @else
+                    Setelah Anda memilih Ya, Anda langsung masuk ke dashboard.
+                @endif
             </div>
 
             <div class="auth-status__actions">

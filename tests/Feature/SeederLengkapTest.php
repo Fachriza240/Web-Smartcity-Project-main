@@ -203,10 +203,21 @@ class SeederLengkapTest extends TestCase
             ->assertRedirect(route('login'))
             ->assertSessionHasErrors(['email' => User::INACTIVE_MESSAGE]);
 
-        foreach (['admin@smartcity.ac.id', 'creator@smartcity.ac.id', 'dosenA@smartcity.ac.id', 'dosenC@smartcity.ac.id', 'dosen.pending@smartcity.ac.id', 'dosen.rejected@smartcity.ac.id'] as $email) {
+        foreach (['dosenA@smartcity.ac.id', 'dosenC@smartcity.ac.id', 'dosen.pending@smartcity.ac.id', 'dosen.rejected@smartcity.ac.id'] as $email) {
             $this->flushSession();
             $this->post('/login', ['email' => $email, 'password' => 'password'])
                 ->assertRedirect(route('login.konfirmasi.menunggu'));
+        }
+
+        foreach ([
+            'admin@smartcity.ac.id' => '/beranda-admin',
+            'creator@smartcity.ac.id' => '/beranda-creator',
+            'creator.pending@smartcity.ac.id' => '/dosen/status',
+        ] as $email => $tujuan) {
+            $this->flushSession();
+            $this->post('/login', ['email' => $email, 'password' => 'password'])
+                ->assertRedirect(url($tujuan));
+            $this->post('/logout');
         }
     }
 

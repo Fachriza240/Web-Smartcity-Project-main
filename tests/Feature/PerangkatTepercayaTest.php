@@ -148,7 +148,7 @@ class PerangkatTepercayaTest extends TestCase
             ->assertRedirect(route('login.konfirmasi.menunggu'));
     }
 
-    public function test_akun_pending_dan_admin_mengikuti_aturan_yang_sama(): void
+    public function test_dosen_pending_mengikuti_aturan_perangkat(): void
     {
         $pending = $this->makeUser('dosen', ['registration_status' => User::STATUS_PENDING]);
         $perangkat = $this->loginPertamaDanKonfirmasi($pending, '/dosen/status');
@@ -158,12 +158,41 @@ class PerangkatTepercayaTest extends TestCase
             ->post('/login', ['email' => $pending->email, 'password' => 'rahasia123'])
             ->assertRedirect(route('dosen.status'));
         Notification::assertNotSentTo($pending, LoginConfirmationNotification::class);
-        $this->post('/logout');
+    }
 
+    public function test_admin_dan_content_creator_login_tanpa_konfirmasi_email(): void
+    {
+        foreach ([
+            [$this->makeUser('admin'), '/beranda-admin'],
+            [$this->makeUser('content_creator'), '/beranda-creator'],
+            [$this->makeUser('content_creator', ['registration_status' => User::STATUS_PENDING]), '/dosen/status'],
+        ] as [$user, $tujuan]) {
+            $this->post('/login', ['email' => $user->email, 'password' => 'rahasia123'])
+                ->assertRedirect(url($tujuan));
+            $this->assertAuthenticatedAs($user);
+            Notification::assertNotSentTo($user, LoginConfirmationNotification::class);
+            $this->logout();
+        }
+
+        $this->assertDatabaseCount('login_confirmations', 0);
+        $this->assertDatabaseCount('trusted_devices', 0);
+    }
+
+    public function test_admin_lama_tidak_aktif_langsung_masuk_setelah_konfirmasi_keaktifan(): void
+    {
         $admin = $this->makeUser('admin');
+        $admin->forceFill(['last_login_at' => now()->subDays(120)])->save();
+
         $this->post('/login', ['email' => $admin->email, 'password' => 'rahasia123'])
-            ->assertRedirect(route('login.konfirmasi.menunggu'));
-        Notification::assertSentTo($admin, LoginConfirmationNotification::class);
+            ->assertRedirect(route('login.keaktifan.tampil'));
+
+        $this->get(route('login.keaktifan.tampil'))->assertOk()
+            ->assertSee('Setelah Anda memilih Ya, Anda langsung masuk ke dashboard.')
+            ->assertDontSee('dilanjutkan dengan konfirmasi melalui email');
+
+        $this->post(route('login.keaktifan.konfirmasi'))->assertRedirect(url('/beranda-admin'));
+        $this->assertAuthenticatedAs($admin);
+        Notification::assertNotSentTo($admin, LoginConfirmationNotification::class);
     }
 
     public function test_password_salah_tetap_ditolak_walau_perangkat_dikenali(): void

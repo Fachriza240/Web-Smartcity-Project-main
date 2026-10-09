@@ -94,12 +94,12 @@ class KonfirmasiLoginDanAkunNonaktifTest extends TestCase
 
     public function test_konfirmasi_di_browser_yang_sama_langsung_masuk_dashboard(): void
     {
-        $admin = $this->makeUser('admin');
-        $token = $this->mulaiLogin($admin);
+        $dosen = $this->makeUser('dosen');
+        $token = $this->mulaiLogin($dosen);
 
-        $this->post(route('login.konfirmasi.setujui', $token))->assertRedirect(url('/beranda-admin'));
-        $this->assertAuthenticatedAs($admin);
-        $this->get(route('login.konfirmasi.menunggu'))->assertRedirect(url('/beranda-admin'));
+        $this->post(route('login.konfirmasi.setujui', $token))->assertRedirect(url('/beranda-dosen'));
+        $this->assertAuthenticatedAs($dosen);
+        $this->get(route('login.konfirmasi.menunggu'))->assertRedirect(url('/beranda-dosen'));
 
         $this->post(route('login.konfirmasi.setujui', $token))->assertOk()->assertSee('Login Sudah Dikonfirmasi');
     }
