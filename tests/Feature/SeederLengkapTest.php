@@ -212,7 +212,7 @@ class SeederLengkapTest extends TestCase
         foreach ([
             'admin@smartcity.ac.id' => '/beranda-admin',
             'creator@smartcity.ac.id' => '/beranda-creator',
-            'creator.pending@smartcity.ac.id' => '/dosen/status',
+            'creator.pending@smartcity.ac.id' => '/creator/status',
         ] as $email => $tujuan) {
             $this->flushSession();
             $this->post('/login', ['email' => $email, 'password' => 'password'])

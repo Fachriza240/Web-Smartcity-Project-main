@@ -74,7 +74,7 @@ Route::controller(LoginConfirmationController::class)->prefix('login/konfirmasi'
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/dosen/status', fn () => view('halaman-dosen.status-pending'))->name('dosen.status');
+    Route::get('/{peran}/status', fn () => view('halaman-dosen.status-pending'))->where('peran', 'dosen|creator')->name('dosen.status');
     Route::get('/registrasi/perbaikan', [AuthController::class, 'showPerbaikan'])->name('registrasi.perbaikan');
     Route::put('/registrasi/perbaikan', [AuthController::class, 'updatePerbaikan'])->name('registrasi.perbaikan.update');
 });
@@ -126,12 +126,12 @@ Route::get('/beranda-creator', fn () => view('halaman-creator.beranda-creator'))
     ->name('beranda.creator');
 
 Route::middleware('role:admin,content_creator')->group(function () {
-    Route::redirect('/research-team-admin', '/admin/teams');
-    Route::redirect('/news-admin', '/admin/news');
-    Route::redirect('/program-admin', '/admin/programs');
+    Route::get('/research-team-admin', fn () => redirect()->route('admin.teams.index'));
+    Route::get('/news-admin', fn () => redirect()->route('admin.news.index'));
+    Route::get('/program-admin', fn () => redirect()->route('admin.programs.index'));
 });
 
-Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'approved'])->prefix('{panel}')->where(['panel' => 'admin|creator'])->name('admin.')->group(function () {
     Route::get('/validasi-registrasi', [ValidationController::class, 'index'])->name('validasi.index');
     Route::post('/validasi-registrasi/{id}/approve', [ValidationController::class, 'approve'])->name('validasi.approve');
     Route::post('/validasi-registrasi/{id}/reject', [ValidationController::class, 'reject'])->name('validasi.reject');

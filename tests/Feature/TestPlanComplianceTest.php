@@ -644,12 +644,13 @@ class TestPlanComplianceTest extends TestCase
         $this->actingAs($creator)->put(route('registrasi.perbaikan.update'), [
             'fullname' => 'Creator Diperbaiki',
             'email' => $creator->email,
-        ])->assertRedirect(route('dosen.status'));
+        ])->assertRedirect(url('/creator/status'));
 
         $this->assertSame(User::STATUS_PENDING, $creator->fresh()->registration_status);
+        $this->actingAs($creator)->get('/creator/status')->assertOk();
 
         $approved = $this->makeUser('dosen');
-        $this->actingAs($approved)->get(route('registrasi.perbaikan'))->assertRedirect(route('dosen.status'));
+        $this->actingAs($approved)->get(route('registrasi.perbaikan'))->assertRedirect(url('/dosen/status'));
     }
 
     public function test_halaman_gagal_dimuat_dengan_tombol_muat_ulang(): void

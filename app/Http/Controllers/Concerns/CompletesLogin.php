@@ -66,7 +66,9 @@ trait CompletesLogin
     {
         if (in_array($user->role, ['dosen', 'content_creator'], true)
             && $user->registration_status !== User::STATUS_APPROVED) {
-            return redirect()->route('dosen.status');
+            return redirect()->route('dosen.status', [
+                'peran' => $user->role === 'content_creator' ? 'creator' : 'dosen',
+            ]);
         }
 
         $response = match ($user->role) {

@@ -3,6 +3,7 @@
 use App\Http\Middleware\EnsureAccountActive;
 use App\Http\Middleware\EnsureRole;
 use App\Http\Middleware\EnsureUserApproved;
+use App\Http\Middleware\ResolveRolePaths;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -23,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->web(append: [
             EnsureAccountActive::class,
+            ResolveRolePaths::class,
         ]);
         $middleware->redirectGuestsTo(function (Request $request) {
             if ($request->hasSession()) {

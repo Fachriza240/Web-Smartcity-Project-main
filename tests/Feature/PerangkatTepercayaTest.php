@@ -165,7 +165,7 @@ class PerangkatTepercayaTest extends TestCase
         foreach ([
             [$this->makeUser('admin'), '/beranda-admin'],
             [$this->makeUser('content_creator'), '/beranda-creator'],
-            [$this->makeUser('content_creator', ['registration_status' => User::STATUS_PENDING]), '/dosen/status'],
+            [$this->makeUser('content_creator', ['registration_status' => User::STATUS_PENDING]), '/creator/status'],
         ] as [$user, $tujuan]) {
             $this->post('/login', ['email' => $user->email, 'password' => 'rahasia123'])
                 ->assertRedirect(url($tujuan));
