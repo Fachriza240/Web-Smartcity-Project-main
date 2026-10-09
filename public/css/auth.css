@@ -127,6 +127,7 @@ body.auth-body {
     font-size: 12px;
     font-weight: 600;
     backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 
 .auth-back {

@@ -85,6 +85,7 @@ body.adm-body {
     top: 0;
     left: 0;
     height: 100vh;
+    height: 100dvh;
     z-index: 1040;
     display: flex;
     flex-direction: column;
@@ -785,6 +786,7 @@ span.badge[class*="bg-info"] {
     cursor: pointer;
     transition: var(--adm-transition);
     user-select: none;
+    -webkit-user-select: none;
     gap: 16px;
 }
 
@@ -1169,6 +1171,7 @@ span.badge[class*="bg-info"] {
     z-index: 1035;
     background: rgba(15, 23, 42, 0.5);
     backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
 }
 
 .brand {

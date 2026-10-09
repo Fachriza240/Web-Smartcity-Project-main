@@ -189,6 +189,7 @@
     .proj-card__badge {
         background: rgba(255, 255, 255, 0.92);
         backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
         padding: 5px 12px;
         border-radius: 20px;
         font-size: 12px;

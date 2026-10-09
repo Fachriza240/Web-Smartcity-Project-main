@@ -685,6 +685,7 @@ a {
     .sc-navbar .navbar-collapse {
         flex-basis: 100%;
         max-height: calc(100vh - var(--sc-nav-h) - 20px);
+        max-height: calc(100dvh - var(--sc-nav-h) - 20px);
         overflow-y: auto;
         overscroll-behavior: contain;
     }
