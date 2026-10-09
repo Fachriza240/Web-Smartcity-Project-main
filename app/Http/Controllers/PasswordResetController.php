@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TrustedDevice;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
@@ -66,6 +67,8 @@ class PasswordResetController extends Controller
                     'remember_token' => Str::random(60),
                     'locked_until' => null,
                 ])->save();
+
+                TrustedDevice::forgetFor($user);
             }
         );
 

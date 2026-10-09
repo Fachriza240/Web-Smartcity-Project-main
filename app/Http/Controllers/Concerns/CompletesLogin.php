@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Concerns;
 
 use App\Models\LoginConfirmation;
+use App\Models\TrustedDevice;
 use App\Models\User;
 use App\Notifications\LoginConfirmationNotification;
 use App\Notifications\RegistrationStatusNotification;
@@ -15,6 +16,14 @@ trait CompletesLogin
     protected function proceedLogin(Request $request, User $user, bool $remember = false)
     {
         if (! config('login.email_confirmation')) {
+            return $this->completeLogin($request, $user, $remember);
+        }
+
+        $device = TrustedDevice::recognize($user, $request);
+
+        if ($device) {
+            $device->markUsed($request);
+
             return $this->completeLogin($request, $user, $remember);
         }
 

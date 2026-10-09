@@ -29,6 +29,7 @@
                 <p class="auth-status__desc">
                     Kami telah mengirim email konfirmasi login ke <strong>{{ $email }}</strong>.
                     Buka email tersebut lalu pilih <strong>Ya, Ini Saya</strong> untuk melanjutkan login.
+                    Konfirmasi ini diminta karena Anda login untuk pertama kali atau dari perangkat/browser yang belum dikenali.
                 </p>
                 <span class="auth-status__badge auth-status__badge--pending"><i class="bi bi-clock-fill" aria-hidden="true"></i> Menunggu Konfirmasi</span>
                 <div class="auth-status__info">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Concerns\CompletesLogin;
 use App\Models\LoginConfirmation;
 use App\Models\SuspiciousLoginReport;
+use App\Models\TrustedDevice;
 use App\Models\User;
 use App\Notifications\LoginConfirmationNotification;
 use App\Notifications\SuspiciousLoginNotification;
@@ -188,6 +189,7 @@ class LoginConfirmationController extends Controller
             ])->save();
 
             LoginConfirmation::cancelPendingFor($user);
+            TrustedDevice::forgetFor($user);
 
             if (config('session.driver') === 'database') {
                 DB::table(config('session.table', 'sessions'))->where('user_id', $user->id)->delete();
@@ -232,6 +234,8 @@ class LoginConfirmationController extends Controller
         }
 
         $confirmation->forceFill(['status' => LoginConfirmation::STATUS_USED])->save();
+
+        TrustedDevice::remember($user, $request);
 
         return $this->completeLogin($request, $user, $confirmation->remember);
     }
