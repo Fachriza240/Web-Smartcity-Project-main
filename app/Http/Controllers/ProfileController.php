@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class ProfileController extends Controller
 {
@@ -36,21 +37,27 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
-        $email = $request->input('email');
-        if (is_string($email)) {
-            $request->merge(['email' => mb_strtolower(trim($email))]);
+        $originalEmail = $request->input('email');
+        if (is_string($originalEmail)) {
+            $request->merge(['email' => mb_strtolower(trim($originalEmail))]);
         }
 
-        $data = $request->validate([
-            'fullname' => ['required', 'string', 'min:3', 'max:100', new PersonName],
-            'email' => ['required', 'string', 'email:rfc', 'min:6', 'max:254', Rule::unique('users', 'email')->ignore($user->id)],
-            'nip' => ['nullable', 'regex:/^[0-9]+$/', 'digits_between:4,30', Rule::unique('users', 'nip')->ignore($user->id)],
-            'prodi' => ['nullable', 'string', 'min:2', 'max:100', new SafeText],
-            'fakultas' => ['nullable', 'string', 'min:2', 'max:100', new SafeText],
-            'bio' => ['nullable', 'string', 'max:2000', new SafeText],
-            'bidang_penelitian' => ['nullable', 'string', 'max:500', new SafeText],
-            'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
-        ]);
+        try {
+            $data = $request->validate([
+                'fullname' => ['required', 'string', 'min:3', 'max:100', new PersonName],
+                'email' => ['required', 'string', 'email:rfc', 'min:6', 'max:254', Rule::unique('users', 'email')->ignore($user->id)],
+                'nip' => ['nullable', 'regex:/^[0-9]+$/', 'digits_between:4,30', Rule::unique('users', 'nip')->ignore($user->id)],
+                'prodi' => ['nullable', 'string', 'min:2', 'max:100', new SafeText],
+                'fakultas' => ['nullable', 'string', 'min:2', 'max:100', new SafeText],
+                'bio' => ['nullable', 'string', 'max:2000', new SafeText],
+                'bidang_penelitian' => ['nullable', 'string', 'max:500', new SafeText],
+                'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            ]);
+        } catch (ValidationException $e) {
+            $request->merge(['email' => $originalEmail]);
+
+            throw $e;
+        }
 
         $data['fullname'] = preg_replace('/\s+/u', ' ', trim($data['fullname']));
         unset($data['foto']);

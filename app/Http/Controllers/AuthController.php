@@ -9,6 +9,7 @@ use App\Rules\SafeText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -21,11 +22,9 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        $this->normalizeEmail($request);
-
         $role = $request->input('role') === 'content_creator' ? 'content_creator' : 'dosen';
 
-        $data = $request->validate(array_merge($this->identityRules($role), [
+        $data = $this->validateWithNormalizedEmail($request, array_merge($this->identityRules($role), [
             'email' => ['required', 'string', 'email:rfc', 'min:6', 'max:254', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'max:64', 'confirmed'],
             'role' => ['required', 'in:dosen,content_creator'],
@@ -134,9 +133,7 @@ class AuthController extends Controller
             return redirect()->route('dosen.status');
         }
 
-        $this->normalizeEmail($request);
-
-        $data = $request->validate(array_merge($this->identityRules($user->role, $user), [
+        $data = $this->validateWithNormalizedEmail($request, array_merge($this->identityRules($user->role, $user), [
             'email' => ['required', 'string', 'email:rfc', 'min:6', 'max:254', Rule::unique('users', 'email')->ignore($user->id)],
         ]));
 
@@ -167,6 +164,21 @@ class AuthController extends Controller
         }
 
         return $rules;
+    }
+
+    private function validateWithNormalizedEmail(Request $request, array $rules): array
+    {
+        $originalEmail = $request->input('email');
+
+        $this->normalizeEmail($request);
+
+        try {
+            return $request->validate($rules);
+        } catch (ValidationException $e) {
+            $request->merge(['email' => $originalEmail]);
+
+            throw $e;
+        }
     }
 
     private function normalizeEmail(Request $request): void
