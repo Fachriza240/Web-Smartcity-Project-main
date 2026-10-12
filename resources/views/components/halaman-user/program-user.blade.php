@@ -264,6 +264,12 @@
             </div>
 
             <div data-aos="fade-left">
+                @php
+                    $jumlahMitra = \App\Models\Partner::published()->count();
+                    $jumlahPeneliti = \App\Models\User::where('role', 'dosen')
+                        ->where('registration_status', \App\Models\User::STATUS_APPROVED)
+                        ->count();
+                @endphp
                 <div class="prog-intro__stats">
                     <div class="prog-intro__stat-card">
                         <div class="prog-intro__stat-num">{{ $programs->count() }}</div>
@@ -274,11 +280,11 @@
                         <div class="prog-intro__stat-lbl">Pilar Utama</div>
                     </div>
                     <div class="prog-intro__stat-card">
-                        <div class="prog-intro__stat-num">10+</div>
+                        <div class="prog-intro__stat-num">{{ $jumlahMitra }}</div>
                         <div class="prog-intro__stat-lbl">Mitra Kerja</div>
                     </div>
                     <div class="prog-intro__stat-card">
-                        <div class="prog-intro__stat-num">50+</div>
+                        <div class="prog-intro__stat-num">{{ $jumlahPeneliti }}</div>
                         <div class="prog-intro__stat-lbl">Peneliti Terlibat</div>
                     </div>
                 </div>
