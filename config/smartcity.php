@@ -6,7 +6,7 @@ return [
     'tagline' => 'Riset, inovasi, dan kolaborasi untuk kota yang lebih cerdas.',
     'address' => 'Fakultas Ilmu Terapan Lt. 1, Telkom University, Jl. Telekomunikasi No.1, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257',
     'address_short' => 'Fakultas Ilmu Terapan Lt. 1, Telkom University, Bandung',
-    'email' => 'innegartina@gmail.com',
+    'email' => 'smartcity1945@gmail.com',
     'phone' => '081392329432',
     'phone_display' => '+62 813-9232-9432',
     'whatsapp' => '6281392329432',
