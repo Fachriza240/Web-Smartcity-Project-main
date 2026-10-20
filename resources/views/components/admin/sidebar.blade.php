@@ -18,12 +18,16 @@
             $isAdmin ? ['label' => 'Tim', 'icon' => 'bi-people-fill', 'url' => route('admin.teams.index'), 'active' => request()->routeIs('admin.teams.*')] : null,
             ['label' => 'Mitra', 'icon' => 'bi-buildings', 'url' => route('admin.partners.index'), 'active' => request()->routeIs('admin.partners.*')],
         ]),
+        'Sistem Pendukung Keputusan' => $isAdmin ? [
+            ['label' => 'Pembobotan AHP', 'icon' => 'bi-sliders', 'url' => route('admin.dss.bobot.index'), 'active' => request()->routeIs('admin.dss.bobot.*')],
+        ] : [],
         'Lainnya' => [
             ['label' => 'Akun Saya', 'icon' => 'bi-person-gear', 'url' => route('admin.akun'), 'active' => request()->routeIs('admin.akun*')],
             ['label' => 'Pengaturan', 'icon' => 'bi-gear', 'url' => route('admin.settings'), 'active' => request()->routeIs('admin.settings')],
             ['label' => 'Lihat Website', 'icon' => 'bi-box-arrow-up-right', 'url' => url('/'), 'active' => false, 'external' => true],
         ],
     ];
+    $menus = array_filter($menus);
 @endphp
 
 <aside class="sidebar" id="admSidebar" aria-label="Menu panel">

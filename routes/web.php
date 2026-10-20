@@ -3,6 +3,7 @@
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Admin\AkunController as AdminAkunController;
 use App\Http\Controllers\Admin\AktivitasDosenController as AdminAktivitasDosenController;
+use App\Http\Controllers\Admin\DssBobotController as AdminDssBobotController;
 use App\Http\Controllers\Admin\HkiController as AdminHkiController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\Admin\PartnerController as AdminPartnerController;
@@ -184,6 +185,13 @@ Route::middleware(['auth', 'approved'])->prefix('{panel}')->where(['panel' => 'a
         Route::get('/{aktivitas}/edit', 'edit')->name('edit');
         Route::put('/{aktivitas}', 'update')->name('update');
         Route::delete('/{aktivitas}', 'destroy')->name('destroy');
+    });
+
+    Route::middleware('role:admin')->controller(AdminDssBobotController::class)->prefix('/dss/bobot')->name('dss.bobot.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/hitung', 'hitung')->name('hitung');
+        Route::post('/simpan', 'simpan')->name('simpan');
+        Route::post('/reset', 'reset')->name('reset');
     });
 
     Route::get('/akun', [AdminAkunController::class, 'index'])->name('akun');
