@@ -170,8 +170,8 @@
         <span class="sc-page-hero__eyebrow"><span class="sc-page-hero__dot" aria-hidden="true"></span> Kemitraan</span>
         <h1 class="sc-page-hero__title">Mitra Strategis<br><span class="text-blue">CoE Smart City</span></h1>
         <p class="sc-page-hero__lead">
-            Membangun kolaborasi strategis dengan berbagai institusi dan organisasi
-                untuk mengembangkan inovasi teknologi kota cerdas yang berkelanjutan.
+            Bermitra dengan berbagai institusi dan organisasi untuk mengembangkan serta menerapkan
+            hasil riset dan inovasi teknologi kota cerdas sesuai kompetensi dosen CoE Smart City.
         </p>
     </div>
     <div class="sc-page-hero__wave" aria-hidden="true">

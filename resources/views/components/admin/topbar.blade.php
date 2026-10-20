@@ -44,6 +44,7 @@
                     <strong>{{ $user?->fullname }}</strong>
                     <span>{{ $user?->email }}</span>
                 </li>
+                <li><a class="dropdown-item" href="{{ route('admin.akun') }}"><i class="bi bi-person-gear" aria-hidden="true"></i> Akun Saya</a></li>
                 <li><a class="dropdown-item" href="{{ route('admin.settings') }}"><i class="bi bi-gear" aria-hidden="true"></i> Pengaturan</a></li>
                 <li><a class="dropdown-item" href="{{ url('/') }}" target="_blank" rel="noopener"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i> Lihat Website</a></li>
                 <li><hr class="dropdown-divider"></li>

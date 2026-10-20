@@ -10,6 +10,7 @@
         'Kelola Konten' => array_filter([
             ['label' => 'Program', 'icon' => 'bi-layers', 'url' => route('admin.programs.index'), 'active' => request()->routeIs('admin.programs.*')],
             ['label' => 'Proyek', 'icon' => 'bi-kanban', 'url' => route('admin.projects.index'), 'active' => request()->routeIs('admin.projects.*')],
+            ['label' => 'Statistik Proyek', 'icon' => 'bi-bar-chart-line', 'url' => route('admin.statistik-proyek.index'), 'active' => request()->routeIs('admin.statistik-proyek.*')],
             $isAdmin ? ['label' => 'Publikasi', 'icon' => 'bi-journal-text', 'url' => route('admin.publications.index'), 'active' => request()->routeIs('admin.publications.*')] : null,
             $isAdmin ? ['label' => 'HKI', 'icon' => 'bi-award', 'url' => route('admin.hki.index'), 'active' => request()->routeIs('admin.hki.*')] : null,
             ['label' => 'Berita', 'icon' => 'bi-newspaper', 'url' => route('admin.news.index'), 'active' => request()->routeIs('admin.news.*')],
@@ -17,6 +18,7 @@
             ['label' => 'Mitra', 'icon' => 'bi-buildings', 'url' => route('admin.partners.index'), 'active' => request()->routeIs('admin.partners.*')],
         ]),
         'Lainnya' => [
+            ['label' => 'Akun Saya', 'icon' => 'bi-person-gear', 'url' => route('admin.akun'), 'active' => request()->routeIs('admin.akun*')],
             ['label' => 'Pengaturan', 'icon' => 'bi-gear', 'url' => route('admin.settings'), 'active' => request()->routeIs('admin.settings')],
             ['label' => 'Lihat Website', 'icon' => 'bi-box-arrow-up-right', 'url' => url('/'), 'active' => false, 'external' => true],
         ],

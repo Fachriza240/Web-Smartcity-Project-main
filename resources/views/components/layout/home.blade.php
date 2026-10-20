@@ -2,6 +2,9 @@
     $isDosenArea = auth()->check() && auth()->user()->role === 'dosen' && auth()->user()->registration_status === \App\Models\User::STATUS_APPROVED;
     $projectUrl = url($isDosenArea ? '/project-dosen' : '/project-user');
     $aboutUrl = url($isDosenArea ? '/about-dosen' : '/about-user');
+    $statistik = \App\Services\SiteStats::ringkasan();
+    $daftarProyek = \App\Services\SiteStats::daftarProyek();
+    $tahunBerdiri = \App\Services\SiteStats::tahunBerdiri();
 @endphp
 <style>
     .sc-hero {
@@ -725,6 +728,17 @@
         flex-shrink: 0;
     }
 
+    .sc-fakta__empty {
+        margin: 0;
+        padding: 18px 20px;
+        font-size: 15px;
+        color: var(--text-gray);
+        font-family: "Lato", sans-serif;
+        background: var(--bg-light);
+        border-radius: 8px;
+        border-left: 3px solid var(--primary-blue);
+    }
+
     @media (max-width: 991px) {
         .sc-hero__grid {
             grid-template-columns: 1fr;
@@ -829,7 +843,7 @@
             <div class="sc-hero__info-card">
                 <div class="info-card__icon"><i class="bi bi-people-fill"></i></div>
                 <div>
-                    <div class="info-card__num">{{ \App\Models\Team::published()->count() ?: '59' }}+</div>
+                    <div class="info-card__num">{{ $statistik['anggota'] }}+</div>
                     <div class="info-card__lbl">Anggota Aktif</div>
                 </div>
             </div>
@@ -837,7 +851,7 @@
             <div class="sc-hero__info-card-2">
                 <div class="info-card__icon"><i class="bi bi-journal-richtext"></i></div>
                 <div>
-                    <div class="info-card__num">{{ \App\Models\Publication::where('status','Publish')->count() ?: '63' }}+</div>
+                    <div class="info-card__num">{{ $statistik['publikasi'] }}+</div>
                     <div class="info-card__lbl">Publikasi</div>
                 </div>
             </div>
@@ -864,10 +878,10 @@
                 <div class="sc-label">Tentang Kami</div>
                 <h2 class="sc-tentang__heading">CoE Smart City</h2>
                 <p class="sc-tentang__desc">
-                    CoE Smart City adalah unit strategis Universitas Telkom yang mempercepat lahirnya riset,
-                    inovasi, dan layanan masyarakat di bidang kota cerdas. Kami mengubah hasil penelitian
-                    menjadi produk, rekomendasi kebijakan, dan pendampingan yang bisa langsung dimanfaatkan
-                    oleh pemerintah daerah, industri, dan warga.
+                    CoE Smart City adalah pusat unggulan riset dan inovasi Universitas Telkom di bidang kota cerdas.
+                    Kami membangun solusi sesuai kompetensi para dosen, lalu mengubah hasil penelitian menjadi
+                    produk dan inovasi teknologi yang dapat dimanfaatkan oleh pemerintah daerah, industri,
+                    dan masyarakat.
                 </p>
 
                 <a href="{{ $aboutUrl }}" class="sc-btn-pelajari">
@@ -925,46 +939,39 @@
             <h2 class="sc-fakta__heading">Statistik Smart City</h2>
         </div>
 
-        @php
-            $statAnggota    = \App\Models\Team::published()->count();
-            $statProject    = \App\Models\Project::published()->count();
-            $statPublication = \App\Models\Publication::where('status','Publish')->count();
-            $statProgram    = \App\Models\Program::published()->count();
-            $statMitra      = \App\Models\Partner::published()->count();
-        @endphp
         <div class="sc-fakta__stats" data-aos="fade-up" data-aos-delay="100">
 
             <div>
                 <div class="sc-fakta__num">
-                    <span class="js-counter" data-target="{{ max($statAnggota, 59) }}">0</span><span class="plus">+</span>
+                    <span class="js-counter" data-target="{{ $statistik['anggota'] }}">0</span><span class="plus">+</span>
                 </div>
                 <div class="sc-fakta__lbl">Jumlah Anggota</div>
             </div>
 
             <div>
                 <div class="sc-fakta__num">
-                    <span class="js-counter" data-target="{{ max($statProject, 14) }}">0</span><span class="plus">+</span>
+                    <span class="js-counter" data-target="{{ $statistik['proyek'] }}">0</span><span class="plus">+</span>
                 </div>
                 <div class="sc-fakta__lbl">Jumlah Proyek</div>
             </div>
 
             <div>
                 <div class="sc-fakta__num">
-                    <span class="js-counter" data-target="{{ max($statPublication, 63) }}">0</span><span class="plus">+</span>
+                    <span class="js-counter" data-target="{{ $statistik['publikasi'] }}">0</span><span class="plus">+</span>
                 </div>
                 <div class="sc-fakta__lbl">Jumlah Publikasi</div>
             </div>
 
             <div>
                 <div class="sc-fakta__num">
-                    <span class="js-counter" data-target="{{ max($statProgram, 7) }}">0</span><span class="plus">+</span>
+                    <span class="js-counter" data-target="{{ $statistik['program'] }}">0</span><span class="plus">+</span>
                 </div>
                 <div class="sc-fakta__lbl">Jumlah Program</div>
             </div>
 
             <div>
                 <div class="sc-fakta__num">
-                    <span class="js-counter" data-target="{{ max($statMitra, 4) }}">0</span><span class="plus">+</span>
+                    <span class="js-counter" data-target="{{ $statistik['mitra'] }}">0</span><span class="plus">+</span>
                 </div>
                 <div class="sc-fakta__lbl">Jumlah Mitra</div>
             </div>
@@ -979,48 +986,24 @@
                 <button class="sc-fakta__tab" data-pane="sc-tab-ung">Produk Unggulan</button>
             </div>
 
-            <div id="sc-tab-int" class="sc-fakta__pane active">
-                <ul class="sc-fakta__list">
-                    <li>Quantum MMU</li>
-                    <li>Asean IVO (PATRIOT-41R-Net)</li>
-                    <li>G20/T20</li>
-                    <li>APT Wireless Group</li>
-                    <li>AI-Agriculture</li>
-                    <li>DSA</li>
-                    <li>RHENIuM</li>
-                    <li>PolarRaptor-IoT</li>
-                </ul>
-            </div>
-
-            <div id="sc-tab-nas" class="sc-fakta__pane">
-                <ul class="sc-fakta__list">
-                    <li>PATRIOT-NET</li>
-                    <li>ADA-DIKTI-MCRBS</li>
-                    <li>5G-MERDEKA</li>
-                    <li>HARUMI 2021</li>
-                    <li>HARUKA 2022</li>
-                    <li>BRIN - Kereta Cepat 2021</li>
-                    <li>BRIN - Roket 2021</li>
-                    <li>BRIN - Kereta Cepat 2022</li>
-                    <li>Master Plan TIK UNP</li>
-                    <li>Deteksi Sinyal</li>
-                    <li>5G-Point</li>
-                    <li>Zebra Codes</li>
-                    <li>Kereta Cepat-KCIC</li>
-                    <li>T3LESDM-Net</li>
-                    <li>ANTASENA</li>
-                    <li>SEKAI</li>
-                </ul>
-            </div>
-
-            <div id="sc-tab-ung" class="sc-fakta__pane">
-                <ul class="sc-fakta__list">
-                    <li>Sistem Monitoring Kota Cerdas</li>
-                    <li>Platform IoT Terintegrasi</li>
-                    <li>Manajemen Lalu Lintas Berbasis AI</li>
-                    <li>Solusi Energi Smart Grid</li>
-                </ul>
-            </div>
+            @foreach ([
+                'sc-tab-int' => \App\Models\StatistikProyek::TIPE_INTERNASIONAL,
+                'sc-tab-nas' => \App\Models\StatistikProyek::TIPE_NASIONAL,
+                'sc-tab-ung' => \App\Models\StatistikProyek::TIPE_PRODUK,
+            ] as $paneId => $tipe)
+                @php $itemsTab = $daftarProyek->get($tipe, collect()); @endphp
+                <div id="{{ $paneId }}" class="sc-fakta__pane {{ $loop->first ? 'active' : '' }}">
+                    @if ($itemsTab->isNotEmpty())
+                        <ul class="sc-fakta__list">
+                            @foreach ($itemsTab as $itemTab)
+                                <li>{{ $itemTab->nama }}</li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <p class="sc-fakta__empty">Data belum tersedia.</p>
+                    @endif
+                </div>
+            @endforeach
 
         </div>
     </div>
@@ -1031,9 +1014,10 @@
         <div class="row">
             <div class="col-lg-6" data-aos="fade-up">
                 <h2>Tentang Kami</h2>
-                <p>CoE Smart City di Universitas Telkom adalah unit strategis untuk mempercepat riset, inovasi,
-                    bisnis, dan layanan masyarakat, serta berkontribusi pada ilmu pengetahuan, teknologi, manajemen,
-                    dan seni.</p>
+                <p>CoE Smart City di Universitas Telkom adalah pusat unggulan riset dan inovasi yang menghimpun
+                    kompetensi dosen lintas bidang untuk membangun solusi kota cerdas. Sejak berdiri pada tahun
+                    {{ $tahunBerdiri }}, kami mengembangkan riset, teknologi, dan produk inovasi sesuai keahlian
+                    para dosen bersama pemerintah daerah, industri, dan masyarakat.</p>
                 <img src="{{ asset('img/fotoaboutus.jpg') }}" alt="Kegiatan tim CoE Smart City" class="about-image" loading="lazy" data-aos="fade-up">
             </div>
             <div class="col-lg-6">

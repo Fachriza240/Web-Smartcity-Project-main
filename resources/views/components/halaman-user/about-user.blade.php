@@ -1,3 +1,7 @@
+@php
+    $tahunBerdiri = \App\Services\SiteStats::tahunBerdiri();
+    $tahunPengalaman = \App\Services\SiteStats::tahunPengalaman();
+@endphp
 <style>
     @keyframes aboutPulse {
         0%,
@@ -138,6 +142,10 @@
         color: var(--text-gray);
         margin-bottom: 2rem;
         font-family: "Lato", sans-serif;
+    }
+
+    .about-desc__text--rapat {
+        margin-bottom: 1rem;
     }
 
     .about-desc__highlights {
@@ -451,7 +459,7 @@
         <span class="sc-page-hero__eyebrow"><span class="sc-page-hero__dot" aria-hidden="true"></span> Tentang Kami</span>
         <h1 class="sc-page-hero__title">Center of Excellence<br><span class="text-blue">Smart City</span></h1>
         <p class="sc-page-hero__lead">
-            Unit strategis Universitas Telkom untuk mempercepat riset, inovasi, bisnis, dan layanan masyarakat di bidang ilmu pengetahuan, teknologi, manajemen, dan seni.
+            Pusat unggulan riset dan inovasi Universitas Telkom yang membangun solusi kota cerdas sesuai dengan kompetensi para dosen di bidang teknologi, data, dan sistem cerdas.
         </p>
     </div>
     <div class="sc-page-hero__wave" aria-hidden="true">
@@ -473,7 +481,7 @@
                         <i class="fas fa-award"></i>
                     </div>
                     <div>
-                        <div class="about-desc__floating-num">10+</div>
+                        <div class="about-desc__floating-num">{{ $tahunPengalaman }}</div>
                         <div class="about-desc__floating-lbl">Tahun Pengalaman</div>
                     </div>
                 </div>
@@ -484,8 +492,11 @@
                 <h2 class="about-desc__heading">
                     Pusat Unggulan Riset &amp;<br>Inovasi Kota Cerdas
                 </h2>
-                <p class="about-desc__text">
+                <p class="about-desc__text about-desc__text--rapat">
                     CoE Smart City di Universitas Telkom merupakan pusat unggulan yang berfokus pada pengembangan solusi kota cerdas melalui pendekatan interdisipliner. Kami mengintegrasikan teknologi informasi, kecerdasan buatan, Internet of Things (IoT), dan analisis data besar untuk menciptakan ekosistem perkotaan yang lebih efisien, berkelanjutan, dan inklusif.
+                </p>
+                <p class="about-desc__text">
+                    Sejak berdiri pada tahun {{ $tahunBerdiri }}, CoE Smart City terus membangun solusi kota cerdas sesuai dengan kompetensi para dosen, mulai dari riset terapan dan pengembangan teknologi hingga penerapannya bersama pemerintah daerah, industri, dan masyarakat.
                 </p>
 
                 <div class="about-desc__highlights">

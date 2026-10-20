@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AboutController;
+use App\Http\Controllers\Admin\AkunController as AdminAkunController;
 use App\Http\Controllers\Admin\HkiController as AdminHkiController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\Admin\PartnerController as AdminPartnerController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\Admin\ProgramController as AdminProgramController;
 use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
 use App\Http\Controllers\Admin\PublicationController as AdminPublicationController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\StatistikProyekController as AdminStatistikProyekController;
 use App\Http\Controllers\Admin\TeamController as AdminTeamController;
 use App\Http\Controllers\Admin\ValidationController;
 use App\Http\Controllers\AuthController;
@@ -155,6 +157,18 @@ Route::middleware(['auth', 'approved'])->prefix('{panel}')->where(['panel' => 'a
         Route::put("/{$uri}/{{$param}}", [$controller, 'update'])->name("{$uri}.update");
         Route::delete("/{$uri}/{{$param}}", [$controller, 'destroy'])->name("{$uri}.destroy");
     }
+
+    Route::controller(AdminStatistikProyekController::class)->prefix('/statistik-proyek')->name('statistik-proyek.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{statistikProyek}/edit', 'edit')->name('edit');
+        Route::put('/{statistikProyek}', 'update')->name('update');
+        Route::delete('/{statistikProyek}', 'destroy')->name('destroy');
+    });
+
+    Route::get('/akun', [AdminAkunController::class, 'index'])->name('akun');
+    Route::put('/akun/email', [AdminAkunController::class, 'updateEmail'])->name('akun.email');
+    Route::put('/akun/password', [AdminAkunController::class, 'updatePassword'])->name('akun.password');
 
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
 });

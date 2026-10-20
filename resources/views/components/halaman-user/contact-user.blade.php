@@ -7,8 +7,8 @@
         <span class="sc-page-hero__eyebrow"><span class="sc-page-hero__dot" aria-hidden="true"></span> Kontak Kami</span>
         <h1 class="sc-page-hero__title">Mari berkolaborasi dengan<br><span class="text-blue">CoE Smart City</span></h1>
         <p class="sc-page-hero__lead">
-            Punya ide riset, kebutuhan pendampingan, atau rencana kerja sama? Tim kami siap mendengarkan
-            dan membantu menemukan solusi kota cerdas yang paling sesuai.
+            Punya ide riset, rencana kolaborasi, atau pertanyaan seputar CoE Smart City? Tim kami siap
+            mendengarkan dan membantu mengarahkan Anda ke dosen dan program yang sesuai.
         </p>
     </div>
     <div class="sc-page-hero__wave" aria-hidden="true">

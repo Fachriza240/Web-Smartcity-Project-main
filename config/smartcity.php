@@ -4,6 +4,7 @@ return [
     'name' => 'CoE Smart City Telkom University',
     'short_name' => 'CoE Smart City',
     'tagline' => 'Riset, inovasi, dan kolaborasi untuk kota yang lebih cerdas.',
+    'founded_year' => 2025,
     'address' => 'Fakultas Ilmu Terapan Lt. 1, Telkom University, Jl. Telekomunikasi No.1, Sukapura, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257',
     'address_short' => 'Fakultas Ilmu Terapan Lt. 1, Telkom University, Bandung',
     'email' => 'smartcity1945@gmail.com',

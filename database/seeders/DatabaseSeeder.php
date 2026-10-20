@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AkunSeeder::class,
             KontenSeeder::class,
+            StatistikProyekSeeder::class,
         ]);
     }
 }
