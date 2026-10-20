@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             AkunSeeder::class,
             KontenSeeder::class,
             StatistikProyekSeeder::class,
+            DssKriteriaSeeder::class,
         ]);
     }
 }
