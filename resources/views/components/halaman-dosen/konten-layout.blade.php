@@ -7,7 +7,7 @@
             <header class="dsn-area__head">
                 <div>
                     <h1 class="dsn-area__title">Konten Saya</h1>
-                    <p class="dsn-area__lead">Kelola publikasi dan HKI atas nama Anda.</p>
+                    <p class="dsn-area__lead">Kelola publikasi, HKI, dan aktivitas riset atas nama Anda.</p>
                 </div>
                 <a href="{{ route('profil.dosen') }}" class="sc-btn sc-btn--ghost sc-btn--sm">
                     <i class="bi bi-person-circle" aria-hidden="true"></i> Lihat Profil
@@ -20,6 +20,9 @@
                 </a>
                 <a href="{{ route('dosen.hki.index') }}" class="dsn-tabs__item {{ $active === 'hki' ? 'active' : '' }}" @if ($active === 'hki') aria-current="page" @endif>
                     <i class="bi bi-award" aria-hidden="true"></i> HKI
+                </a>
+                <a href="{{ route('dosen.aktivitas.index') }}" class="dsn-tabs__item {{ $active === 'aktivitas' ? 'active' : '' }}" @if ($active === 'aktivitas') aria-current="page" @endif>
+                    <i class="bi bi-clipboard-data" aria-hidden="true"></i> Aktivitas
                 </a>
             </nav>
 

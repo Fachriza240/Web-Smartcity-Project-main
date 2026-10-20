@@ -143,6 +143,7 @@
                             <li><a class="dropdown-item" href="{{ route('profil.dosen') }}"><i class="bi bi-person" aria-hidden="true"></i> Profil</a></li>
                             <li><a class="dropdown-item" href="{{ route('dosen.publikasi.index') }}"><i class="bi bi-journal-text" aria-hidden="true"></i> Publikasi Saya</a></li>
                             <li><a class="dropdown-item" href="{{ route('dosen.hki.index') }}"><i class="bi bi-award" aria-hidden="true"></i> HKI Saya</a></li>
+                            <li><a class="dropdown-item" href="{{ route('dosen.aktivitas.index') }}"><i class="bi bi-clipboard-data" aria-hidden="true"></i> Aktivitas Saya</a></li>
                             <li>
                                 <a class="dropdown-item" href="{{ route('dosen.notifications.index') }}">
                                     <i class="bi bi-bell" aria-hidden="true"></i> Notifikasi

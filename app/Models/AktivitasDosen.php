@@ -68,6 +68,11 @@ class AktivitasDosen extends Model
         return (int) $this->user_id === (int) $user->id;
     }
 
+    public static function statuses(): array
+    {
+        return [self::STATUS_DRAFT, self::STATUS_PUBLISH];
+    }
+
     public static function jenisList(): array
     {
         return [
@@ -115,6 +120,38 @@ class AktivitasDosen extends Model
 
     public function getLabelJenisAttribute(): string
     {
-        return self::jenisList()[$this->jenis] ?? $this->jenis;
+        return self::jenisList()[$this->jenis] ?? (string) $this->jenis;
+    }
+
+    public function getLabelBidangAttribute(): string
+    {
+        if (! $this->bidang_smart_city) {
+            return '-';
+        }
+
+        return self::bidangSmartCityList()[$this->bidang_smart_city] ?? (string) $this->bidang_smart_city;
+    }
+
+    public function getRingkasanAttribute(): string
+    {
+        $bagian = [];
+
+        if ($this->skala) {
+            $bagian[] = self::skalaList()[$this->skala] ?? $this->skala;
+        }
+
+        if ($this->sub_jenis) {
+            $bagian[] = self::subJenisList((string) $this->jenis)[$this->sub_jenis] ?? $this->sub_jenis;
+        }
+
+        if (in_array($this->jenis, [self::JENIS_PENELITIAN, self::JENIS_ABDIMAS, self::JENIS_PRODUK], true)) {
+            $bagian[] = self::peranList()[$this->peran] ?? $this->peran;
+        }
+
+        if ($this->jenis === self::JENIS_ABDIMAS && $this->berkelanjutan) {
+            $bagian[] = 'Berkelanjutan';
+        }
+
+        return implode(', ', $bagian) ?: '-';
     }
 }

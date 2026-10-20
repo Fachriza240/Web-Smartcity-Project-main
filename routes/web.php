@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Admin\AkunController as AdminAkunController;
+use App\Http\Controllers\Admin\AktivitasDosenController as AdminAktivitasDosenController;
 use App\Http\Controllers\Admin\HkiController as AdminHkiController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\Admin\PartnerController as AdminPartnerController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\Admin\ValidationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BiografiController;
 use App\Http\Controllers\DormantAccountController;
+use App\Http\Controllers\DosenAktivitasController;
 use App\Http\Controllers\DosenKontenController;
 use App\Http\Controllers\LoginConfirmationController;
 use App\Http\Controllers\NewsController;
@@ -111,6 +113,15 @@ Route::middleware('approved')->group(function () {
             Route::delete('/hki/{h}', 'hkiDestroy')->name('hki.destroy');
         });
 
+        Route::controller(DosenAktivitasController::class)->group(function () {
+            Route::get('/aktivitas', 'index')->name('aktivitas.index');
+            Route::get('/aktivitas/create', 'create')->name('aktivitas.create');
+            Route::post('/aktivitas', 'store')->name('aktivitas.store');
+            Route::get('/aktivitas/{aktivitas}/edit', 'edit')->name('aktivitas.edit');
+            Route::put('/aktivitas/{aktivitas}', 'update')->name('aktivitas.update');
+            Route::delete('/aktivitas/{aktivitas}', 'destroy')->name('aktivitas.destroy');
+        });
+
         Route::controller(NotificationController::class)->group(function () {
             Route::get('/notifications', 'index')->name('notifications.index');
             Route::post('/notifications/read-all', 'readAll')->name('notifications.read-all');
@@ -164,6 +175,15 @@ Route::middleware(['auth', 'approved'])->prefix('{panel}')->where(['panel' => 'a
         Route::get('/{statistikProyek}/edit', 'edit')->name('edit');
         Route::put('/{statistikProyek}', 'update')->name('update');
         Route::delete('/{statistikProyek}', 'destroy')->name('destroy');
+    });
+
+    Route::middleware('role:admin')->controller(AdminAktivitasDosenController::class)->prefix('/aktivitas-dosen')->name('aktivitas-dosen.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{aktivitas}/edit', 'edit')->name('edit');
+        Route::put('/{aktivitas}', 'update')->name('update');
+        Route::delete('/{aktivitas}', 'destroy')->name('destroy');
     });
 
     Route::get('/akun', [AdminAkunController::class, 'index'])->name('akun');

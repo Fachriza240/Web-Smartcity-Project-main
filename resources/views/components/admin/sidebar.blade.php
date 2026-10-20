@@ -13,6 +13,7 @@
             ['label' => 'Statistik Proyek', 'icon' => 'bi-bar-chart-line', 'url' => route('admin.statistik-proyek.index'), 'active' => request()->routeIs('admin.statistik-proyek.*')],
             $isAdmin ? ['label' => 'Publikasi', 'icon' => 'bi-journal-text', 'url' => route('admin.publications.index'), 'active' => request()->routeIs('admin.publications.*')] : null,
             $isAdmin ? ['label' => 'HKI', 'icon' => 'bi-award', 'url' => route('admin.hki.index'), 'active' => request()->routeIs('admin.hki.*')] : null,
+            $isAdmin ? ['label' => 'Aktivitas Dosen', 'icon' => 'bi-clipboard-data', 'url' => route('admin.aktivitas-dosen.index'), 'active' => request()->routeIs('admin.aktivitas-dosen.*')] : null,
             ['label' => 'Berita', 'icon' => 'bi-newspaper', 'url' => route('admin.news.index'), 'active' => request()->routeIs('admin.news.*')],
             $isAdmin ? ['label' => 'Tim', 'icon' => 'bi-people-fill', 'url' => route('admin.teams.index'), 'active' => request()->routeIs('admin.teams.*')] : null,
             ['label' => 'Mitra', 'icon' => 'bi-buildings', 'url' => route('admin.partners.index'), 'active' => request()->routeIs('admin.partners.*')],
