@@ -80,6 +80,21 @@
                         <p class="sc-panel__muted">Bidang penelitian belum diisi.</p>
                     @endif
                 </div>
+                @unless ($isSample)
+                    @php
+                        $dimensiSmartCity = app(\App\Services\DssLaporanService::class)->dimensiPublik($lecturer);
+                    @endphp
+                    @if (count($dimensiSmartCity) > 0)
+                        <div class="sc-panel">
+                            <h2 class="sc-panel__title">Peta Kompetensi Smart City</h2>
+                            <ul class="sc-chips">
+                                @foreach ($dimensiSmartCity as $label)
+                                    <li>{{ $label }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                @endunless
                 <div class="sc-panel">
                     <h2 class="sc-panel__title">Ringkasan</h2>
                     <dl class="sc-bio__stats">

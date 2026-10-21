@@ -19,6 +19,8 @@
             ['label' => 'Mitra', 'icon' => 'bi-buildings', 'url' => route('admin.partners.index'), 'active' => request()->routeIs('admin.partners.*')],
         ]),
         'Sistem Pendukung Keputusan' => $isAdmin ? [
+            ['label' => 'Peringkat Dosen', 'icon' => 'bi-trophy', 'url' => route('admin.dss.hasil.index'), 'active' => request()->routeIs('admin.dss.hasil.*')],
+            ['label' => 'Peta Kompetensi', 'icon' => 'bi-diagram-3', 'url' => route('admin.dss.peta'), 'active' => request()->routeIs('admin.dss.peta')],
             ['label' => 'Pembobotan AHP', 'icon' => 'bi-sliders', 'url' => route('admin.dss.bobot.index'), 'active' => request()->routeIs('admin.dss.bobot.*')],
         ] : [],
         'Lainnya' => [

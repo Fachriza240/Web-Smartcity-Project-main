@@ -4,6 +4,7 @@ use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Admin\AkunController as AdminAkunController;
 use App\Http\Controllers\Admin\AktivitasDosenController as AdminAktivitasDosenController;
 use App\Http\Controllers\Admin\DssBobotController as AdminDssBobotController;
+use App\Http\Controllers\Admin\DssHasilController as AdminDssHasilController;
 use App\Http\Controllers\Admin\HkiController as AdminHkiController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\Admin\PartnerController as AdminPartnerController;
@@ -192,6 +193,14 @@ Route::middleware(['auth', 'approved'])->prefix('{panel}')->where(['panel' => 'a
         Route::post('/hitung', 'hitung')->name('hitung');
         Route::post('/simpan', 'simpan')->name('simpan');
         Route::post('/reset', 'reset')->name('reset');
+    });
+
+    Route::middleware('role:admin')->controller(AdminDssHasilController::class)->prefix('/dss')->name('dss.')->group(function () {
+        Route::get('/hasil', 'index')->name('hasil.index');
+        Route::get('/hasil/ekspor', 'ekspor')->name('hasil.ekspor');
+        Route::post('/hasil/hitung', 'hitung')->name('hasil.hitung');
+        Route::get('/hasil/{dosen}', 'show')->whereNumber('dosen')->name('hasil.show');
+        Route::get('/peta-kompetensi', 'peta')->name('peta');
     });
 
     Route::get('/akun', [AdminAkunController::class, 'index'])->name('akun');

@@ -184,6 +184,8 @@
                     @endforelse
                 </div>
 
+                <x-halaman-dosen.analisis-kompetensi :user="$user" />
+                
                 <div class="sc-panel">
                     <div class="prf-panel-head">
                         <h2 class="sc-panel__title">Publikasi</h2>
