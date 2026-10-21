@@ -11,15 +11,9 @@ use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
-/**
- * Menyiapkan data tampilan hasil DSS (Hari 5 dan Hari 6).
- * Hanya membaca snapshot di dss_hasil, tidak menghitung ulang skor.
- */
 class DssLaporanService
 {
-    /**
-     * Label rincian poin per kriteria (kunci mengikuti DssHitungService / KompetensiService).
-     */
+
     public const LABEL_RINCIAN = [
         'C1' => ['publikasi' => 'Poin publikasi', 'penelitian' => 'Poin aktivitas penelitian'],
         'C2' => ['abdimas' => 'Poin aktivitas abdimas'],
@@ -39,11 +33,6 @@ class DssLaporanService
         return $nilai ? Carbon::parse($nilai) : null;
     }
 
-    /**
-     * Waktu perubahan terakhir pada data yang memengaruhi skor.
-     * Jika $user diisi, hanya data milik dosen itu (plus bobot kriteria).
-     * Status Draft ikut dicek supaya perubahan Publish menjadi Draft juga terdeteksi.
-     */
     public function perubahanTerakhir(?User $user = null): ?Carbon
     {
         $publikasi = Publication::query();
@@ -67,10 +56,6 @@ class DssLaporanService
             ->max();
     }
 
-    /**
-     * Untuk halaman admin: skor bersifat relatif antar dosen, jadi perubahan data dosen mana pun
-     * atau perubahan daftar dosen yang dinilai membuat seluruh hasil kedaluwarsa.
-     */
     public function kedaluwarsaGlobal(): bool
     {
         $waktu = $this->terakhirDihitung();
@@ -91,9 +76,6 @@ class DssLaporanService
         return $perubahan !== null && $perubahan->gt($waktu);
     }
 
-    /**
-     * Untuk kartu dosen: hanya data milik dosen tersebut yang dibandingkan.
-     */
     public function kedaluwarsaUntuk(User $user, DssHasil $hasil): bool
     {
         if (! $hasil->dihitung_pada) {
@@ -105,11 +87,6 @@ class DssLaporanService
         return $perubahan !== null && $perubahan->gt($hasil->dihitung_pada);
     }
 
-    /**
-     * Statistik sebaran skor dan acuan skala relatif (poin tertinggi tiap kriteria = 100).
-     *
-     * @param  Collection<int, DssHasil>  $semua
-     */
     public function kalibrasi(Collection $semua): array
     {
         $skor = $semua->pluck('skor_akhir')->map(fn ($nilai) => (float) $nilai)->sort()->values();
@@ -154,12 +131,6 @@ class DssLaporanService
         ];
     }
 
-    /**
-     * Peta kompetensi Smart City: jumlah dosen dan dokumen per dimensi.
-     *
-     * @param  Collection<int, DssHasil>  $semua  sebaiknya sudah di-load dengan relasi user
-     * @return array<string, array{label: string, jumlah_dosen: int, jumlah_dokumen: int, dosen: array}>
-     */
     public function petaDimensi(Collection $semua): array
     {
         $peta = [];
@@ -197,11 +168,6 @@ class DssLaporanService
         return $peta;
     }
 
-    /**
-     * Baris rincian per kriteria: poin mentah, skor ternormalisasi, bobot, kontribusi.
-     *
-     * @param  array<string, float>|null  $maks  poin tertinggi per kriteria (hanya untuk admin)
-     */
     public function barisKriteria(DssHasil $hasil, ?array $maks = null): array
     {
         $baris = [];
@@ -223,9 +189,6 @@ class DssLaporanService
         return $baris;
     }
 
-    /**
-     * Rincian poin tiap kriteria untuk halaman detail admin.
-     */
     public function rincianPoin(DssHasil $hasil): array
     {
         $hasilRincian = [];
@@ -242,11 +205,6 @@ class DssLaporanService
         return $hasilRincian;
     }
 
-    /**
-     * Label dimensi Smart City milik satu dosen, dimensi dominan di urutan pertama.
-     *
-     * @return array<string, string> [kunci => label]
-     */
     public function labelDimensi(?DssHasil $hasil): array
     {
         if (! $hasil) {
@@ -281,10 +239,6 @@ class DssLaporanService
         return array_values($this->labelDimensi($hasil));
     }
 
-    /**
-     * Data kartu Analisis Kompetensi milik dosen yang login. Tidak memuat peringkat
-     * maupun poin dosen lain. Mengembalikan null jika dosen belum punya hasil.
-     */
     public function analisisPribadi(User $user): ?array
     {
         $hasil = DssHasil::query()->where('user_id', $user->id)->first();
@@ -302,9 +256,6 @@ class DssLaporanService
         ];
     }
 
-    /**
-     * @return array{label: string, warna: string, makna: string}
-     */
     public function infoKategori(string $label): array
     {
         foreach ((array) config('dss.kategori', []) as $kategori) {
@@ -320,9 +271,6 @@ class DssLaporanService
         return ['label' => $label, 'warna' => 'secondary', 'makna' => ''];
     }
 
-    /**
-     * @return array<string, string> [label kategori => warna]
-     */
     public function warnaKategori(): array
     {
         return collect((array) config('dss.kategori', []))->pluck('warna', 'label')->all();

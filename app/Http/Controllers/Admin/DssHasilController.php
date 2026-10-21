@@ -120,8 +120,6 @@ class DssHasilController extends Controller
         try {
             $ringkasan = $this->hitung->hitungSemua();
         } catch (PDOException $e) {
-            // QueryException turunan RuntimeException. Dilempar ulang agar ditangani handler
-            // di bootstrap/app.php dan pesan SQL tidak tampil ke pengguna.
             throw $e;
         } catch (RuntimeException|InvalidArgumentException $e) {
             return redirect()->route('admin.dss.hasil.index')->with('error', $e->getMessage());
@@ -193,10 +191,6 @@ class DssHasilController extends Controller
         }, $nama, ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
-    /**
-     * @param  array<int, string>  $daftarProdi
-     * @return array{prodi: string, kategori: string}
-     */
     private function filter(Request $request, array $daftarProdi): array
     {
         $prodi = $request->string('prodi')->trim()->toString();
@@ -224,9 +218,6 @@ class DssHasilController extends Controller
         return number_format((float) $nilai, 2, ',', '');
     }
 
-    /**
-     * Mencegah CSV injection: sel teks yang diawali = + - @ dibuat menjadi teks biasa di Excel.
-     */
     private function aman(string $nilai): string
     {
         return preg_match('/^[=+\-@\t\r]/', $nilai) === 1 ? "'" . $nilai : $nilai;

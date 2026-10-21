@@ -18,7 +18,7 @@ class DssHitungService
         private RekomendasiService $rekomendasi,
     ) {
     }
-    
+
     public function dosenYangDinilai(): Collection
     {
         return User::query()
@@ -31,13 +31,6 @@ class DssHitungService
             ->get();
     }
 
-    /**
-     * Menghitung ulang seluruh dosen dan menyimpan hasilnya.
-     *
-     * @return array{jumlah: int, dihitung_pada: \Illuminate\Support\Carbon, ahp_id: int|null}
-     *
-     * @throws RuntimeException jika data kriteria belum tersedia
-     */
     public function hitungSemua(): array
     {
         $kriteria = DssKriteria::daftar();

@@ -10,21 +10,11 @@ class RekomendasiService
 
     private array $konfigurasi;
 
-    /**
-     * @param  array|null  $konfigurasi  isi config/dss.php. Default: config('dss')
-     */
     public function __construct(?array $konfigurasi = null)
     {
         $this->konfigurasi = $konfigurasi ?? (array) config('dss', []);
     }
 
-    /**
-     * @param  array<string, float>  $skorNormal  [kode => skor ternormalisasi 0 sampai 100]
-     * @param  float  $skorAkhir  skor akhir SAW 0 sampai 100
-     * @param  array<string, array>  $kriteria  [kode => [nama, bobot, cluster, peran_utama, peran_dasar, saran_gap]]
-     * @param  array  $kompetensi  hasil petaKompetensi (butuh dominan_label)
-     * @param  bool  $adaData  false jika dosen belum memiliki data sama sekali
-     */
     public function susun(array $skorNormal, float $skorAkhir, array $kriteria, array $kompetensi = [], bool $adaData = true): array
     {
         $skorAkhir = round($skorAkhir, 2);
@@ -62,11 +52,6 @@ class RekomendasiService
         ];
     }
 
-    /**
-     * Kategori berdasarkan skor akhir yang sudah dibulatkan 2 desimal.
-     *
-     * @return array{min: float, label: string, warna: string, makna: string}
-     */
     public function tentukanKategori(float $skorAkhir): array
     {
         $skorAkhir = round($skorAkhir, 2);
@@ -81,12 +66,6 @@ class RekomendasiService
         return $this->formatKategori(end($daftar) ?: ['min' => 0, 'label' => '-', 'warna' => 'secondary', 'makna' => '']);
     }
 
-    /**
-     * Kriteria dengan skor ternormalisasi tertinggi. Jika sama, bobot yang lebih besar menang.
-     * Mengembalikan null jika semua skor 0.
-     *
-     * @return array{kode: string, nama: string, skor: float}|null
-     */
     public function kekuatanUtama(array $skorNormal, array $kriteria): ?array
     {
         $terbaik = null;
@@ -118,11 +97,6 @@ class RekomendasiService
         ];
     }
 
-    /**
-     * Kriteria dengan skor ternormalisasi di bawah ambang gap, dari yang paling rendah.
-     *
-     * @return array<int, array{kode: string, kriteria: string, skor: float, saran: string}>
-     */
     public function gapAnalysis(array $skorNormal, array $kriteria): array
     {
         $ambang = (float) ($this->konfigurasi['ambang_gap'] ?? 50);

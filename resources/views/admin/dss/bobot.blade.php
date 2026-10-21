@@ -28,7 +28,6 @@
         </div>
     @else
 
-        {{-- Bobot yang sedang dipakai --}}
         <div class="card-admin mb-4">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
@@ -272,7 +271,6 @@
             </div>
         @endif
 
-        {{-- Riwayat --}}
         @if ($riwayat->isNotEmpty())
             <div class="card-admin">
                 <div class="card-body">

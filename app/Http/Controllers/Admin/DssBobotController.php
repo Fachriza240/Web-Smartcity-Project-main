@@ -188,9 +188,6 @@ class DssBobotController extends Controller
         return $nilai;
     }
 
-    /**
-     * @return array{nilai: array, catatan: string|null}
-     */
     private function validasiPerbandingan(Request $request, Collection $kriteria): array
     {
         $kode = $kriteria->pluck('kode')->values()->all();

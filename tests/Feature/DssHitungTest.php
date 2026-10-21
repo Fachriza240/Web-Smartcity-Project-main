@@ -116,7 +116,6 @@ class DssHitungTest extends TestCase
         $this->assertSame(3, $ringkasan['jumlah']);
         $this->assertSame(3, DssHasil::count());
 
-        // Alfa: C1 = 10 + 10 + 8 = 28 (tertinggi), skor = 0,30 x 100
         $a = $this->hasilDari($alfa);
         $this->assertEqualsWithDelta(30.0, $a->skor_akhir, 0.001);
         $this->assertSame(1, $a->peringkat);
@@ -128,13 +127,11 @@ class DssHitungTest extends TestCase
         $this->assertEqualsWithDelta(100.0, $a->skor_normal['C1'], 0.001);
         $this->assertCount(4, $a->gap);
 
-        // Beta: C2 = 6 (tertinggi), skor = 0,25 x 100
         $b = $this->hasilDari($beta);
         $this->assertEqualsWithDelta(25.0, $b->skor_akhir, 0.001);
         $this->assertSame(2, $b->peringkat);
         $this->assertSame('Abdimas', $b->kekuatan_utama);
 
-        // Gamma: tanpa data
         $g = $this->hasilDari($gamma);
         $this->assertEqualsWithDelta(0.0, $g->skor_akhir, 0.001);
         $this->assertSame(3, $g->peringkat);
@@ -148,20 +145,16 @@ class DssHitungTest extends TestCase
     {
         $dosen = $this->buatUser('Dosen Uji Delta');
 
-        // Publikasi Draft (non member) atas nama dosen
         $this->publikasi($dosen, 'Jurnal', 0, [
             'user_id' => null,
             'submission_type' => 'non_member',
             'recommended_by' => 'Admin Uji',
             'status' => 'Draft',
         ]);
-        // Publikasi dan HKI lama (di luar jendela 5 tahun)
         $this->publikasi($dosen, 'Jurnal', 8);
         $this->hki($dosen, 'Paten', 8);
-        // Aktivitas Draft dan aktivitas lama
         $this->aktivitas($dosen, 'penelitian', ['skala' => 'internasional', 'status' => AktivitasDosen::STATUS_DRAFT]);
         $this->aktivitas($dosen, 'penelitian', ['skala' => 'internasional', 'tahun' => now()->year - 8]);
-        // Satu aktivitas sah sebagai pembanding
         $this->aktivitas($dosen, 'abdimas', ['skala' => 'institusi']);
 
         $this->hitung();

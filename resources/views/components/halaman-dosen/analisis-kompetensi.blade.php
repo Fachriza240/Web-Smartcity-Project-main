@@ -1,7 +1,6 @@
 @props(['user'])
 
 @php
-    // Kartu ini hanya untuk dosen yang sedang login dan hanya memuat datanya sendiri.
     $pemilik = auth()->check()
         && (int) auth()->id() === (int) $user->id
         && $user->role === 'dosen';

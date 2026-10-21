@@ -9,12 +9,7 @@ use Illuminate\Validation\Rule;
 
 trait ValidatesAktivitasDosen
 {
-    /**
-     * Validasi dan normalisasi input aktivitas dosen.
-     *
-     * @param  int|null  $userId  pemilik aktivitas (untuk cek duplikasi)
-     * @param  array  $aturanTambahan  aturan ekstra (misalnya user_id dan status untuk admin)
-     */
+
     protected function validasiAktivitas(
         Request $request,
         ?AktivitasDosen $aktivitas = null,

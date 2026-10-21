@@ -11,9 +11,6 @@ class KompetensiService
 {
     private array $konfigurasi;
 
-    /**
-     * @param  array|null  $konfigurasi  isi config/dss.php. Default: config('dss')
-     */
     public function __construct(?array $konfigurasi = null)
     {
         $this->konfigurasi = $konfigurasi ?? (array) config('dss', []);
@@ -72,12 +69,6 @@ class KompetensiService
         ];
     }
 
-    /**
-     * Menghitung poin mentah C1 sampai C5 dan peta kompetensi Smart City.
-     *
-     * @param  array  $data  hasil kumpulkanData()
-     * @return array{poin: array<string, float>, rincian: array, kompetensi: array}
-     */
     public function hitungPoin(array $data): array
     {
         $rubrik = $this->konfigurasi['rubrik'] ?? [];
@@ -167,12 +158,6 @@ class KompetensiService
         ];
     }
 
-    /**
-     * Mengenali dimensi Smart City dari sebuah teks berdasarkan kata kunci di config/dss.php.
-     * Kata kunci dicocokkan di awal kata, tanpa membedakan huruf besar dan kecil.
-     *
-     * @return array<int, string> daftar kunci dimensi, misalnya ['smart_mobility']
-     */
     public function deteksiDimensi(string $teks): array
     {
         $teks = trim($teks);
@@ -197,9 +182,6 @@ class KompetensiService
         return $hasil;
     }
 
-    /**
-     * Peta kompetensi: jumlah dokumen per dimensi, dimensi dominan, dan dimensi dari profil.
-     */
     private function petaKompetensi(array $publikasi, array $hki, array $aktivitas, string $profil): array
     {
         $dimensiConf = $this->konfigurasi['bidang_smart_city'] ?? [];

@@ -6,13 +6,7 @@ use InvalidArgumentException;
 
 class SawService
 {
-    /**
-     * @param  array<int|string, array<string, float|int>>  $poin  [id dosen => [kode => poin mentah]]
-     * @param  array<string, float|int>  $bobot  [kode => bobot], jumlahnya 1
-     * @return array{maks: array, normal: array, skor: array, peringkat: array}
-     *
-     * @throws InvalidArgumentException jika bobot tidak valid
-     */
+
     public function hitung(array $poin, array $bobot): array
     {
         $this->pastikanBobotValid($bobot);
@@ -49,13 +43,6 @@ class SawService
         ];
     }
 
-    /**
-     * Peringkat kompetisi (1, 2, 2, 4). Skor dibandingkan setelah dibulatkan 2 desimal,
-     * sama seperti yang disimpan dan ditampilkan.
-     *
-     * @param  array<int|string, float>  $skor
-     * @return array<int|string, int>
-     */
     public function peringkat(array $skor): array
     {
         $dibulatkan = array_map(fn ($nilai) => round((float) $nilai, 2), $skor);

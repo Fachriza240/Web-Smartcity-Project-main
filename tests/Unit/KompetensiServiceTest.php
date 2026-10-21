@@ -62,7 +62,6 @@ class KompetensiServiceTest extends TestCase
             $this->aktivitas('penelitian', ['skala' => 'institusi', 'peran' => 'ketua']),
         ]]);
 
-        // 8 x 1,0 + 12 x 0,6 + 4 x 1,0
         $this->assertEqualsWithDelta(19.2, $hasil['poin']['C1'], 1e-9);
     }
 
@@ -82,7 +81,6 @@ class KompetensiServiceTest extends TestCase
             $this->aktivitas('abdimas', ['skala' => 'institusi', 'peran' => 'anggota', 'berkelanjutan' => false]),
         ]]);
 
-        // (6 x 1,0 + 2) + (3 x 0,6)
         $this->assertEqualsWithDelta(9.8, $hasil['poin']['C2'], 1e-9);
     }
 
@@ -100,7 +98,6 @@ class KompetensiServiceTest extends TestCase
             ],
         ]);
 
-        // HKI: 12 + 5 + 3 = 20. Produk: 10 x 1,0 + 6 x 0,6 = 13,6.
         $this->assertEqualsWithDelta(33.6, $hasil['poin']['C3'], 1e-9);
         $this->assertEqualsWithDelta(20.0, $hasil['rincian']['C3']['hki'], 1e-9);
         $this->assertEqualsWithDelta(13.6, $hasil['rincian']['C3']['produk'], 1e-9);
@@ -115,7 +112,6 @@ class KompetensiServiceTest extends TestCase
             $this->aktivitas('kepemimpinan', ['sub_jenis' => 'pic', 'peran' => 'anggota']),
         ]]);
 
-        // 5 + 8 + 6 + 4, peran anggota tidak mengurangi poin
         $this->assertEqualsWithDelta(23.0, $hasil['poin']['C5'], 1e-9);
     }
 
@@ -152,7 +148,6 @@ class KompetensiServiceTest extends TestCase
         $this->assertSame('smart_environment', $kompetensi['dominan']);
         $this->assertSame('Smart Environment', $kompetensi['dominan_label']);
 
-        // 3 dokumen x 2 + 3 dimensi x 3
         $this->assertEqualsWithDelta(15.0, $hasil['poin']['C4'], 1e-9);
     }
 
@@ -210,7 +205,6 @@ class KompetensiServiceTest extends TestCase
 
         $this->assertSame(1, $hasil['kompetensi']['dokumen_cocok']);
         $this->assertSame(2, $hasil['kompetensi']['dimensi_tercakup']);
-        // 1 x 2 + 2 x 3
         $this->assertEqualsWithDelta(8.0, $hasil['poin']['C4'], 1e-9);
     }
 

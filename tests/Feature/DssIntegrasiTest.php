@@ -76,7 +76,6 @@ class DssIntegrasiTest extends TestCase
         app(DssHitungService::class)->hitungSemua();
     }
 
-    /** @return array{alfa: User, beta: User, kosong: User} */
     private function siapkan(): array
     {
         $alfa = $this->buatUser('Dosen Alfa Rahasia');

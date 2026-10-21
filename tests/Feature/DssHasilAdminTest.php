@@ -63,7 +63,6 @@ class DssHasilAdminTest extends TestCase
         app(DssHitungService::class)->hitungSemua();
     }
 
-    /** @return array{admin: User, alfa: User, beta: User, kosong: User} */
     private function siapkanData(): array
     {
         $admin = $this->buatUser('Admin Uji', 'admin');
@@ -172,7 +171,6 @@ class DssHasilAdminTest extends TestCase
             ->assertOk()
             ->assertViewHas('hasil', fn ($hasil) => $hasil->count() === 0);
 
-        // nilai filter yang tidak dikenal diabaikan, tidak menyebabkan error
         $this->actingAs($d['admin'])->get('/admin/dss/hasil?prodi=%27+OR+1%3D1&kategori=xyz')
             ->assertOk()
             ->assertSee('Dosen Alfa')

@@ -1,4 +1,3 @@
-{{-- Status perhitungan: tanggal terakhir dan tanda hasil kedaluwarsa --}}
 @if (! $terakhir)
     <div class="alert alert-info" role="alert">
         Belum ada hasil perhitungan. Klik <strong>Hitung Ulang</strong> di halaman Peringkat Dosen untuk menjalankan AHP dan SAW.
