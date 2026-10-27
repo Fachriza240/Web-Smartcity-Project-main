@@ -56,7 +56,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 str_starts_with($route, 'profil.') => 'Perubahan profil gagal disimpan. Silakan coba lagi.',
                 str_starts_with($route, 'dosen.publikasi.'), str_starts_with($route, 'admin.publications.') => 'Publikasi gagal disimpan. Silakan coba lagi.',
                 str_starts_with($route, 'dosen.hki.'), str_starts_with($route, 'admin.hki.') => 'Data HKI gagal disimpan. Silakan coba lagi.',
-                                $route === 'admin.dss.hasil.hitung' => 'Perhitungan ulang DSS gagal disimpan karena gangguan database. Hasil sebelumnya tidak berubah. Silakan coba lagi.',
+                $route === 'admin.dss.hasil.hitung' => 'Perhitungan ulang DSS gagal disimpan karena gangguan database. Hasil sebelumnya tidak berubah. Silakan coba lagi.',
                 str_starts_with($route, 'admin.dss.bobot.') => 'Bobot AHP gagal disimpan. Bobot yang berlaku tidak berubah. Silakan coba lagi.',
                 str_starts_with($route, 'admin.dss.') => 'Data DSS gagal disimpan. Silakan coba lagi.',
                 default => 'Data gagal disimpan karena terjadi gangguan sistem. Silakan coba lagi.',

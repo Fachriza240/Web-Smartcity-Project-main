@@ -25,7 +25,7 @@ return [
 
     'ambang_cluster' => 60,
 
-    'ambang_peran_utama' => 70,
+    'ambang_peran_utama' => 30,
 
     'kriteria' => [
         'C1' => [
@@ -81,9 +81,9 @@ return [
     ],
 
     'kategori' => [
-        ['min' => 85, 'label' => 'Sangat Potensial', 'warna' => 'success', 'makna' => 'Cocok menjadi ketua program atau ketua riset unggulan CoE.'],
-        ['min' => 70, 'label' => 'Potensial', 'warna' => 'primary', 'makna' => 'Cocok menjadi anggota inti atau PIC kegiatan tertentu.'],
-        ['min' => 55, 'label' => 'Cukup Potensial', 'warna' => 'warning', 'makna' => 'Perlu penguatan publikasi, abdimas, atau kolaborasi.'],
+        ['min' => 45, 'label' => 'Sangat Potensial', 'warna' => 'success', 'makna' => 'Cocok menjadi ketua program atau ketua riset unggulan CoE.'],
+        ['min' => 30, 'label' => 'Potensial', 'warna' => 'primary', 'makna' => 'Cocok menjadi anggota inti atau PIC kegiatan tertentu.'],
+        ['min' => 15, 'label' => 'Cukup Potensial', 'warna' => 'warning', 'makna' => 'Perlu penguatan publikasi, abdimas, atau kolaborasi.'],
         ['min' => 0, 'label' => 'Perlu Pengembangan', 'warna' => 'secondary', 'makna' => 'Perlu pendampingan dan integrasi ke program CoE.'],
     ],
 

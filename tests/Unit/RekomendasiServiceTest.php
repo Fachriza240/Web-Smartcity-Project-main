@@ -11,7 +11,17 @@ class RekomendasiServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->konfigurasi = require __DIR__ . '/../../config/dss.php';
+        $this->konfigurasi = array_replace(require __DIR__ . '/../../config/dss.php', [
+            'kategori' => [
+                ['min' => 85, 'label' => 'Sangat Potensial', 'warna' => 'success', 'makna' => 'Cocok menjadi ketua program atau ketua riset unggulan CoE.'],
+                ['min' => 70, 'label' => 'Potensial', 'warna' => 'primary', 'makna' => 'Cocok menjadi anggota inti atau PIC kegiatan tertentu.'],
+                ['min' => 55, 'label' => 'Cukup Potensial', 'warna' => 'warning', 'makna' => 'Perlu penguatan publikasi, abdimas, atau kolaborasi.'],
+                ['min' => 0, 'label' => 'Perlu Pengembangan', 'warna' => 'secondary', 'makna' => 'Perlu pendampingan dan integrasi ke program CoE.'],
+            ],
+            'ambang_peran_utama' => 70,
+            'ambang_cluster' => 60,
+            'ambang_gap' => 50,
+        ]);
     }
 
     private function service(): RekomendasiService
