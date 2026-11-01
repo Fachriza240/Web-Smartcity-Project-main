@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Hki;
 use App\Models\Publication;
+use App\Models\TrustedDevice;
 use App\Rules\PersonName;
 use App\Rules\SafeText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -72,5 +74,33 @@ class ProfileController extends Controller
         $user->forceFill($data)->save();
 
         return redirect()->route('profil.dosen')->with('success', 'Profil berhasil diperbarui.');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $user = Auth::user();
+
+        $data = $request->validateWithBag('dosenPassword', [
+            'current_password' => ['required', 'string', 'current_password'],
+            'password' => ['required', 'string', 'min:8', 'max:64', 'confirmed', 'different:current_password'],
+        ], [
+            'current_password.current_password' => 'Password saat ini tidak sesuai.',
+            'password.different' => 'Password baru harus berbeda dari password saat ini.',
+            'password.confirmed' => 'Konfirmasi password baru tidak cocok.',
+        ], [
+            'current_password' => 'Password saat ini',
+            'password' => 'Password baru',
+        ]);
+
+        $user->forceFill([
+            'password' => $data['password'],
+            'remember_token' => Str::random(60),
+        ])->save();
+
+        TrustedDevice::forgetFor($user);
+
+        $request->session()->regenerate();
+
+        return redirect()->route('profil.dosen')->with('success', 'Password berhasil diperbarui.');
     }
 }

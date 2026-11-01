@@ -97,6 +97,7 @@ Route::middleware('approved')->group(function () {
 
     Route::get('/profil-dosen', [ProfileController::class, 'show'])->name('profil.dosen');
     Route::put('/profil-dosen', [ProfileController::class, 'update'])->name('profil.dosen.update');
+    Route::put('/profil-dosen/password', [ProfileController::class, 'updatePassword'])->name('profil.dosen.password'); 
 
     Route::prefix('dosen')->name('dosen.')->middleware('role:dosen')->group(function () {
         Route::controller(DosenKontenController::class)->group(function () {

@@ -160,6 +160,43 @@
                         </div>
                     </dl>
                 </div>
+                <div class="sc-panel" id="ubahPassword">
+                    <h2 class="sc-panel__title">Ubah Password</h2>
+                    <p class="sc-panel__muted">Gunakan password baru yang terdiri dari 8 sampai 64 karakter.</p>
+
+                    <form action="{{ route('profil.dosen.password') }}" method="POST" novalidate data-validate>
+                        @csrf
+                        @method('PUT')
+
+                        <div class="mb-3" data-field>
+                            <label for="current_password" class="form-label">Password Saat Ini <span class="text-danger">*</span></label>
+                            <input type="password" id="current_password" name="current_password" autocomplete="current-password"
+                                class="form-control @error('current_password', 'dosenPassword') is-invalid @enderror" required
+                                data-label="Password saat ini" data-rules="required|max:64">
+                            <div class="field-error" data-error-for="current_password">@error('current_password', 'dosenPassword'){{ $message }}@enderror</div>
+                        </div>
+
+                        <div class="mb-3" data-field>
+                            <label for="new_password" class="form-label">Password Baru <span class="text-danger">*</span></label>
+                            <input type="password" id="new_password" name="password" autocomplete="new-password"
+                                class="form-control @error('password', 'dosenPassword') is-invalid @enderror" required
+                                data-label="Password baru" data-rules="required|min:8|max:64">
+                            <div class="field-error" data-error-for="password">@error('password', 'dosenPassword'){{ $message }}@enderror</div>
+                        </div>
+
+                        <div class="mb-3" data-field>
+                            <label for="password_confirmation" class="form-label">Konfirmasi Password Baru <span class="text-danger">*</span></label>
+                            <input type="password" id="password_confirmation" name="password_confirmation" autocomplete="new-password"
+                                class="form-control" required
+                                data-label="Konfirmasi password" data-rules="required|same:password">
+                            <div class="field-error" data-error-for="password_confirmation"></div>
+                        </div>
+
+                        <button type="submit" class="sc-btn sc-btn--primary sc-btn--sm" data-confirm-submit="Apakah Anda yakin ingin mengubah password akun?">
+                            <i class="bi bi-key-fill" aria-hidden="true"></i> Simpan Password
+                        </button>
+                    </form>
+                </div>
                 <div class="sc-panel">
                     <h2 class="sc-panel__title">Bidang Penelitian</h2>
                     @if ($fields->isNotEmpty())
