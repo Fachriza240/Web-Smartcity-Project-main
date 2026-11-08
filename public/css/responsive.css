@@ -1,0 +1,129 @@
+@media (max-width: 1199.98px) {
+    .sc-navbar .navbar-collapse,
+    .sc-navbar__right,
+    .sc-search {
+        min-width: 0;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .dsn-card,
+    .dsn-card--padded,
+    .dsn-tabs,
+    .dsn-table td {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .dsn-table td {
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .adm-body .main-content,
+    .adm-body .content-header,
+    .adm-body .content-header > *,
+    .adm-body .card-admin,
+    .adm-body .card-admin .card-body,
+    .adm-body .adm-card-head > * {
+        min-width: 0;
+    }
+
+    .adm-body .adm-card-head {
+        flex-wrap: wrap;
+    }
+    
+    .adm-body .table-responsive {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .adm-body .table-responsive > .data-table:not(.is-stackable) {
+        width: max-content;
+        min-width: 100%;
+    }
+
+    .adm-body .dss-chart {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .news-search__input,
+    .news-search__select,
+    .pub-search__input,
+    .pub-search__select {
+        min-width: 0 !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .sc-btn,
+    .sc-btn-proyek,
+    .adm-body .header-actions .btn {
+        max-width: 100%;
+        white-space: normal;
+        text-align: center;
+    }
+
+    .adm-body .header-actions {
+        min-width: 0;
+        flex-wrap: wrap;
+    }
+
+    .adm-body .adm-dropdown {
+        max-width: calc(100vw - 24px);
+    }
+
+    .auth-card {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 359.98px) {
+    body,
+    body.auth-body {
+        min-width: 0;
+    }
+
+    .sc-topbar__social {
+        display: none;
+    }
+
+    .sc-navbar .navbar-brand {
+        margin-right: 0;
+    }
+
+    .sc-navbar__mobile-actions {
+        gap: 4px;
+    }
+
+    /* Aturan halaman tertentu ada di style Blade setelah CSS eksternal. */
+    .sc-hero__grid {
+        padding-inline: 12px !important;
+    }
+
+    .sc-fakta__stats,
+    .sc-fakta__list,
+    .prog-intro__stats,
+    .mitra-grid,
+    .dss-summary {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    .prf-panel-head {
+        flex-wrap: wrap;
+    }
+
+    .adm-body .row > .col-6.col-lg-3 {
+        width: 100%;
+    }
+
+    .auth-left,
+    .auth-card--narrow .auth-left {
+        padding-inline: 12px;
+    }
+}
