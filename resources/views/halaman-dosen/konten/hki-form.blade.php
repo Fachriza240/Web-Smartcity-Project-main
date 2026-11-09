@@ -26,14 +26,6 @@
             </div>
         @endif
 
-        @if (session('retry'))
-            <div class="dsn-alert" role="alert">
-                <i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>
-                <span>{{ session('error') }}</span>
-                <button type="button" class="sc-btn sc-btn--ghost sc-btn--sm ms-auto" data-retry>Coba Lagi</button>
-            </div>
-        @endif
-
         <form action="{{ $isCreate ? route('dosen.hki.store') : route('dosen.hki.update', $hki) }}"
             method="POST" enctype="multipart/form-data" novalidate data-validate>
             @csrf

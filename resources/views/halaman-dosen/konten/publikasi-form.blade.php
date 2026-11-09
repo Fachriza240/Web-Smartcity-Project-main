@@ -23,14 +23,6 @@
             </div>
         @endif
 
-        @if (session('retry'))
-            <div class="dsn-alert" role="alert">
-                <i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>
-                <span>{{ session('error') }}</span>
-                <button type="button" class="sc-btn sc-btn--ghost sc-btn--sm ms-auto" data-retry>Coba Lagi</button>
-            </div>
-        @endif
-
         <form action="{{ $isCreate ? route('dosen.publikasi.store') : route('dosen.publikasi.update', $publication) }}"
             method="POST" enctype="multipart/form-data" novalidate data-validate>
             @csrf

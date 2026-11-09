@@ -48,14 +48,6 @@
                 </div>
             @endif
 
-            @if (session('retry'))
-                <div class="dsn-alert" role="alert">
-                    <i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>
-                    <span>{{ session('error') }}</span>
-                    <button type="button" class="sc-btn sc-btn--ghost sc-btn--sm ms-auto" data-retry>Coba Lagi</button>
-                </div>
-            @endif
-
             <form action="{{ route('profil.dosen.update') }}" method="POST" enctype="multipart/form-data" id="profForm" novalidate data-validate>
                 @csrf
                 @method('PUT')
@@ -222,7 +214,7 @@
                 </div>
 
                 <x-halaman-dosen.analisis-kompetensi :user="$user" />
-                
+
                 <div class="sc-panel">
                     <div class="prf-panel-head">
                         <h2 class="sc-panel__title">Publikasi</h2>

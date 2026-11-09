@@ -65,6 +65,7 @@ return Application::configure(basePath: dirname(__DIR__))
             return back()
                 ->withInput($request->except(['password', 'password_confirmation', '_token', '_method']))
                 ->with('error', $message)
-                ->with('retry', true);
+                ->with('retry', true)
+                ->with('retry_action', $request->url());
         });
     })->create();

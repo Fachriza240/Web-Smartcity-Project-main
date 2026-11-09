@@ -248,13 +248,13 @@
             source = submitter;
         } else if (form.hasAttribute('data-confirm-submit')) {
             source = form;
-        } else {
+        } else if (!submitter) {
             source = form.querySelector('[data-confirm-submit]');
         }
         if (!source) {
             return [];
         }
-        return [source.getAttribute('data-confirm-submit'), source.getAttribute('data-confirm-second')].filter(Boolean);
+        return [source.getAttribute('data-confirm-submit')].filter(Boolean);
     }
 
     function lockForm(form, locked) {
@@ -328,10 +328,27 @@
             if (!button) {
                 return;
             }
+            event.preventDefault();
             var forms = Array.prototype.filter.call(document.querySelectorAll('form[data-enhanced="true"]'), function (form) {
                 return !form.closest('.modal');
             });
-            var submit = forms.length ? forms[0].querySelector('[type="submit"]') : null;
+            var action = button.getAttribute('data-retry-action');
+            var submit = null;
+            if (action) {
+                var target = new URL(action, document.baseURI).href;
+                forms.some(function (form) {
+                    return Array.prototype.some.call(form.querySelectorAll('[type="submit"]'), function (candidate) {
+                        var destination = candidate.hasAttribute('formaction') ? candidate.formAction : form.action;
+                        if (!candidate.disabled && destination === target) {
+                            submit = candidate;
+                            return true;
+                        }
+                        return false;
+                    });
+                });
+            } else if (forms.length === 1) {
+                submit = forms[0].querySelector('[type="submit"]');
+            }
             if (submit) {
                 submit.click();
             } else {

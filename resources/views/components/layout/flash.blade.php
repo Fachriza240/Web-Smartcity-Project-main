@@ -23,7 +23,7 @@
                 <span class="alert-flash__text">
                     {{ $message }}
                     @if ($type === 'danger' && session('retry'))
-                        <button type="button" class="btn btn-sm btn-light d-block mt-2" data-retry>Coba Lagi</button>
+                        <button type="button" class="btn btn-sm btn-light d-block mt-2" data-retry data-retry-action="{{ session('retry_action') }}">Coba Lagi</button>
                     @endif
                 </span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
