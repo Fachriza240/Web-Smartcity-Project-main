@@ -8,8 +8,12 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        if (app()->environment('production')) {
-            $this->command?->warn('DatabaseSeeder dilewati karena aplikasi berjalan di environment production.');
+        if (! app()->environment(['local', 'testing'])) {
+            $this->command?->warn(
+                'Seeder data dummy dilewati. '
+                . 'Seeder hanya boleh berjalan pada '
+                . 'environment local atau testing.'
+            );
 
             return;
         }
