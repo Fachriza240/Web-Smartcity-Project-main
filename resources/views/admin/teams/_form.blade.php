@@ -91,6 +91,7 @@
         @error('telepon')<div class="invalid-feedback d-block" data-error-for="telepon">{{ $message }}</div>@enderror
     </div>
 </div>
+
 <div class="row">
     <div class="col-md-4 mb-3" data-field>
         <label for="linkedin" class="form-label"><i class="bi bi-linkedin me-1 text-primary" aria-hidden="true"></i>URL LinkedIn</label>
@@ -118,7 +119,8 @@
 </div>
 
 <div class="d-flex gap-2 mt-1">
-    <button type="submit" class="btn btn-success" data-confirm-submit="Apakah Anda yakin ingin menyimpan data anggota tim ini?">
+    <button type="submit" class="btn btn-success"
+            data-confirm-submit="{{ $team->exists ? 'Apakah Anda yakin ingin menyimpan perubahan?' : 'Apakah Anda yakin ingin menyimpan data anggota tim ini?' }}">
         <i class="bi bi-save me-1" aria-hidden="true"></i> Simpan
     </button>
     <a href="{{ route('admin.teams.index') }}" class="btn btn-light">Batal</a>

@@ -157,7 +157,7 @@
 
 <div class="d-flex gap-2">
     <button type="submit" class="btn btn-success"
-            data-confirm-submit="Apakah data yang diinputkan sudah benar?">
+            data-confirm-submit="{{ $publication->exists ? 'Apakah Anda yakin ingin menyimpan perubahan?' : 'Apakah data yang diinputkan sudah benar?' }}">
         <i class="bi bi-save me-1" aria-hidden="true"></i> Simpan
     </button>
     <a href="{{ route('admin.publications.index') }}" class="btn btn-light">Batal</a>

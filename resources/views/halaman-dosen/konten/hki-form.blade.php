@@ -96,7 +96,8 @@
             </div>
 
             <div class="dsn-form-actions">
-                <button type="submit" class="sc-btn sc-btn--primary" data-confirm-submit="Apakah Anda yakin ingin menyimpan data HKI ini?">
+                <button type="submit" class="sc-btn sc-btn--primary"
+                        data-confirm-submit="{{ $isCreate ? 'Apakah Anda yakin ingin menyimpan data HKI ini?' : 'Apakah Anda yakin ingin menyimpan perubahan?' }}">
                     <i class="bi bi-save" aria-hidden="true"></i> {{ $isCreate ? 'Simpan HKI' : 'Perbarui HKI' }}
                 </button>
                 <a href="{{ route('dosen.hki.index') }}" class="sc-btn sc-btn--ghost">Batal</a>

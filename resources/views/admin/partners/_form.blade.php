@@ -61,7 +61,8 @@
 </div>
 
 <div class="d-flex gap-2 mt-1">
-    <button type="submit" class="btn btn-success" data-confirm-submit="Apakah Anda yakin ingin menyimpan data mitra ini?">
+    <button type="submit" class="btn btn-success"
+            data-confirm-submit="{{ $partner->exists ? 'Apakah Anda yakin ingin menyimpan perubahan?' : 'Apakah Anda yakin ingin menyimpan data mitra ini?' }}">
         <i class="bi bi-save me-1" aria-hidden="true"></i> Simpan
     </button>
     <a href="{{ route('admin.partners.index') }}" class="btn btn-light">Batal</a>

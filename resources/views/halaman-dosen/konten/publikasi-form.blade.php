@@ -118,7 +118,8 @@
             </div>
 
             <div class="dsn-form-actions">
-                <button type="submit" class="sc-btn sc-btn--primary" data-confirm-submit="Apakah Anda yakin ingin menyimpan publikasi ini?">
+                <button type="submit" class="sc-btn sc-btn--primary"
+                        data-confirm-submit="{{ $isCreate ? 'Apakah Anda yakin ingin menyimpan publikasi ini?' : 'Apakah Anda yakin ingin menyimpan perubahan?' }}">
                     <i class="bi bi-save" aria-hidden="true"></i> {{ $isCreate ? 'Simpan Publikasi' : 'Perbarui Publikasi' }}
                 </button>
                 <a href="{{ route('dosen.publikasi.index') }}" class="sc-btn sc-btn--ghost">Batal</a>
