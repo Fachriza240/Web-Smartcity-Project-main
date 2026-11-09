@@ -6,6 +6,7 @@
     $daftarProyek = \App\Services\SiteStats::daftarProyek();
     $tahunBerdiri = \App\Services\SiteStats::tahunBerdiri();
 @endphp
+
 <style>
     .sc-hero {
         min-height: 80vh;
@@ -23,10 +24,12 @@
         right: -120px;
         width: 650px;
         height: 650px;
-        background: radial-gradient(circle,
-                rgba(76, 141, 201, 0.13) 0%,
-                rgba(76, 141, 201, 0.04) 55%,
-                transparent 75%);
+        background: radial-gradient(
+            circle,
+            rgba(76, 141, 201, 0.13) 0%,
+            rgba(76, 141, 201, 0.04) 55%,
+            transparent 75%
+        );
         border-radius: 50%;
         pointer-events: none;
     }
@@ -37,9 +40,11 @@
         left: -90px;
         width: 320px;
         height: 320px;
-        background: radial-gradient(circle,
-                rgba(76, 141, 201, 0.08) 0%,
-                transparent 70%);
+        background: radial-gradient(
+            circle,
+            rgba(76, 141, 201, 0.08) 0%,
+            transparent 70%
+        );
         border-radius: 50%;
         pointer-events: none;
     }
@@ -47,10 +52,16 @@
     .sc-hero__dots {
         position: absolute;
         inset: 0;
-        background-image: radial-gradient(rgba(76, 141, 201, 0.16) 1.5px, transparent 1.5px);
+        background-image: radial-gradient(
+            rgba(76, 141, 201, 0.16) 1.5px,
+            transparent 1.5px
+        );
         background-size: 34px 34px;
-        mask-image: radial-gradient(ellipse 48% 62% at 84% 24%,
-                black 5%, transparent 80%);
+        mask-image: radial-gradient(
+            ellipse 48% 62% at 84% 24%,
+            black 5%,
+            transparent 80%
+        );
         pointer-events: none;
     }
 
@@ -317,7 +328,11 @@
         top: 5%;
         width: 90%;
         height: 88%;
-        background: linear-gradient(135deg, var(--primary-blue) 0%, #1a4f80 100%);
+        background: linear-gradient(
+            135deg,
+            var(--primary-blue) 0%,
+            #1a4f80 100%
+        );
         border-radius: 50% 40% 52% 40%;
         z-index: 0;
         opacity: 0.11;
@@ -775,7 +790,6 @@
 </style>
 
 <section class="sc-hero" id="beranda">
-
     <div class="sc-hero__circle-lg"></div>
     <div class="sc-hero__circle-sm"></div>
     <div class="sc-hero__dots"></div>
@@ -786,9 +800,7 @@
     <div class="sc-hero__geo sc-hero__geo--e"></div>
 
     <div class="sc-hero__grid">
-
         <div data-aos="fade-up" data-aos-duration="800">
-
             <div class="sc-hero__badge">
                 <span class="sc-hero__badge-dot"></span>
                 Universitas Telkom
@@ -801,7 +813,9 @@
 
             <div class="sc-hero__divider"></div>
 
-            <div class="sc-hero__subtitle">Riset, inovasi, dan kolaborasi untuk kota yang lebih cerdas</div>
+            <div class="sc-hero__subtitle">
+                Riset, inovasi, dan kolaborasi untuk kota yang lebih cerdas
+            </div>
 
             <p class="sc-hero__desc">
                 Pusat unggulan Universitas Telkom yang mempertemukan akademisi, industri,
@@ -816,32 +830,53 @@
                         <i class="bi bi-arrow-right"></i>
                     </span>
                 </a>
-                <a href="https://wa.me/{{ config('smartcity.whatsapp') }}" class="sc-btn-wa" target="_blank" rel="noopener">
+
+                <a
+                    href="https://wa.me/{{ config('smartcity.whatsapp') }}"
+                    class="sc-btn-wa"
+                    target="_blank"
+                    rel="noopener"
+                >
                     <div class="sc-btn-wa__icon">
                         <i class="bi bi-whatsapp"></i>
                     </div>
                     <div>
                         <div class="sc-btn-wa__label">Hubungi Kami</div>
-                        <div class="sc-btn-wa__number">{{ config('smartcity.phone_display') }}</div>
+                        <div class="sc-btn-wa__number">
+                            {{ config('smartcity.phone_display') }}
+                        </div>
                     </div>
                 </a>
             </div>
         </div>
 
-        <div class="sc-hero__photo-col" data-aos="fade-left" data-aos-duration="900" data-aos-delay="150">
-
+        <div
+            class="sc-hero__photo-col"
+            data-aos="fade-left"
+            data-aos-duration="900"
+            data-aos-delay="150"
+        >
             <div class="sc-hero__blob"></div>
             <div class="sc-hero__ring"></div>
 
-            <img src="{{ asset('img/fotosukses.png') }}" alt="Tim CoE Smart City Universitas Telkom" class="sc-hero__photo" width="560" height="560"
-                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <img
+                src="{{ asset('img/fotosukses.png') }}"
+                alt="Tim CoE Smart City Universitas Telkom"
+                class="sc-hero__photo"
+                width="560"
+                height="560"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            >
+
             <div class="sc-hero__photo-placeholder">
                 <i class="bi bi-people-fill"></i>
                 <span>Foto Tim CoE<br>Smart City</span>
             </div>
 
             <div class="sc-hero__info-card">
-                <div class="info-card__icon"><i class="bi bi-people-fill"></i></div>
+                <div class="info-card__icon">
+                    <i class="bi bi-people-fill"></i>
+                </div>
                 <div>
                     <div class="info-card__num">{{ $statistik['anggota'] }}+</div>
                     <div class="info-card__lbl">Anggota Aktif</div>
@@ -849,34 +884,43 @@
             </div>
 
             <div class="sc-hero__info-card-2">
-                <div class="info-card__icon"><i class="bi bi-journal-richtext"></i></div>
+                <div class="info-card__icon">
+                    <i class="bi bi-journal-richtext"></i>
+                </div>
                 <div>
                     <div class="info-card__num">{{ $statistik['publikasi'] }}+</div>
                     <div class="info-card__lbl">Publikasi</div>
                 </div>
             </div>
-
         </div>
     </div>
 
     <div class="sc-hero__wave">
-        <svg viewBox="0 0 1440 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-            <path d="M0,55 C360,95 720,15 1080,60 C1260,83 1380,48 1440,58 L1440,90 L0,90 Z"
-                fill="rgba(76,141,201,0.06)" />
-            <path d="M0,68 C300,100 600,34 900,68 C1050,85 1260,50 1440,64 L1440,90 L0,90 Z" fill="#f4f8fc" />
+        <svg
+            viewBox="0 0 1440 90"
+            xmlns="http://www.w3.org/2000/svg"
+            preserveAspectRatio="none"
+        >
+            <path
+                d="M0,55 C360,95 720,15 1080,60 C1260,83 1380,48 1440,58 L1440,90 L0,90 Z"
+                fill="rgba(76,141,201,0.06)"
+            />
+            <path
+                d="M0,68 C300,100 600,34 900,68 C1050,85 1260,50 1440,64 L1440,90 L0,90 Z"
+                fill="#f4f8fc"
+            />
         </svg>
     </div>
-
 </section>
 
 <section class="sc-tentang" id="tentang">
     <div class="container">
-
         <div class="row" data-aos="fade-up">
             <div class="col-12">
-
                 <div class="sc-label">Tentang Kami</div>
+
                 <h2 class="sc-tentang__heading">CoE Smart City</h2>
+
                 <p class="sc-tentang__desc">
                     CoE Smart City adalah pusat unggulan riset dan inovasi Universitas Telkom di bidang kota cerdas.
                     Kami membangun solusi sesuai kompetensi para dosen, lalu mengubah hasil penelitian menjadi
@@ -892,15 +936,15 @@
                 </a>
 
                 <div class="sc-label sc-label--spaced">Aktivitas Kami</div>
-
             </div>
         </div>
 
         <div class="row g-4 mt-1">
-
             <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
                 <div class="sc-akt__row">
-                    <div class="sc-akt__icon"><i class="bi bi-pie-chart-fill"></i></div>
+                    <div class="sc-akt__icon">
+                        <i class="bi bi-pie-chart-fill"></i>
+                    </div>
                     <div class="sc-akt__text">
                         Pengembangan Lembaga dan SDM
                     </div>
@@ -909,7 +953,9 @@
 
             <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
                 <div class="sc-akt__row">
-                    <div class="sc-akt__icon"><i class="bi bi-display"></i></div>
+                    <div class="sc-akt__icon">
+                        <i class="bi bi-display"></i>
+                    </div>
                     <div class="sc-akt__text">
                         Keunggulan Akademik
                         <br><small>Riset dan publikasi ilmiah</small>
@@ -919,28 +965,27 @@
 
             <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
                 <div class="sc-akt__row">
-                    <div class="sc-akt__icon"><i class="bi bi-file-earmark-text-fill"></i></div>
+                    <div class="sc-akt__icon">
+                        <i class="bi bi-file-earmark-text-fill"></i>
+                    </div>
                     <div class="sc-akt__text">
                         Komersialisasi
                         <br><small>Kerja sama pemanfaatan produk hasil riset</small>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </section>
 
 <section class="sc-fakta" id="fakta">
     <div class="container">
-
         <div class="text-center" data-aos="fade-up">
             <div class="sc-label sc-label--center">Fakta Smart City</div>
             <h2 class="sc-fakta__heading">Statistik Smart City</h2>
         </div>
 
         <div class="sc-fakta__stats" data-aos="fade-up" data-aos-delay="100">
-
             <div>
                 <div class="sc-fakta__num">
                     <span class="js-counter" data-target="{{ $statistik['anggota'] }}">0</span><span class="plus">+</span>
@@ -975,15 +1020,19 @@
                 </div>
                 <div class="sc-fakta__lbl">Jumlah Mitra</div>
             </div>
-
         </div>
 
         <div data-aos="fade-up" data-aos-delay="150">
-
             <div class="sc-fakta__tabbar">
-                <button class="sc-fakta__tab active" data-pane="sc-tab-int">Proyek Internasional</button>
-                <button class="sc-fakta__tab" data-pane="sc-tab-nas">Proyek Nasional</button>
-                <button class="sc-fakta__tab" data-pane="sc-tab-ung">Produk Unggulan</button>
+                <button class="sc-fakta__tab active" data-pane="sc-tab-int">
+                    Proyek Internasional
+                </button>
+                <button class="sc-fakta__tab" data-pane="sc-tab-nas">
+                    Proyek Nasional
+                </button>
+                <button class="sc-fakta__tab" data-pane="sc-tab-ung">
+                    Produk Unggulan
+                </button>
             </div>
 
             @foreach ([
@@ -991,8 +1040,14 @@
                 'sc-tab-nas' => \App\Models\StatistikProyek::TIPE_NASIONAL,
                 'sc-tab-ung' => \App\Models\StatistikProyek::TIPE_PRODUK,
             ] as $paneId => $tipe)
-                @php $itemsTab = $daftarProyek->get($tipe, collect()); @endphp
-                <div id="{{ $paneId }}" class="sc-fakta__pane {{ $loop->first ? 'active' : '' }}">
+                @php
+                    $itemsTab = $daftarProyek->get($tipe, collect());
+                @endphp
+
+                <div
+                    id="{{ $paneId }}"
+                    class="sc-fakta__pane {{ $loop->first ? 'active' : '' }}"
+                >
                     @if ($itemsTab->isNotEmpty())
                         <ul class="sc-fakta__list">
                             @foreach ($itemsTab as $itemTab)
@@ -1004,7 +1059,6 @@
                     @endif
                 </div>
             @endforeach
-
         </div>
     </div>
 </section>
@@ -1014,32 +1068,57 @@
         <div class="row">
             <div class="col-lg-6" data-aos="fade-up">
                 <h2>Tentang Kami</h2>
-                <p>CoE Smart City di Universitas Telkom adalah pusat unggulan riset dan inovasi yang menghimpun
+
+                <p>
+                    CoE Smart City di Universitas Telkom adalah pusat unggulan riset dan inovasi yang menghimpun
                     kompetensi dosen lintas bidang untuk membangun solusi kota cerdas. Sejak berdiri pada tahun
                     {{ $tahunBerdiri }}, kami mengembangkan riset, teknologi, dan produk inovasi sesuai keahlian
-                    para dosen bersama pemerintah daerah, industri, dan masyarakat.</p>
-                <img src="{{ asset('img/fotoaboutus.jpg') }}" alt="Kegiatan tim CoE Smart City" class="about-image" loading="lazy" data-aos="fade-up">
+                    para dosen bersama pemerintah daerah, industri, dan masyarakat.
+                </p>
+
+                <img
+                    src="{{ asset('img/kegiatan-smartcity-beranda.png') }}"
+                    alt="Kegiatan diskusi tim CoE Smart City"
+                    class="about-image"
+                    width="1280"
+                    height="720"
+                    style="height: auto;"
+                    loading="lazy"
+                    data-aos="fade-up"
+                >
             </div>
+
             <div class="col-lg-6">
                 <div class="feature-item" data-aos="fade-up">
                     <h3>Riset</h3>
-                    <p>CoE Smart City mengakselerasi penelitian di berbagai bidang ilmu untuk menghasilkan penemuan
-                        dan inovasi baru yang bermanfaat bagi masyarakat dan industri.</p>
+                    <p>
+                        CoE Smart City mengakselerasi penelitian di berbagai bidang ilmu untuk menghasilkan penemuan
+                        dan inovasi baru yang bermanfaat bagi masyarakat dan industri.
+                    </p>
                 </div>
+
                 <div class="feature-item" data-aos="fade-up">
                     <h3>Inovasi</h3>
-                    <p>CoE Smart City mendorong pengembangan teknologi dan solusi kreatif yang dapat
-                        diimplementasikan untuk meningkatkan kualitas hidup dan efektivitas layanan kota.</p>
+                    <p>
+                        CoE Smart City mendorong pengembangan teknologi dan solusi kreatif yang dapat
+                        diimplementasikan untuk meningkatkan kualitas hidup dan efektivitas layanan kota.
+                    </p>
                 </div>
+
                 <div class="feature-item" data-aos="fade-up">
                     <h3>Bisnis</h3>
-                    <p>CoE Smart City menjembatani hasil riset dengan kebutuhan pasar melalui kemitraan industri,
-                        lisensi teknologi, dan komersialisasi produk inovasi yang berkelanjutan.</p>
+                    <p>
+                        CoE Smart City menjembatani hasil riset dengan kebutuhan pasar melalui kemitraan industri,
+                        lisensi teknologi, dan komersialisasi produk inovasi yang berkelanjutan.
+                    </p>
                 </div>
+
                 <div class="feature-item" data-aos="fade-up">
                     <h3>Layanan Masyarakat</h3>
-                    <p>CoE Smart City berkontribusi melalui program dan inisiatif yang dirancang untuk memberdayakan
-                        komunitas, meningkatkan kesejahteraan sosial, dan menyelesaikan masalah-masalah kawasan.</p>
+                    <p>
+                        CoE Smart City berkontribusi melalui program dan inisiatif yang dirancang untuk memberdayakan
+                        komunitas, meningkatkan kesejahteraan sosial, dan menyelesaikan masalah-masalah kawasan.
+                    </p>
                 </div>
             </div>
         </div>
@@ -1048,14 +1127,38 @@
 
 @php
     $homePrograms = \App\Models\Program::published()->orderBy('urutan')->limit(4)->get();
-    $homeGradients = ['blue-gradient', 'purple-gradient', 'cyan-gradient', 'orange-gradient'];
+
+    $homeGradients = [
+        'blue-gradient',
+        'purple-gradient',
+        'cyan-gradient',
+        'orange-gradient',
+    ];
+
     $homeFallbacks = [
-        ['img' => 'card1.jpg', 'title' => 'Program Kota Cerdas', 'desc' => 'Mengintegrasikan data, teknologi, dan tata kelola untuk meningkatkan kualitas hidup di kota-kota modern.'],
-        ['img' => 'card2.jpg', 'title' => 'Inovasi Masa Depan', 'desc' => 'Mengembangkan solusi inovatif berbasis sistem pintar yang siap diterapkan untuk kebutuhan kota.'],
-        ['img' => 'card3.jpg', 'title' => 'Infrastruktur Cerdas', 'desc' => 'Membangun infrastruktur terhubung yang membuat layanan kota lebih efisien, aman, dan mudah dipantau.'],
-        ['img' => 'card4.jpg', 'title' => 'Kota Berkelanjutan', 'desc' => 'Memanfaatkan teknologi hijau dan data lingkungan untuk mewujudkan kota yang ramah dan berkelanjutan.'],
+        [
+            'img' => 'card1.jpg',
+            'title' => 'Program Kota Cerdas',
+            'desc' => 'Mengintegrasikan data, teknologi, dan tata kelola untuk meningkatkan kualitas hidup di kota-kota modern.',
+        ],
+        [
+            'img' => 'card2.jpg',
+            'title' => 'Inovasi Masa Depan',
+            'desc' => 'Mengembangkan solusi inovatif berbasis sistem pintar yang siap diterapkan untuk kebutuhan kota.',
+        ],
+        [
+            'img' => 'card3.jpg',
+            'title' => 'Infrastruktur Cerdas',
+            'desc' => 'Membangun infrastruktur terhubung yang membuat layanan kota lebih efisien, aman, dan mudah dipantau.',
+        ],
+        [
+            'img' => 'card4.jpg',
+            'title' => 'Kota Berkelanjutan',
+            'desc' => 'Memanfaatkan teknologi hijau dan data lingkungan untuk mewujudkan kota yang ramah dan berkelanjutan.',
+        ],
     ];
 @endphp
+
 <section class="cards-section">
     <div class="container">
         <div class="row g-4">
@@ -1065,11 +1168,18 @@
                         <div class="program-card">
                             <div class="card-image">
                                 @if($prog->thumbnail_path)
-                                    <img src="{{ asset('storage/'.$prog->thumbnail_path) }}" alt="{{ $prog->judul }}" loading="lazy">
+                                    <img
+                                        src="{{ asset('storage/'.$prog->thumbnail_path) }}"
+                                        alt="{{ $prog->judul }}"
+                                        loading="lazy"
+                                    >
                                 @else
-                                    <div class="card-image__placeholder"><i class="bi bi-layers" aria-hidden="true"></i></div>
+                                    <div class="card-image__placeholder">
+                                        <i class="bi bi-layers" aria-hidden="true"></i>
+                                    </div>
                                 @endif
                             </div>
+
                             <div class="card-content {{ $homeGradients[$i % 4] }}">
                                 <h3>{{ $prog->judul }}</h3>
                                 <p>{{ \Illuminate\Support\Str::limit($prog->deskripsi, 100) }}</p>
@@ -1082,8 +1192,13 @@
                     <div class="col-lg-3 col-md-6" data-aos="fade-up">
                         <div class="program-card">
                             <div class="card-image">
-                                <img src="{{ asset('img/'.$fb['img']) }}" alt="{{ $fb['title'] }}" loading="lazy">
+                                <img
+                                    src="{{ asset('img/'.$fb['img']) }}"
+                                    alt="{{ $fb['title'] }}"
+                                    loading="lazy"
+                                >
                             </div>
+
                             <div class="card-content {{ $homeGradients[$i] }}">
                                 <h3>{{ $fb['title'] }}</h3>
                                 <p>{{ $fb['desc'] }}</p>
@@ -1099,34 +1214,52 @@
 @php
     $homeProjects = \App\Models\Project::published()->orderByDesc('tahun')->limit(5)->get();
 @endphp
+
 <section class="gallery-section" id="gallery">
     <div class="container">
         <div class="text-center mb-5" data-aos="fade-up">
             <h2 class="gallery-title">
                 Proyek <a href="{{ $projectUrl }}">Kami</a>
             </h2>
-            <p class="gallery-subtitle">Dokumentasi proyek-proyek inovatif dalam pengembangan Smart City.</p>
+            <p class="gallery-subtitle">
+                Dokumentasi proyek-proyek inovatif dalam pengembangan Smart City.
+            </p>
         </div>
+
         <div class="gallery-carousel" data-aos="fade-up">
-            <div id="galleryCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div
+                id="galleryCarousel"
+                class="carousel slide"
+                data-bs-ride="carousel"
+            >
                 <div class="carousel-inner">
                     @if($homeProjects->isNotEmpty())
                         @foreach($homeProjects as $idx => $proj)
                             @php
                                 $imgSrc = null;
+
                                 if (!empty($proj->gallery_paths) && count($proj->gallery_paths) > 0) {
                                     $imgSrc = asset('storage/' . $proj->gallery_paths[0]);
                                 } elseif ($proj->thumbnail_path) {
                                     $imgSrc = asset('storage/' . $proj->thumbnail_path);
                                 }
                             @endphp
+
                             <div class="carousel-item {{ $idx === 0 ? 'active' : '' }}">
                                 <div class="carousel-image-container">
                                     @if($imgSrc)
-                                        <img src="{{ $imgSrc }}" class="d-block w-100" alt="{{ $proj->judul }}" loading="lazy">
+                                        <img
+                                            src="{{ $imgSrc }}"
+                                            class="d-block w-100"
+                                            alt="{{ $proj->judul }}"
+                                            loading="lazy"
+                                        >
                                     @else
-                                        <div class="card-image__placeholder"><i class="bi bi-kanban" aria-hidden="true"></i></div>
+                                        <div class="card-image__placeholder">
+                                            <i class="bi bi-kanban" aria-hidden="true"></i>
+                                        </div>
                                     @endif
+
                                     <div class="carousel-caption">
                                         <h3>{{ $proj->judul }}</h3>
                                         <p>{{ \Illuminate\Support\Str::limit($proj->deskripsi, 100) }}</p>
@@ -1137,28 +1270,54 @@
                     @else
                         <div class="carousel-item active">
                             <div class="carousel-image-container">
-                                <img src="{{ asset('img/card1.jpg') }}" class="d-block w-100" alt="Dokumentasi proyek CoE Smart City" loading="lazy">
+                                <img
+                                    src="{{ asset('img/card1.jpg') }}"
+                                    class="d-block w-100"
+                                    alt="Dokumentasi proyek CoE Smart City"
+                                    loading="lazy"
+                                >
+
                                 <div class="carousel-caption">
                                     <h3>Laboratorium Riset Kota Cerdas</h3>
-                                    <p>Kolaborasi tim peneliti dalam mengembangkan solusi teknologi kota cerdas.</p>
+                                    <p>
+                                        Kolaborasi tim peneliti dalam mengembangkan solusi teknologi kota cerdas.
+                                    </p>
                                 </div>
                             </div>
                         </div>
+
                         <div class="carousel-item">
                             <div class="carousel-image-container">
-                                <img src="{{ asset('img/card2.jpg') }}" class="d-block w-100" alt="Dokumentasi proyek CoE Smart City" loading="lazy">
+                                <img
+                                    src="{{ asset('img/card2.jpg') }}"
+                                    class="d-block w-100"
+                                    alt="Dokumentasi proyek CoE Smart City"
+                                    loading="lazy"
+                                >
+
                                 <div class="carousel-caption">
                                     <h3>Lokakarya Inovasi</h3>
-                                    <p>Lokakarya pengembangan sistem pemantauan berbasis IoT bersama mitra.</p>
+                                    <p>
+                                        Lokakarya pengembangan sistem pemantauan berbasis IoT bersama mitra.
+                                    </p>
                                 </div>
                             </div>
                         </div>
+
                         <div class="carousel-item">
                             <div class="carousel-image-container">
-                                <img src="{{ asset('img/card3.jpg') }}" class="d-block w-100" alt="Dokumentasi proyek CoE Smart City" loading="lazy">
+                                <img
+                                    src="{{ asset('img/card3.jpg') }}"
+                                    class="d-block w-100"
+                                    alt="Dokumentasi proyek CoE Smart City"
+                                    loading="lazy"
+                                >
+
                                 <div class="carousel-caption">
                                     <h3>Pengembangan Kota Cerdas</h3>
-                                    <p>Implementasi teknologi AI dalam manajemen lalu lintas kota.</p>
+                                    <p>
+                                        Implementasi teknologi AI dalam manajemen lalu lintas kota.
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -1166,25 +1325,59 @@
                 </div>
 
                 @if($homeProjects->count() > 1 || $homeProjects->isEmpty())
-                    <button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev">
+                    <button
+                        class="carousel-control-prev"
+                        type="button"
+                        data-bs-target="#galleryCarousel"
+                        data-bs-slide="prev"
+                    >
                         <span class="carousel-control-prev-icon"></span>
                         <span class="visually-hidden">Proyek sebelumnya</span>
                     </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#galleryCarousel" data-bs-slide="next">
+
+                    <button
+                        class="carousel-control-next"
+                        type="button"
+                        data-bs-target="#galleryCarousel"
+                        data-bs-slide="next"
+                    >
                         <span class="carousel-control-next-icon"></span>
                         <span class="visually-hidden">Proyek berikutnya</span>
                     </button>
+
                     <div class="carousel-indicators">
                         @if($homeProjects->isNotEmpty())
                             @foreach($homeProjects as $idx => $proj)
-                                <button type="button" data-bs-target="#galleryCarousel"
-                                        data-bs-slide-to="{{ $idx }}"
-                                        class="{{ $idx === 0 ? 'active' : '' }}" aria-label="Tampilkan proyek {{ $idx + 1 }}"></button>
+                                <button
+                                    type="button"
+                                    data-bs-target="#galleryCarousel"
+                                    data-bs-slide-to="{{ $idx }}"
+                                    class="{{ $idx === 0 ? 'active' : '' }}"
+                                    aria-label="Tampilkan proyek {{ $idx + 1 }}"
+                                ></button>
                             @endforeach
                         @else
-                            <button type="button" data-bs-target="#galleryCarousel" data-bs-slide-to="0" class="active" aria-label="Tampilkan proyek 1"></button>
-                            <button type="button" data-bs-target="#galleryCarousel" data-bs-slide-to="1" aria-label="Tampilkan proyek 2"></button>
-                            <button type="button" data-bs-target="#galleryCarousel" data-bs-slide-to="2" aria-label="Tampilkan proyek 3"></button>
+                            <button
+                                type="button"
+                                data-bs-target="#galleryCarousel"
+                                data-bs-slide-to="0"
+                                class="active"
+                                aria-label="Tampilkan proyek 1"
+                            ></button>
+
+                            <button
+                                type="button"
+                                data-bs-target="#galleryCarousel"
+                                data-bs-slide-to="1"
+                                aria-label="Tampilkan proyek 2"
+                            ></button>
+
+                            <button
+                                type="button"
+                                data-bs-target="#galleryCarousel"
+                                data-bs-slide-to="2"
+                                aria-label="Tampilkan proyek 3"
+                            ></button>
                         @endif
                     </div>
                 @endif
@@ -1195,46 +1388,57 @@
 
 <script>
     function scRunCounter(el) {
-            var target = parseInt(el.dataset.target, 10);
-            var duration = 1800;
-            var step = target / (duration / 16);
-            var current = 0;
-            var timer = setInterval(function() {
-                current += step;
-                if (current >= target) {
-                    current = target;
-                    clearInterval(timer);
-                }
-                el.textContent = Math.floor(current);
-            }, 16);
-        }
+        var target = parseInt(el.dataset.target, 10);
+        var duration = 1800;
+        var step = target / (duration / 16);
+        var current = 0;
 
-        var scCounterDone = false;
-        var scFaktaEl = document.querySelector('.sc-fakta');
-        if (scFaktaEl) {
-            new IntersectionObserver(function(entries) {
-                if (entries[0].isIntersecting && !scCounterDone) {
-                    scCounterDone = true;
-                    document.querySelectorAll('.js-counter').forEach(function(el) {
-                        scRunCounter(el);
-                    });
-                }
-            }, {
-                threshold: 0.25
-            }).observe(scFaktaEl);
-        }
+        var timer = setInterval(function() {
+            current += step;
 
-        document.querySelectorAll('.sc-fakta__tab').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.sc-fakta__tab').forEach(function(b) {
-                    b.classList.remove('active');
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+
+            el.textContent = Math.floor(current);
+        }, 16);
+    }
+
+    var scCounterDone = false;
+    var scFaktaEl = document.querySelector('.sc-fakta');
+
+    if (scFaktaEl) {
+        new IntersectionObserver(function(entries) {
+            if (entries[0].isIntersecting && !scCounterDone) {
+                scCounterDone = true;
+
+                document.querySelectorAll('.js-counter').forEach(function(el) {
+                    scRunCounter(el);
                 });
-                document.querySelectorAll('.sc-fakta__pane').forEach(function(p) {
-                    p.classList.remove('active');
-                });
-                btn.classList.add('active');
-                var pane = document.getElementById(btn.dataset.pane);
-                if (pane) pane.classList.add('active');
+            }
+        }, {
+            threshold: 0.25
+        }).observe(scFaktaEl);
+    }
+
+    document.querySelectorAll('.sc-fakta__tab').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.sc-fakta__tab').forEach(function(b) {
+                b.classList.remove('active');
             });
+
+            document.querySelectorAll('.sc-fakta__pane').forEach(function(p) {
+                p.classList.remove('active');
+            });
+
+            btn.classList.add('active');
+
+            var pane = document.getElementById(btn.dataset.pane);
+
+            if (pane) {
+                pane.classList.add('active');
+            }
         });
+    });
 </script>

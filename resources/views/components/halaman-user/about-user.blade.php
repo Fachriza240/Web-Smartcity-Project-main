@@ -2,6 +2,7 @@
     $tahunBerdiri = \App\Services\SiteStats::tahunBerdiri();
     $tahunPengalaman = \App\Services\SiteStats::tahunPengalaman();
 @endphp
+
 <style>
     @keyframes aboutPulse {
         0%,
@@ -321,7 +322,11 @@
     }
 
     .about-visimisi__card--visi {
-        background: linear-gradient(135deg, var(--primary-blue) 0%, #2b6da8 100%);
+        background: linear-gradient(
+            135deg,
+            var(--primary-blue) 0%,
+            #2b6da8 100%
+        );
         color: #fff;
     }
 
@@ -456,15 +461,27 @@
 
 <section class="sc-page-hero">
     <div class="container">
-        <span class="sc-page-hero__eyebrow"><span class="sc-page-hero__dot" aria-hidden="true"></span> Tentang Kami</span>
-        <h1 class="sc-page-hero__title">Center of Excellence<br><span class="text-blue">Smart City</span></h1>
+        <span class="sc-page-hero__eyebrow">
+            <span class="sc-page-hero__dot" aria-hidden="true"></span>
+            Tentang Kami
+        </span>
+
+        <h1 class="sc-page-hero__title">
+            Center of Excellence<br>
+            <span class="text-blue">Smart City</span>
+        </h1>
+
         <p class="sc-page-hero__lead">
             Pusat unggulan riset dan inovasi Universitas Telkom yang membangun solusi kota cerdas sesuai dengan kompetensi para dosen di bidang teknologi, data, dan sistem cerdas.
         </p>
     </div>
+
     <div class="sc-page-hero__wave" aria-hidden="true">
         <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
-            <path fill="#ffffff" d="M0,60 C360,110 720,10 1080,60 C1260,85 1380,50 1440,40 L1440,100 L0,100Z" />
+            <path
+                fill="#ffffff"
+                d="M0,60 C360,110 720,10 1080,60 C1260,85 1380,50 1440,40 L1440,100 L0,100Z"
+            />
         </svg>
     </div>
 </section>
@@ -473,28 +490,44 @@
     <div class="container">
         <div class="about-desc__grid">
             <div class="about-desc__img-wrap" data-aos="fade-right">
-                <img src="img/fotoaboutus.jpg" alt="Tim CoE Smart City" class="about-desc__img"
-                     onerror="this.style.display='none'">
+                <img
+                    src="{{ asset('img/kegiatan-smartcity-tentang-kami.png') }}"
+                    alt="Kegiatan diskusi tim CoE Smart City"
+                    class="about-desc__img"
+                    width="1280"
+                    height="720"
+                    style="height: auto;"
+                    loading="lazy"
+                    onerror="this.style.display='none'"
+                >
 
                 <div class="about-desc__floating-card">
                     <div class="about-desc__floating-icon">
                         <i class="fas fa-award"></i>
                     </div>
+
                     <div>
-                        <div class="about-desc__floating-num">{{ $tahunPengalaman }}</div>
-                        <div class="about-desc__floating-lbl">Tahun Pengalaman</div>
+                        <div class="about-desc__floating-num">
+                            {{ $tahunPengalaman }}
+                        </div>
+                        <div class="about-desc__floating-lbl">
+                            Tahun Pengalaman
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div data-aos="fade-left">
                 <div class="about-desc__label">Siapa Kami</div>
+
                 <h2 class="about-desc__heading">
                     Pusat Unggulan Riset &amp;<br>Inovasi Kota Cerdas
                 </h2>
+
                 <p class="about-desc__text about-desc__text--rapat">
                     CoE Smart City di Universitas Telkom merupakan pusat unggulan yang berfokus pada pengembangan solusi kota cerdas melalui pendekatan interdisipliner. Kami mengintegrasikan teknologi informasi, kecerdasan buatan, Internet of Things (IoT), dan analisis data besar untuk menciptakan ekosistem perkotaan yang lebih efisien, berkelanjutan, dan inklusif.
                 </p>
+
                 <p class="about-desc__text">
                     Sejak berdiri pada tahun {{ $tahunBerdiri }}, CoE Smart City terus membangun solusi kota cerdas sesuai dengan kompetensi para dosen, mulai dari riset terapan dan pengembangan teknologi hingga penerapannya bersama pemerintah daerah, industri, dan masyarakat.
                 </p>
@@ -504,19 +537,27 @@
                         <div class="about-desc__highlight-icon">
                             <i class="fas fa-microscope"></i>
                         </div>
-                        <span class="about-desc__highlight-text">Penelitian Terapan Berbasis Data</span>
+                        <span class="about-desc__highlight-text">
+                            Penelitian Terapan Berbasis Data
+                        </span>
                     </div>
+
                     <div class="about-desc__highlight-item">
                         <div class="about-desc__highlight-icon">
                             <i class="fas fa-handshake"></i>
                         </div>
-                        <span class="about-desc__highlight-text">Kolaborasi Industri &amp; Pemerintah</span>
+                        <span class="about-desc__highlight-text">
+                            Kolaborasi Industri &amp; Pemerintah
+                        </span>
                     </div>
+
                     <div class="about-desc__highlight-item">
                         <div class="about-desc__highlight-icon">
                             <i class="fas fa-graduation-cap"></i>
                         </div>
-                        <span class="about-desc__highlight-text">Pengembangan SDM Unggul</span>
+                        <span class="about-desc__highlight-text">
+                            Pengembangan SDM Unggul
+                        </span>
                     </div>
                 </div>
             </div>
@@ -528,8 +569,14 @@
     <div class="container">
         <div data-aos="fade-up">
             <div class="about-desc__label sc-label-center">Pilar Utama</div>
-            <h2 class="about-pillars__heading">Empat Pilar <span class="text-blue">Unggulan Kami</span></h2>
-            <p class="about-pillars__subtitle">Fondasi yang menopang seluruh aktivitas dan pencapaian CoE Smart City.</p>
+
+            <h2 class="about-pillars__heading">
+                Empat Pilar <span class="text-blue">Unggulan Kami</span>
+            </h2>
+
+            <p class="about-pillars__subtitle">
+                Fondasi yang menopang seluruh aktivitas dan pencapaian CoE Smart City.
+            </p>
         </div>
 
         <div class="about-pillars__grid">
@@ -537,7 +584,9 @@
                 <div class="about-pillar-card__icon about-pillar-card__icon--riset">
                     <i class="fas fa-flask"></i>
                 </div>
+
                 <h3 class="about-pillar-card__title">Riset</h3>
+
                 <p class="about-pillar-card__text">
                     Mengakselerasi penelitian di berbagai bidang ilmu untuk menghasilkan penemuan dan inovasi baru yang bermanfaat bagi masyarakat dan industri.
                 </p>
@@ -547,7 +596,9 @@
                 <div class="about-pillar-card__icon about-pillar-card__icon--inovasi">
                     <i class="fas fa-lightbulb"></i>
                 </div>
+
                 <h3 class="about-pillar-card__title">Inovasi</h3>
+
                 <p class="about-pillar-card__text">
                     Mendorong pengembangan teknologi dan solusi kreatif yang dapat diimplementasikan untuk meningkatkan kualitas hidup dan efektivitas kota.
                 </p>
@@ -557,7 +608,9 @@
                 <div class="about-pillar-card__icon about-pillar-card__icon--bisnis">
                     <i class="fas fa-chart-line"></i>
                 </div>
+
                 <h3 class="about-pillar-card__title">Bisnis</h3>
+
                 <p class="about-pillar-card__text">
                     Mentransformasi hasil riset menjadi solusi bisnis yang berkelanjutan melalui kemitraan strategis dengan industri dan pemerintah daerah.
                 </p>
@@ -567,7 +620,9 @@
                 <div class="about-pillar-card__icon about-pillar-card__icon--layanan">
                     <i class="fas fa-hands-helping"></i>
                 </div>
+
                 <h3 class="about-pillar-card__title">Layanan Masyarakat</h3>
+
                 <p class="about-pillar-card__text">
                     Berkontribusi melalui program dan inisiatif yang memberdayakan komunitas, meningkatkan kesejahteraan sosial, dan menyelesaikan masalah kawasan.
                 </p>
@@ -580,25 +635,38 @@
     <div class="container">
         <div class="about-visimisi__head" data-aos="fade-up">
             <div class="about-desc__label sc-label-center">Arah &amp; Tujuan</div>
-            <h2 class="about-pillars__heading">Visi &amp; <span class="text-blue">Misi Kami</span></h2>
+
+            <h2 class="about-pillars__heading">
+                Visi &amp; <span class="text-blue">Misi Kami</span>
+            </h2>
         </div>
 
         <div class="about-visimisi__grid">
-            <div class="about-visimisi__card about-visimisi__card--visi" data-aos="fade-right">
+            <div
+                class="about-visimisi__card about-visimisi__card--visi"
+                data-aos="fade-right"
+            >
                 <div class="about-visimisi__icon">
                     <i class="fas fa-eye"></i>
                 </div>
+
                 <h3 class="about-visimisi__title">Visi</h3>
+
                 <p class="about-visimisi__text">
                     Menjadi pusat unggulan terdepan di Asia Tenggara dalam riset dan inovasi kota cerdas yang berkelanjutan, berdaya saing global, serta berdampak nyata bagi masyarakat dan ekosistem perkotaan Indonesia.
                 </p>
             </div>
 
-            <div class="about-visimisi__card about-visimisi__card--misi" data-aos="fade-left">
+            <div
+                class="about-visimisi__card about-visimisi__card--misi"
+                data-aos="fade-left"
+            >
                 <div class="about-visimisi__icon">
                     <i class="fas fa-bullseye"></i>
                 </div>
+
                 <h3 class="about-visimisi__title">Misi</h3>
+
                 <ul class="about-visimisi__list">
                     <li>
                         <i class="fas fa-check-circle"></i>
