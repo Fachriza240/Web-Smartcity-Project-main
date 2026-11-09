@@ -17,7 +17,15 @@
 </head>
 
 <body class="auth-body">
+    @if (session('error') && ! request()->routeIs('login'))
+        <div class="auth-alert auth-alert-error" role="alert" style="position:fixed;top:16px;left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:560px;z-index:2000">
+            <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+            <span>{{ session('error') }}</span>
+        </div>
+    @endif
+
     {{ $slot }}
+
     <script src="{{ asset('js/validation.js') }}"></script>
     <script src="{{ asset('js/auth.js') }}"></script>
 </body>

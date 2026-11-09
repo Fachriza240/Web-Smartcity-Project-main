@@ -699,36 +699,95 @@ class TestPlanComplianceTest extends TestCase
         $admin = $this->makeUser('admin');
         $dosen = $this->makeUser('dosen');
 
-        $program = Program::create(['judul' => 'Program Uji', 'deskripsi' => str_repeat('d', 30), 'status' => 'Draft']);
-        $project = Project::create(['judul' => 'Proyek Uji', 'deskripsi' => str_repeat('d', 30), 'status' => 'Draft']);
-        $news = News::create(['judul' => 'Berita Uji', 'konten' => str_repeat('k', 30), 'status' => 'Draft']);
-        $partner = Partner::create(['nama' => 'Mitra Uji', 'status' => 'Draft']);
-        $team = Team::create(['nama' => 'Anggota Uji', 'jabatan' => 'Peneliti', 'tipe' => 'Staff', 'status' => 'Draft']);
-        $hki = Hki::create($this->hkiPayload(['submission_type' => 'non_member', 'status' => 'Draft']));
+        $program = Program::create([
+            'judul' => 'Program Uji',
+            'deskripsi' => str_repeat('d', 30),
+            'status' => 'Draft',
+        ]);
+
+        $project = Project::create([
+            'judul' => 'Proyek Uji',
+            'deskripsi' => str_repeat('d', 30),
+            'status' => 'Draft',
+        ]);
+
+        $news = News::create([
+            'judul' => 'Berita Uji',
+            'konten' => str_repeat('k', 30),
+            'status' => 'Draft',
+        ]);
+
+        $partner = Partner::create([
+            'nama' => 'Mitra Uji',
+            'status' => 'Draft',
+        ]);
+
+        $team = Team::create([
+            'nama' => 'Anggota Uji',
+            'jabatan' => 'Peneliti',
+            'tipe' => 'Staff',
+            'status' => 'Draft',
+        ]);
+
+        $hki = Hki::create($this->hkiPayload([
+            'submission_type' => 'non_member',
+            'status' => 'Draft',
+        ]));
+
         $publication = Publication::create([
-            'judul' => 'Publikasi Uji', 'penulis' => 'Budi Santoso', 'tahun' => 2024, 'abstrak' => str_repeat('a', 30),
-            'kategori' => 'Jurnal', 'pdf_path' => 'publications/x.pdf', 'status' => 'Draft', 'submission_type' => 'non_member',
+            'judul' => 'Publikasi Uji',
+            'penulis' => 'Budi Santoso',
+            'tahun' => 2024,
+            'abstrak' => str_repeat('a', 30),
+            'kategori' => 'Jurnal',
+            'pdf_path' => 'publications/x.pdf',
+            'status' => 'Draft',
+            'submission_type' => 'non_member',
         ]);
 
         $pages = [
-            '/admin/programs/create', "/admin/programs/{$program->id}/edit",
-            '/admin/projects/create', "/admin/projects/{$project->id}/edit",
-            '/admin/news/create', "/admin/news/{$news->id}/edit",
-            '/admin/partners/create', "/admin/partners/{$partner->id}/edit",
-            '/admin/teams/create', "/admin/teams/{$team->id}/edit",
-            '/admin/hki/create', "/admin/hki/{$hki->id}/edit",
-            '/admin/publications/create', "/admin/publications/{$publication->id}/edit",
+            '/admin/programs/create',
+            "/admin/programs/{$program->id}/edit",
+            '/admin/projects/create',
+            "/admin/projects/{$project->id}/edit",
+            '/admin/news/create',
+            "/admin/news/{$news->id}/edit",
+            '/admin/partners/create',
+            "/admin/partners/{$partner->id}/edit",
+            '/admin/teams/create',
+            "/admin/teams/{$team->id}/edit",
+            '/admin/hki/create',
+            "/admin/hki/{$hki->id}/edit",
+            '/admin/publications/create',
+            "/admin/publications/{$publication->id}/edit",
         ];
+
         foreach ($pages as $page) {
-            $this->actingAs($admin)->get($page)->assertOk()->assertSee('data-confirm-submit', false)->assertSee('data-rules', false);
+            $response = $this->actingAs($admin)->get($page);
+
+            $response->assertOk()
+                ->assertSee('data-confirm-submit', false)
+                ->assertSee('data-rules', false)
+                ->assertDontSee('data-confirm-second', false);
+
+            $this->assertSame(
+                1,
+                substr_count($response->getContent(), 'data-confirm-submit='),
+                "Halaman {$page} harus memiliki satu konfirmasi simpan."
+            );
         }
 
         foreach (['/admin/hki/create', '/admin/publications/create'] as $page) {
-            $this->actingAs($admin)->get($page)->assertSee('Apakah data yang diinputkan sudah benar?')->assertSee('Apakah Anda yakin ingin menyimpan perubahan?');
+            $this->actingAs($admin)
+                ->get($page)
+                ->assertSee('Apakah data yang diinputkan sudah benar?');
         }
 
         foreach (['/dosen/publikasi/create', '/dosen/hki/create', '/profil-dosen'] as $page) {
-            $this->actingAs($dosen)->get($page)->assertOk()->assertSee('data-confirm-submit', false);
+            $this->actingAs($dosen)
+                ->get($page)
+                ->assertOk()
+                ->assertSee('data-confirm-submit', false);
         }
     }
 

@@ -22,8 +22,14 @@ class PublicationController extends Controller
                         ->orWhere('doi', 'like', "%{$search}%");
                 });
             })
-            ->when($request->filled('kategori'), fn($query) => $query->where('kategori', $request->kategori))
-            ->when($request->filled('tahun'), fn($query) => $query->where('tahun', $request->tahun))
+            ->when(
+                $request->filled('kategori'),
+                fn ($query) => $query->where('kategori', $request->kategori)
+            )
+            ->when(
+                $request->filled('tahun'),
+                fn ($query) => $query->where('tahun', $request->tahun)
+            )
             ->orderByDesc('tahun')
             ->latest();
 
@@ -47,18 +53,35 @@ class PublicationController extends Controller
 
     public function show(Publication $publication)
     {
-        abort_unless($publication->status === Publication::STATUS_PUBLISH, 404);
+        abort_unless(
+            $publication->status === Publication::STATUS_PUBLISH,
+            404
+        );
 
         return view('publications.show', compact('publication'));
     }
 
     public function download(Publication $publication)
     {
-        abort_unless($publication->status === Publication::STATUS_PUBLISH, 404);
-        abort_unless($publication->pdf_path && Storage::disk('public')->exists($publication->pdf_path), 404);
+        abort_unless(
+            $publication->status === Publication::STATUS_PUBLISH,
+            404
+        );
 
-        $filename = str($publication->judul)->slug()->append('.pdf')->toString();
+        abort_unless(
+            $publication->pdf_path
+                && Storage::disk('public')->exists($publication->pdf_path),
+            404
+        );
 
-        return Storage::disk('public')->download($publication->pdf_path, $filename);
+        $filename = str($publication->judul)
+            ->slug()
+            ->append('.pdf')
+            ->toString();
+
+        return Storage::disk('public')->download(
+            $publication->pdf_path,
+            $filename
+        );
     }
 }

@@ -39,14 +39,12 @@ class ValidationController extends Controller
     {
         $this->authorizeAdmin();
 
-        $user = User::whereIn('role', ['dosen', 'content_creator'])->findOrFail($id);
+        [$user, $changed] = $this->changeStatus($id, User::STATUS_APPROVED);
 
-        $user->forceFill([
-            'registration_status' => User::STATUS_APPROVED,
-            'rejection_reason' => null,
-        ])->save();
-
-        $user->notify(new RegistrationStatusNotification(User::STATUS_APPROVED));
+        if (! $changed) {
+            return redirect()->route('admin.validasi.index')
+                ->with('info', "Akun {$user->fullname} sudah disetujui. Notifikasi tidak dikirim ulang.");
+        }
 
         return redirect()->route('admin.validasi.index')
             ->with('success', "Akun {$user->fullname} ({$user->role}) berhasil di-approve. Notifikasi telah dikirim ke pengguna.");
@@ -71,12 +69,12 @@ class ValidationController extends Controller
 
         $alasan = $validator->validated()['alasan'];
 
-        $user->forceFill([
-            'registration_status' => User::STATUS_REJECTED,
-            'rejection_reason' => $alasan,
-        ])->save();
+        [$user, $changed] = $this->changeStatus($id, User::STATUS_REJECTED, $alasan);
 
-        $user->notify(new RegistrationStatusNotification(User::STATUS_REJECTED, $alasan));
+        if (! $changed) {
+            return redirect()->route('admin.validasi.index')
+                ->with('info', "Penolakan akun {$user->fullname} sudah diproses. Notifikasi tidak dikirim ulang.");
+        }
 
         return redirect()->route('admin.validasi.index')
             ->with('success', "Akun {$user->fullname} ({$user->role}) berhasil di-reject. Notifikasi beserta alasan penolakan telah dikirim ke pengguna.");
@@ -96,7 +94,9 @@ class ValidationController extends Controller
         LoginConfirmation::cancelPendingFor($user);
 
         if (config('session.driver') === 'database') {
-            DB::table(config('session.table', 'sessions'))->where('user_id', $user->id)->delete();
+            DB::table(config('session.table', 'sessions'))
+                ->where('user_id', $user->id)
+                ->delete();
         }
 
         return back()
@@ -113,6 +113,28 @@ class ValidationController extends Controller
 
         return back()
             ->with('success', "Akun {$user->fullname} berhasil diaktifkan kembali dan sudah dapat digunakan untuk login.");
+    }
+
+    private function changeStatus(int|string $id, string $status, ?string $reason = null): array
+    {
+        return DB::transaction(function () use ($id, $status, $reason) {
+            $user = User::whereIn('role', ['dosen', 'content_creator'])
+                ->lockForUpdate()
+                ->findOrFail($id);
+
+            if ($user->registration_status === $status && $user->rejection_reason === $reason) {
+                return [$user, false];
+            }
+
+            $user->forceFill([
+                'registration_status' => $status,
+                'rejection_reason' => $reason,
+            ])->save();
+
+            $user->notify(new RegistrationStatusNotification($status, $reason));
+
+            return [$user, true];
+        });
     }
 
     private function authorizeAdmin(): void

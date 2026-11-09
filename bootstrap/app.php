@@ -22,13 +22,18 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => EnsureRole::class,
             'approved' => EnsureUserApproved::class,
         ]);
+
         $middleware->web(append: [
             EnsureAccountActive::class,
             ResolveRolePaths::class,
         ]);
+
         $middleware->redirectGuestsTo(function (Request $request) {
             if ($request->hasSession()) {
-                $request->session()->flash('warning', 'Sesi Anda telah berakhir, silakan login kembali.');
+                $request->session()->flash(
+                    'warning',
+                    'Sesi Anda telah berakhir, silakan login kembali.'
+                );
             }
 
             return route('login');
@@ -54,8 +59,10 @@ return Application::configure(basePath: dirname(__DIR__))
             $message = match (true) {
                 $route === 'logout' => 'Logout gagal, silakan coba kembali.',
                 str_starts_with($route, 'profil.') => 'Perubahan profil gagal disimpan. Silakan coba lagi.',
-                str_starts_with($route, 'dosen.publikasi.'), str_starts_with($route, 'admin.publications.') => 'Publikasi gagal disimpan. Silakan coba lagi.',
-                str_starts_with($route, 'dosen.hki.'), str_starts_with($route, 'admin.hki.') => 'Data HKI gagal disimpan. Silakan coba lagi.',
+                str_starts_with($route, 'dosen.publikasi.'),
+                str_starts_with($route, 'admin.publications.') => 'Publikasi gagal disimpan. Silakan coba lagi.',
+                str_starts_with($route, 'dosen.hki.'),
+                str_starts_with($route, 'admin.hki.') => 'Data HKI gagal disimpan. Silakan coba lagi.',
                 $route === 'admin.dss.hasil.hitung' => 'Perhitungan ulang DSS gagal disimpan karena gangguan database. Hasil sebelumnya tidak berubah. Silakan coba lagi.',
                 str_starts_with($route, 'admin.dss.bobot.') => 'Bobot AHP gagal disimpan. Bobot yang berlaku tidak berubah. Silakan coba lagi.',
                 str_starts_with($route, 'admin.dss.') => 'Data DSS gagal disimpan. Silakan coba lagi.',
@@ -63,7 +70,13 @@ return Application::configure(basePath: dirname(__DIR__))
             };
 
             return back()
-                ->withInput($request->except(['password', 'password_confirmation', '_token', '_method']))
+                ->withInput($request->except([
+                    'current_password',
+                    'password',
+                    'password_confirmation',
+                    '_token',
+                    '_method',
+                ]))
                 ->with('error', $message)
                 ->with('retry', true)
                 ->with('retry_action', $request->url());

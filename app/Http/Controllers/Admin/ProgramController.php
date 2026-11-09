@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Program;
 use App\Rules\SafeText;
+use App\Services\PublicFileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class ProgramController extends Controller
@@ -20,7 +20,7 @@ class ProgramController extends Controller
             ->when($request->filled('search'), function ($q) use ($request) {
                 $q->where(function ($q) use ($request) {
                     $q->where('judul', 'like', "%{$request->search}%")
-                      ->orWhere('deskripsi', 'like', "%{$request->search}%");
+                        ->orWhere('deskripsi', 'like', "%{$request->search}%");
                 });
             })
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
@@ -39,7 +39,7 @@ class ProgramController extends Controller
         $this->authorizeContentManager();
 
         return view('admin.programs.create', [
-            'program'  => new Program(['status' => Program::STATUS_DRAFT]),
+            'program' => new Program(['status' => Program::STATUS_DRAFT]),
             'statuses' => Program::statuses(),
         ]);
     }
@@ -49,11 +49,14 @@ class ProgramController extends Controller
         $this->authorizeContentManager();
 
         $data = $this->validatedData($request);
-        $data = $this->storeFiles($request, $data);
+        unset($data['thumbnail']);
 
-        Program::create($data);
+        app(PublicFileService::class)->save(new Program, $data, [
+            'thumbnail_path' => [$request->file('thumbnail'), 'programs/thumbnails'],
+        ]);
 
-        return redirect()->route('admin.programs.index')->with('success', 'Program berhasil ditambahkan.');
+        return redirect()->route('admin.programs.index')
+            ->with('success', 'Program berhasil ditambahkan.');
     }
 
     public function edit(Program $program)
@@ -61,7 +64,7 @@ class ProgramController extends Controller
         $this->authorizeContentManager();
 
         return view('admin.programs.edit', [
-            'program'  => $program,
+            'program' => $program,
             'statuses' => Program::statuses(),
         ]);
     }
@@ -71,57 +74,41 @@ class ProgramController extends Controller
         $this->authorizeContentManager();
 
         $data = $this->validatedData($request, $program);
-        $data = $this->storeFiles($request, $data, $program);
+        unset($data['thumbnail']);
 
-        $program->update($data);
+        app(PublicFileService::class)->save($program, $data, [
+            'thumbnail_path' => [$request->file('thumbnail'), 'programs/thumbnails'],
+        ]);
 
-        return redirect()->route('admin.programs.index')->with('success', 'Program berhasil diperbarui.');
+        return redirect()->route('admin.programs.index')
+            ->with('success', 'Program berhasil diperbarui.');
     }
 
     public function destroy(Program $program)
     {
         $this->authorizeContentManager();
 
-        $this->deleteFile($program->thumbnail_path);
-        $program->delete();
+        app(PublicFileService::class)->delete($program, ['thumbnail_path']);
 
-        return redirect()->route('admin.programs.index')->with('success', 'Program berhasil dihapus.');
+        return redirect()->route('admin.programs.index')
+            ->with('success', 'Program berhasil dihapus.');
     }
 
     private function validatedData(Request $request, ?Program $program = null): array
     {
         return $request->validate([
-            'judul'     => ['required', 'string', 'min:3', 'max:100', new SafeText],
+            'judul' => ['required', 'string', 'min:3', 'max:100', new SafeText],
             'deskripsi' => ['required', 'string', 'min:20', 'max:5000', new SafeText(false)],
             'thumbnail' => [$program ? 'nullable' : 'required', 'image', 'max:4096'],
-            'urutan'    => ['nullable', 'integer', 'min:0', 'max:9999'],
-            'status'    => ['required', Rule::in(Program::statuses())],
+            'urutan' => ['nullable', 'integer', 'min:0', 'max:9999'],
+            'status' => ['required', Rule::in(Program::statuses())],
         ]);
-    }
-
-    private function storeFiles(Request $request, array $data, ?Program $program = null): array
-    {
-        unset($data['thumbnail']);
-
-        if ($request->hasFile('thumbnail')) {
-            $this->deleteFile($program?->thumbnail_path);
-            $data['thumbnail_path'] = $request->file('thumbnail')->store('programs/thumbnails', 'public');
-        }
-
-        return $data;
     }
 
     private function authorizeContentManager(): void
     {
-        if (!Auth::check() || !in_array(Auth::user()->role, ['admin', 'content_creator'], true)) {
+        if (! Auth::check() || ! in_array(Auth::user()->role, ['admin', 'content_creator'], true)) {
             abort(403);
-        }
-    }
-
-    private function deleteFile(?string $path): void
-    {
-        if ($path && Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
         }
     }
 }

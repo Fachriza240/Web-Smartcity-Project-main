@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Rules\SafeText;
+use App\Services\PublicFileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class ProjectController extends Controller
@@ -53,11 +53,16 @@ class ProjectController extends Controller
         $this->authorizeContentManager();
 
         $data = $this->validatedData($request);
-        $data = $this->storeFiles($request, $data);
+        unset($data['thumbnail'], $data['dokumen'], $data['gallery']);
 
-        Project::create($data);
+        app(PublicFileService::class)->save(new Project, $data, [
+            'thumbnail_path' => [$request->file('thumbnail'), 'projects/thumbnails'],
+            'dokumen_path' => [$request->file('dokumen'), 'projects/documents'],
+            'gallery_paths' => [$request->file('gallery'), 'projects/gallery'],
+        ]);
 
-        return redirect()->route('admin.projects.index')->with('success', 'Proyek berhasil ditambahkan.');
+        return redirect()->route('admin.projects.index')
+            ->with('success', 'Proyek berhasil ditambahkan.');
     }
 
     public function edit(Project $project)
@@ -75,26 +80,30 @@ class ProjectController extends Controller
         $this->authorizeContentManager();
 
         $data = $this->validatedData($request, $project);
-        $data = $this->storeFiles($request, $data, $project);
+        unset($data['thumbnail'], $data['dokumen'], $data['gallery']);
 
-        $project->update($data);
+        app(PublicFileService::class)->save($project, $data, [
+            'thumbnail_path' => [$request->file('thumbnail'), 'projects/thumbnails'],
+            'dokumen_path' => [$request->file('dokumen'), 'projects/documents'],
+            'gallery_paths' => [$request->file('gallery'), 'projects/gallery'],
+        ]);
 
-        return redirect()->route('admin.projects.index')->with('success', 'Proyek berhasil diperbarui.');
+        return redirect()->route('admin.projects.index')
+            ->with('success', 'Proyek berhasil diperbarui.');
     }
 
     public function destroy(Project $project)
     {
         $this->authorizeContentManager();
 
-        $this->deleteFile($project->thumbnail_path);
-        $this->deleteFile($project->dokumen_path);
-        foreach ($project->gallery_paths ?? [] as $path) {
-            $this->deleteFile($path);
-        }
+        app(PublicFileService::class)->delete($project, [
+            'thumbnail_path',
+            'dokumen_path',
+            'gallery_paths',
+        ]);
 
-        $project->delete();
-
-        return redirect()->route('admin.projects.index')->with('success', 'Proyek berhasil dihapus.');
+        return redirect()->route('admin.projects.index')
+            ->with('success', 'Proyek berhasil dihapus.');
     }
 
     private function validatedData(Request $request, ?Project $project = null): array
@@ -113,45 +122,10 @@ class ProjectController extends Controller
         ]);
     }
 
-    private function storeFiles(Request $request, array $data, ?Project $project = null): array
-    {
-        unset($data['thumbnail'], $data['gallery'], $data['dokumen']);
-
-        if ($request->hasFile('thumbnail')) {
-            $this->deleteFile($project?->thumbnail_path);
-            $data['thumbnail_path'] = $request->file('thumbnail')->store('projects/thumbnails', 'public');
-        }
-
-        if ($request->hasFile('dokumen')) {
-            $this->deleteFile($project?->dokumen_path);
-            $data['dokumen_path'] = $request->file('dokumen')->store('projects/documents', 'public');
-        }
-
-        if ($request->hasFile('gallery')) {
-            foreach ($project?->gallery_paths ?? [] as $path) {
-                $this->deleteFile($path);
-            }
-
-            $data['gallery_paths'] = collect($request->file('gallery'))
-                ->map(fn ($file) => $file->store('projects/gallery', 'public'))
-                ->values()
-                ->all();
-        }
-
-        return $data;
-    }
-
     private function authorizeContentManager(): void
     {
-        if (!Auth::check() || !in_array(Auth::user()->role, ['admin', 'content_creator'], true)) {
+        if (! Auth::check() || ! in_array(Auth::user()->role, ['admin', 'content_creator'], true)) {
             abort(403);
-        }
-    }
-
-    private function deleteFile(?string $path): void
-    {
-        if ($path && Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
         }
     }
 }

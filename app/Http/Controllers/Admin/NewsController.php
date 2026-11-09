@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\News;
 use App\Rules\SafeText;
+use App\Services\PublicFileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class NewsController extends Controller
@@ -20,8 +20,8 @@ class NewsController extends Controller
             ->when($request->filled('search'), function ($q) use ($request) {
                 $q->where(function ($q) use ($request) {
                     $q->where('judul', 'like', "%{$request->search}%")
-                      ->orWhere('konten', 'like', "%{$request->search}%")
-                      ->orWhere('kategori', 'like', "%{$request->search}%");
+                        ->orWhere('konten', 'like', "%{$request->search}%")
+                        ->orWhere('kategori', 'like', "%{$request->search}%");
                 });
             })
             ->when($request->filled('kategori'), fn ($q) => $q->where('kategori', $request->kategori))
@@ -31,8 +31,8 @@ class NewsController extends Controller
             ->withQueryString();
 
         return view('admin.news.index', [
-            'news'       => $news,
-            'statuses'   => News::statuses(),
+            'news' => $news,
+            'statuses' => News::statuses(),
             'categories' => News::categories(),
         ]);
     }
@@ -42,8 +42,8 @@ class NewsController extends Controller
         $this->authorizeContentManager();
 
         return view('admin.news.create', [
-            'news'       => new News(['status' => News::STATUS_DRAFT]),
-            'statuses'   => News::statuses(),
+            'news' => new News(['status' => News::STATUS_DRAFT]),
+            'statuses' => News::statuses(),
             'categories' => News::categories(),
         ]);
     }
@@ -53,11 +53,14 @@ class NewsController extends Controller
         $this->authorizeContentManager();
 
         $data = $this->validatedData($request);
-        $data = $this->storeFiles($request, $data);
+        unset($data['thumbnail']);
 
-        News::create($data);
+        app(PublicFileService::class)->save(new News, $data, [
+            'thumbnail_path' => [$request->file('thumbnail'), 'news/thumbnails'],
+        ]);
 
-        return redirect()->route('admin.news.index')->with('success', 'Berita berhasil ditambahkan.');
+        return redirect()->route('admin.news.index')
+            ->with('success', 'Berita berhasil ditambahkan.');
     }
 
     public function edit(News $news)
@@ -65,8 +68,8 @@ class NewsController extends Controller
         $this->authorizeContentManager();
 
         return view('admin.news.edit', [
-            'news'       => $news,
-            'statuses'   => News::statuses(),
+            'news' => $news,
+            'statuses' => News::statuses(),
             'categories' => News::categories(),
         ]);
     }
@@ -76,57 +79,41 @@ class NewsController extends Controller
         $this->authorizeContentManager();
 
         $data = $this->validatedData($request, $news);
-        $data = $this->storeFiles($request, $data, $news);
+        unset($data['thumbnail']);
 
-        $news->update($data);
+        app(PublicFileService::class)->save($news, $data, [
+            'thumbnail_path' => [$request->file('thumbnail'), 'news/thumbnails'],
+        ]);
 
-        return redirect()->route('admin.news.index')->with('success', 'Berita berhasil diperbarui.');
+        return redirect()->route('admin.news.index')
+            ->with('success', 'Berita berhasil diperbarui.');
     }
 
     public function destroy(News $news)
     {
         $this->authorizeContentManager();
 
-        $this->deleteFile($news->thumbnail_path);
-        $news->delete();
+        app(PublicFileService::class)->delete($news, ['thumbnail_path']);
 
-        return redirect()->route('admin.news.index')->with('success', 'Berita berhasil dihapus.');
+        return redirect()->route('admin.news.index')
+            ->with('success', 'Berita berhasil dihapus.');
     }
 
     private function validatedData(Request $request, ?News $news = null): array
     {
         return $request->validate([
-            'judul'     => ['required', 'string', 'min:3', 'max:100', new SafeText],
-            'kategori'  => ['nullable', Rule::in(News::categories())],
-            'konten'    => ['required', 'string', 'min:20', 'max:5000', new SafeText(false)],
+            'judul' => ['required', 'string', 'min:3', 'max:100', new SafeText],
+            'kategori' => ['nullable', Rule::in(News::categories())],
+            'konten' => ['required', 'string', 'min:20', 'max:5000', new SafeText(false)],
             'thumbnail' => [$news ? 'nullable' : 'required', 'image', 'max:4096'],
-            'status'    => ['required', Rule::in(News::statuses())],
+            'status' => ['required', Rule::in(News::statuses())],
         ]);
-    }
-
-    private function storeFiles(Request $request, array $data, ?News $news = null): array
-    {
-        unset($data['thumbnail']);
-
-        if ($request->hasFile('thumbnail')) {
-            $this->deleteFile($news?->thumbnail_path);
-            $data['thumbnail_path'] = $request->file('thumbnail')->store('news/thumbnails', 'public');
-        }
-
-        return $data;
     }
 
     private function authorizeContentManager(): void
     {
-        if (!Auth::check() || !in_array(Auth::user()->role, ['admin', 'content_creator'], true)) {
+        if (! Auth::check() || ! in_array(Auth::user()->role, ['admin', 'content_creator'], true)) {
             abort(403);
-        }
-    }
-
-    private function deleteFile(?string $path): void
-    {
-        if ($path && Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
         }
     }
 }

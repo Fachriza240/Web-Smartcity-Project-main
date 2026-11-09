@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Partner;
 use App\Rules\SafeText;
+use App\Services\PublicFileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class PartnerController extends Controller
@@ -20,7 +20,7 @@ class PartnerController extends Controller
             ->when($request->filled('search'), function ($q) use ($request) {
                 $q->where(function ($q) use ($request) {
                     $q->where('nama', 'like', "%{$request->search}%")
-                      ->orWhere('deskripsi', 'like', "%{$request->search}%");
+                        ->orWhere('deskripsi', 'like', "%{$request->search}%");
                 });
             })
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
@@ -40,7 +40,7 @@ class PartnerController extends Controller
         $this->authorizeContentManager();
 
         return view('admin.partners.create', [
-            'partner'  => new Partner(['status' => Partner::STATUS_DRAFT]),
+            'partner' => new Partner(['status' => Partner::STATUS_DRAFT]),
             'statuses' => Partner::statuses(),
         ]);
     }
@@ -50,15 +50,14 @@ class PartnerController extends Controller
         $this->authorizeContentManager();
 
         $data = $this->validatedData($request);
-
-        if ($request->hasFile('logo')) {
-            $data['logo_path'] = $request->file('logo')->store('partners/logos', 'public');
-        }
         unset($data['logo']);
 
-        Partner::create($data);
+        app(PublicFileService::class)->save(new Partner, $data, [
+            'logo_path' => [$request->file('logo'), 'partners/logos'],
+        ]);
 
-        return redirect()->route('admin.partners.index')->with('success', 'Mitra berhasil ditambahkan.');
+        return redirect()->route('admin.partners.index')
+            ->with('success', 'Mitra berhasil ditambahkan.');
     }
 
     public function edit(Partner $partner)
@@ -66,7 +65,7 @@ class PartnerController extends Controller
         $this->authorizeContentManager();
 
         return view('admin.partners.edit', [
-            'partner'  => $partner,
+            'partner' => $partner,
             'statuses' => Partner::statuses(),
         ]);
     }
@@ -76,51 +75,42 @@ class PartnerController extends Controller
         $this->authorizeContentManager();
 
         $data = $this->validatedData($request, $partner);
-
-        if ($request->hasFile('logo')) {
-            $this->deleteFile($partner->logo_path);
-            $data['logo_path'] = $request->file('logo')->store('partners/logos', 'public');
-        }
         unset($data['logo']);
 
-        $partner->update($data);
+        app(PublicFileService::class)->save($partner, $data, [
+            'logo_path' => [$request->file('logo'), 'partners/logos'],
+        ]);
 
-        return redirect()->route('admin.partners.index')->with('success', 'Mitra berhasil diperbarui.');
+        return redirect()->route('admin.partners.index')
+            ->with('success', 'Mitra berhasil diperbarui.');
     }
 
     public function destroy(Partner $partner)
     {
         $this->authorizeContentManager();
 
-        $this->deleteFile($partner->logo_path);
-        $partner->delete();
+        app(PublicFileService::class)->delete($partner, ['logo_path']);
 
-        return redirect()->route('admin.partners.index')->with('success', 'Mitra berhasil dihapus.');
+        return redirect()->route('admin.partners.index')
+            ->with('success', 'Mitra berhasil dihapus.');
     }
 
     private function validatedData(Request $request, ?Partner $partner = null): array
     {
         return $request->validate([
-            'nama'      => ['required', 'string', 'min:3', 'max:100', new SafeText],
+            'nama' => ['required', 'string', 'min:3', 'max:100', new SafeText],
             'deskripsi' => ['nullable', 'string', 'min:20', 'max:5000', new SafeText(false)],
-            'logo'      => ['nullable', 'image', 'max:4096'],
-            'website'   => ['nullable', 'url', 'max:500'],
-            'status'    => ['required', Rule::in(Partner::statuses())],
-            'urutan'    => ['nullable', 'integer', 'min:0', 'max:9999'],
+            'logo' => ['nullable', 'image', 'max:4096'],
+            'website' => ['nullable', 'url', 'max:500'],
+            'status' => ['required', Rule::in(Partner::statuses())],
+            'urutan' => ['nullable', 'integer', 'min:0', 'max:9999'],
         ]);
     }
 
     private function authorizeContentManager(): void
     {
-        if (!Auth::check() || !in_array(Auth::user()->role, ['admin', 'content_creator'], true)) {
+        if (! Auth::check() || ! in_array(Auth::user()->role, ['admin', 'content_creator'], true)) {
             abort(403);
-        }
-    }
-
-    private function deleteFile(?string $path): void
-    {
-        if ($path && Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
         }
     }
 }

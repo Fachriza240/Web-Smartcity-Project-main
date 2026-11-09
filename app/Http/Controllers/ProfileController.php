@@ -7,9 +7,9 @@ use App\Models\Publication;
 use App\Models\TrustedDevice;
 use App\Rules\PersonName;
 use App\Rules\SafeText;
+use App\Services\PublicFileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -40,6 +40,7 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         $originalEmail = $request->input('email');
+
         if (is_string($originalEmail)) {
             $request->merge(['email' => mb_strtolower(trim($originalEmail))]);
         }
@@ -64,14 +65,9 @@ class ProfileController extends Controller
         $data['fullname'] = preg_replace('/\s+/u', ' ', trim($data['fullname']));
         unset($data['foto']);
 
-        if ($request->hasFile('foto')) {
-            if ($user->foto && Storage::disk('public')->exists($user->foto)) {
-                Storage::disk('public')->delete($user->foto);
-            }
-            $data['foto'] = $request->file('foto')->store('foto-users', 'public');
-        }
-
-        $user->forceFill($data)->save();
+        app(PublicFileService::class)->save($user, $data, [
+            'foto' => [$request->file('foto'), 'foto-users'],
+        ]);
 
         return redirect()->route('profil.dosen')->with('success', 'Profil berhasil diperbarui.');
     }

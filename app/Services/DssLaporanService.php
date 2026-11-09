@@ -13,17 +13,32 @@ use Illuminate\Support\Collection;
 
 class DssLaporanService
 {
-
     public const LABEL_RINCIAN = [
-        'C1' => ['publikasi' => 'Poin publikasi', 'penelitian' => 'Poin aktivitas penelitian'],
-        'C2' => ['abdimas' => 'Poin aktivitas abdimas'],
-        'C3' => ['hki' => 'Poin HKI', 'produk' => 'Poin produk dan inovasi'],
-        'C4' => ['dokumen_cocok' => 'Dokumen cocok kata kunci (jumlah)', 'dimensi_tercakup' => 'Dimensi Smart City tercakup (jumlah)'],
-        'C5' => ['kolaborasi' => 'Poin kolaborasi', 'kepemimpinan' => 'Poin kepemimpinan'],
+        'C1' => [
+            'publikasi' => 'Poin publikasi',
+            'penelitian' => 'Poin aktivitas penelitian',
+        ],
+        'C2' => [
+            'abdimas' => 'Poin aktivitas abdimas',
+        ],
+        'C3' => [
+            'hki' => 'Poin HKI',
+            'produk' => 'Poin produk dan inovasi',
+        ],
+        'C4' => [
+            'dokumen_cocok' => 'Dokumen cocok kata kunci (jumlah)',
+            'dimensi_tercakup' => 'Dimensi Smart City tercakup (jumlah)',
+        ],
+        'C5' => [
+            'kolaborasi' => 'Poin kolaborasi',
+            'kepemimpinan' => 'Poin kepemimpinan',
+        ],
     ];
 
-    public function __construct(private DssHitungService $hitung)
-    {
+    public function __construct(
+        private DssHitungService $hitung,
+        private KompetensiService $kompetensi,
+    ) {
     }
 
     public function terakhirDihitung(): ?Carbon
@@ -64,8 +79,10 @@ class DssLaporanService
             return false;
         }
 
-        $dinilai = $this->hitung->dosenYangDinilai()->pluck('id')->map(fn ($id) => (int) $id)->sort()->values()->all();
-        $tersimpan = DssHasil::query()->pluck('user_id')->map(fn ($id) => (int) $id)->sort()->values()->all();
+        $dosen = $this->hitung->dosenYangDinilai();
+        $hasil = DssHasil::query()->get()->keyBy('user_id');
+        $dinilai = $dosen->pluck('id')->map(fn ($id) => (int) $id)->sort()->values()->all();
+        $tersimpan = $hasil->keys()->map(fn ($id) => (int) $id)->sort()->values()->all();
 
         if ($dinilai !== $tersimpan) {
             return true;
@@ -73,7 +90,13 @@ class DssLaporanService
 
         $perubahan = $this->perubahanTerakhir();
 
-        return $perubahan !== null && $perubahan->gt($waktu);
+        if ($perubahan !== null && $perubahan->gt($waktu)) {
+            return true;
+        }
+
+        return $dosen->contains(
+            fn (User $user) => $this->sumberBerubah($user, $hasil->get($user->id))
+        );
     }
 
     public function kedaluwarsaUntuk(User $user, DssHasil $hasil): bool
@@ -84,23 +107,43 @@ class DssLaporanService
 
         $perubahan = $this->perubahanTerakhir($user);
 
-        return $perubahan !== null && $perubahan->gt($hasil->dihitung_pada);
+        return ($perubahan !== null && $perubahan->gt($hasil->dihitung_pada))
+            || $this->sumberBerubah($user, $hasil);
+    }
+
+    private function sumberBerubah(User $user, DssHasil $hasil): bool
+    {
+        $aktual = $this->kompetensi->analisis($user);
+        $tersimpan = (array) $hasil->kompetensi;
+
+        return (array) $hasil->poin_mentah != $aktual['poin']
+            || ($tersimpan['rincian'] ?? []) != $aktual['rincian']
+            || ($tersimpan['dimensi'] ?? []) != $aktual['kompetensi']['dimensi'];
     }
 
     public function kalibrasi(Collection $semua): array
     {
-        $skor = $semua->pluck('skor_akhir')->map(fn ($nilai) => (float) $nilai)->sort()->values();
-        $jumlah = $skor->count();
+        $skor = $semua->pluck('skor_akhir')
+            ->map(fn ($nilai) => (float) $nilai)
+            ->sort()
+            ->values();
 
+        $jumlah = $skor->count();
         $median = 0.0;
+
         if ($jumlah > 0) {
             $tengah = intdiv($jumlah, 2);
-            $median = $jumlah % 2 === 1 ? $skor[$tengah] : ($skor[$tengah - 1] + $skor[$tengah]) / 2;
+            $median = $jumlah % 2 === 1
+                ? $skor[$tengah]
+                : ($skor[$tengah - 1] + $skor[$tengah]) / 2;
         }
 
         $kriteria = [];
+
         foreach (DssKriteria::daftar() as $item) {
-            $poin = $semua->map(fn ($hasil) => (float) ($hasil->poin_mentah[$item->kode] ?? 0));
+            $poin = $semua->map(
+                fn ($hasil) => (float) ($hasil->poin_mentah[$item->kode] ?? 0)
+            );
 
             $kriteria[$item->kode] = [
                 'nama' => $item->nama,
@@ -111,6 +154,7 @@ class DssLaporanService
         }
 
         $sebaran = [];
+
         foreach ((array) config('dss.kategori', []) as $kategori) {
             $sebaran[] = [
                 'label' => $kategori['label'],
@@ -162,7 +206,10 @@ class DssLaporanService
         }
 
         foreach ($peta as $kunci => $isi) {
-            usort($peta[$kunci]['dosen'], fn ($a, $b) => strcasecmp($a['nama'], $b['nama']));
+            usort(
+                $peta[$kunci]['dosen'],
+                fn ($a, $b) => strcasecmp($a['nama'], $b['nama'])
+            );
         }
 
         return $peta;
@@ -227,11 +274,6 @@ class DssLaporanService
         return $daftar;
     }
 
-    /**
-     * Data untuk halaman publik: hanya label dimensi, tanpa skor apa pun.
-     *
-     * @return array<int, string>
-     */
     public function dimensiPublik(User $user): array
     {
         $hasil = DssHasil::query()->where('user_id', $user->id)->first();
@@ -268,11 +310,17 @@ class DssLaporanService
             }
         }
 
-        return ['label' => $label, 'warna' => 'secondary', 'makna' => ''];
+        return [
+            'label' => $label,
+            'warna' => 'secondary',
+            'makna' => '',
+        ];
     }
 
     public function warnaKategori(): array
     {
-        return collect((array) config('dss.kategori', []))->pluck('warna', 'label')->all();
+        return collect((array) config('dss.kategori', []))
+            ->pluck('warna', 'label')
+            ->all();
     }
 }

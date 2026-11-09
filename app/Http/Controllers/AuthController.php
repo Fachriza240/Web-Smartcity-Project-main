@@ -6,6 +6,7 @@ use App\Http\Controllers\Concerns\CompletesLogin;
 use App\Models\User;
 use App\Rules\PersonName;
 use App\Rules\SafeText;
+use App\Services\PublicFileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -41,11 +42,9 @@ class AuthController extends Controller
 
         unset($data['foto']);
 
-        if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('foto-users', 'public');
-        }
-
-        User::create($data);
+        app(PublicFileService::class)->save(new User, $data, [
+            'foto' => [$request->file('foto'), 'foto-users'],
+        ]);
 
         $message = $role === 'dosen'
             ? 'Registrasi berhasil. Akun dosen Anda menunggu validasi admin.'
