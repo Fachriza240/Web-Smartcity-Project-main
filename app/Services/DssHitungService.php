@@ -33,41 +33,51 @@ class DssHitungService
 
     public function hitungSemua(): array
     {
-        $kriteria = DssKriteria::daftar();
+        return DB::transaction(function () {
+            $kriteria = DssKriteria::query()
+                ->urut()
+                ->lockForUpdate()
+                ->get();
 
-        if ($kriteria->isEmpty()) {
-            throw new RuntimeException('Data kriteria belum tersedia. Jalankan: php artisan db:seed --class=DssKriteriaSeeder');
-        }
+            if ($kriteria->isEmpty()) {
+                throw new RuntimeException(
+                    'Data kriteria belum tersedia. Jalankan: php artisan db:seed --class=DssKriteriaSeeder'
+                );
+            }
 
-        $bobot = [];
-        $info = [];
-        foreach ($kriteria as $item) {
-            $konfig = (array) config('dss.kriteria.' . $item->kode, []);
-            $bobot[$item->kode] = (float) $item->bobot;
-            $info[$item->kode] = [
-                'nama' => $item->nama,
-                'bobot' => (float) $item->bobot,
-                'cluster' => $konfig['cluster'] ?? $item->nama,
-                'peran_utama' => $konfig['peran_utama'] ?? ('Pelaksana ' . $item->nama),
-                'peran_dasar' => $konfig['peran_dasar'] ?? ('Anggota ' . $item->nama),
-                'saran_gap' => $konfig['saran_gap'] ?? '',
-            ];
-        }
+            $bobot = [];
+            $info = [];
 
-        $dosen = $this->dosenYangDinilai();
-        $waktu = now();
-        $ahpId = DssAhp::terpakai()?->id;
+            foreach ($kriteria as $item) {
+                $konfig = (array) config('dss.kriteria.' . $item->kode, []);
+                $bobot[$item->kode] = (float) $item->bobot;
 
-        $analisis = [];
-        $poin = [];
-        foreach ($dosen as $orang) {
-            $analisis[$orang->id] = $this->kompetensi->analisis($orang);
-            $poin[$orang->id] = $analisis[$orang->id]['poin'];
-        }
+                $info[$item->kode] = [
+                    'nama' => $item->nama,
+                    'bobot' => (float) $item->bobot,
+                    'cluster' => $konfig['cluster'] ?? $item->nama,
+                    'peran_utama' => $konfig['peran_utama']
+                        ?? ('Pelaksana ' . $item->nama),
+                    'peran_dasar' => $konfig['peran_dasar']
+                        ?? ('Anggota ' . $item->nama),
+                    'saran_gap' => $konfig['saran_gap'] ?? '',
+                ];
+            }
 
-        $saw = $this->saw->hitung($poin, $bobot);
+            $dosen = $this->dosenYangDinilai();
+            $waktu = now();
+            $ahpId = DssAhp::terpakai()?->id;
 
-        DB::transaction(function () use ($dosen, $analisis, $poin, $saw, $info, $waktu, $ahpId) {
+            $analisis = [];
+            $poin = [];
+
+            foreach ($dosen as $orang) {
+                $analisis[$orang->id] = $this->kompetensi->analisis($orang);
+                $poin[$orang->id] = $analisis[$orang->id]['poin'];
+            }
+
+            $saw = $this->saw->hitung($poin, $bobot);
+
             foreach ($dosen as $orang) {
                 $id = $orang->id;
                 $skorAkhir = round($saw['skor'][$id], 2);
@@ -85,7 +95,10 @@ class DssHitungService
                     [
                         'ahp_id' => $ahpId,
                         'poin_mentah' => $poin[$id],
-                        'skor_normal' => array_map(fn ($nilai) => round($nilai, 2), $saw['normal'][$id]),
+                        'skor_normal' => array_map(
+                            fn ($nilai) => round($nilai, 2),
+                            $saw['normal'][$id]
+                        ),
                         'skor_akhir' => $skorAkhir,
                         'peringkat' => $saw['peringkat'][$id],
                         'kategori' => $rekomendasi['kategori']['label'],
@@ -93,19 +106,29 @@ class DssHitungService
                         'cluster' => $rekomendasi['cluster'],
                         'rekomendasi_peran' => $rekomendasi['rekomendasi_peran'],
                         'gap' => $rekomendasi['gap'],
-                        'kompetensi' => $analisis[$id]['kompetensi'] + ['rincian' => $analisis[$id]['rincian']],
+                        'kompetensi' => $analisis[$id]['kompetensi'] + [
+                            'rincian' => $analisis[$id]['rincian'],
+                            'bobot_penilaian' => $bobot,
+                            'konfigurasi_hash' => hash(
+                                'sha256',
+                                json_encode(config('dss'), JSON_THROW_ON_ERROR)
+                            ),
+                        ],
                         'dihitung_pada' => $waktu,
                     ]
                 );
             }
 
-            DssHasil::whereNotIn('user_id', $dosen->pluck('id')->all())->delete();
-        });
+            DssHasil::whereNotIn(
+                'user_id',
+                $dosen->pluck('id')->all()
+            )->delete();
 
-        return [
-            'jumlah' => $dosen->count(),
-            'dihitung_pada' => $waktu,
-            'ahp_id' => $ahpId,
-        ];
+            return [
+                'jumlah' => $dosen->count(),
+                'dihitung_pada' => $waktu,
+                'ahp_id' => $ahpId,
+            ];
+        }, 3);
     }
 }

@@ -50,7 +50,12 @@ class DssAhp extends Model
     public function jadikanAktif(): void
     {
         DB::transaction(function () {
-            static::where('id', '!=', $this->id)->where('aktif', true)->update(['aktif' => false]);
+            DssKriteria::query()->urut()->lockForUpdate()->get();
+
+            static::where('id', '!=', $this->id)
+                ->where('aktif', true)
+                ->update(['aktif' => false]);
+
             $this->forceFill(['aktif' => true])->save();
         });
     }

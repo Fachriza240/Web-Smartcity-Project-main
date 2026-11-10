@@ -9,6 +9,7 @@ use App\Rules\SafeText;
 use App\Services\PublicFileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -23,14 +24,19 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        $role = $request->input('role') === 'content_creator' ? 'content_creator' : 'dosen';
+        $role = $request->input('role') === 'content_creator'
+            ? 'content_creator'
+            : 'dosen';
 
-        $data = $this->validateWithNormalizedEmail($request, array_merge($this->identityRules($role), [
-            'email' => ['required', 'string', 'email:rfc', 'min:6', 'max:254', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'max:64', 'confirmed'],
-            'role' => ['required', 'in:dosen,content_creator'],
-            'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
-        ]));
+        $data = $this->validateWithNormalizedEmail(
+            $request,
+            array_merge($this->identityRules($role), [
+                'email' => ['required', 'string', 'email:rfc', 'min:6', 'max:254', 'unique:users,email'],
+                'password' => ['required', 'string', 'min:8', 'max:64', 'confirmed'],
+                'role' => ['required', 'in:dosen,content_creator'],
+                'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            ])
+        );
 
         $data['fullname'] = $this->cleanName($data['fullname']);
         $data['role'] = $role;
@@ -65,6 +71,27 @@ class AuthController extends Controller
             'password' => ['required', 'string', 'min:8', 'max:64'],
         ]);
 
+        $ipKey = 'login:ip:' . hash('sha256', (string) $request->ip());
+        $accountKey = 'login:account:' . hash(
+            'sha256',
+            mb_strtolower(trim($credentials['email'])) . '|' . $request->ip()
+        );
+
+        foreach ([$ipKey => 50, $accountKey => 5] as $key => $limit) {
+            if (RateLimiter::tooManyAttempts($key, $limit)) {
+                $seconds = RateLimiter::availableIn($key);
+
+                return back()
+                    ->withErrors([
+                        'email' => "Terlalu banyak percobaan login. Coba kembali dalam {$seconds} detik.",
+                    ])
+                    ->withInput($request->only('email', 'remember'));
+            }
+        }
+
+        RateLimiter::hit($ipKey, 60);
+        RateLimiter::hit($accountKey, 60);
+
         $attempt = [
             User::emailCredential($credentials['email']),
             'password' => $credentials['password'],
@@ -94,6 +121,7 @@ class AuthController extends Controller
         if ($user->isDormant()) {
             $request->session()->put(DormantAccountController::SESSION_KEY, [
                 'user_id' => $user->id,
+                'credential_stamp' => hash('sha256', $user->getAuthPassword()),
                 'remember' => $remember,
                 'expires_at' => now()->addMinutes(10)->timestamp,
             ]);
@@ -132,9 +160,19 @@ class AuthController extends Controller
             return redirect()->route('dosen.status');
         }
 
-        $data = $this->validateWithNormalizedEmail($request, array_merge($this->identityRules($user->role, $user), [
-            'email' => ['required', 'string', 'email:rfc', 'min:6', 'max:254', Rule::unique('users', 'email')->ignore($user->id)],
-        ]));
+        $data = $this->validateWithNormalizedEmail(
+            $request,
+            array_merge($this->identityRules($user->role, $user), [
+                'email' => [
+                    'required',
+                    'string',
+                    'email:rfc',
+                    'min:6',
+                    'max:254',
+                    Rule::unique('users', 'email')->ignore($user->id),
+                ],
+            ])
+        );
 
         $data['fullname'] = $this->cleanName($data['fullname']);
         $data['registration_status'] = User::STATUS_PENDING;
@@ -143,7 +181,10 @@ class AuthController extends Controller
         $user->forceFill($data)->save();
 
         return redirect()->route('dosen.status')
-            ->with('success', 'Data registrasi berhasil diperbaiki dan diajukan ulang. Silakan tunggu validasi Admin.');
+            ->with(
+                'success',
+                'Data registrasi berhasil diperbaiki dan diajukan ulang. Silakan tunggu validasi Admin.'
+            );
     }
 
     private function identityRules(string $role, ?User $user = null): array

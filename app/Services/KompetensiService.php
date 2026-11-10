@@ -27,7 +27,7 @@ class KompetensiService
 
         $publikasi = Publication::published()
             ->forDosen($user)
-            ->where('tahun', '>=', $mulai)
+            ->whereBetween('tahun', [$mulai, now()->year])
             ->get(['judul', 'kategori', 'tahun'])
             ->map(fn ($p) => [
                 'judul' => (string) $p->judul,
@@ -38,6 +38,7 @@ class KompetensiService
         $hki = Hki::published()
             ->forDosen($user)
             ->whereDate('tgl_terbit', '>=', $mulai . '-01-01')
+            ->whereDate('tgl_terbit', '<=', now()->toDateString())
             ->get(['judul_sertifikat', 'jenis_sertifikat', 'tgl_terbit'])
             ->map(fn ($h) => [
                 'judul' => (string) $h->judul_sertifikat,
@@ -48,6 +49,7 @@ class KompetensiService
         $aktivitas = AktivitasDosen::milik($user)
             ->published()
             ->dalamJendela()
+            ->where('tahun', '<=', now()->year)
             ->get()
             ->map(fn ($a) => [
                 'jenis' => (string) $a->jenis,
@@ -78,13 +80,19 @@ class KompetensiService
         $profil = (string) ($data['bidang_penelitian'] ?? '');
 
         $poinPublikasi = 0.0;
+
         foreach ($publikasi as $item) {
-            $poinPublikasi += (float) ($rubrik['publikasi'][(string) ($item['kategori'] ?? '')] ?? 0);
+            $poinPublikasi += (float) (
+                $rubrik['publikasi'][(string) ($item['kategori'] ?? '')] ?? 0
+            );
         }
 
         $poinHki = 0.0;
+
         foreach ($hki as $item) {
-            $poinHki += (float) ($rubrik['hki'][(string) ($item['jenis'] ?? '')] ?? 0);
+            $poinHki += (float) (
+                $rubrik['hki'][(string) ($item['jenis'] ?? '')] ?? 0
+            );
         }
 
         $per = [
@@ -108,9 +116,11 @@ class KompetensiService
 
                 case AktivitasDosen::JENIS_ABDIMAS:
                     $per[$jenis] += (float) ($rubrik['abdimas'][$skala] ?? 0) * $pengali;
+
                     if (! empty($item['berkelanjutan'])) {
                         $per[$jenis] += (float) ($rubrik['bonus_berkelanjutan'] ?? 0);
                     }
+
                     break;
 
                 case AktivitasDosen::JENIS_PRODUK:
@@ -129,29 +139,50 @@ class KompetensiService
 
         $kompetensi = $this->petaKompetensi($publikasi, $hki, $aktivitas, $profil);
 
-        $poinSmartCity = $kompetensi['dokumen_cocok'] * (float) ($rubrik['smart_city']['poin_per_dokumen'] ?? 0)
-            + $kompetensi['dimensi_tercakup'] * (float) ($rubrik['smart_city']['bonus_per_dimensi'] ?? 0);
+        $poinSmartCity = $kompetensi['dokumen_cocok']
+            * (float) ($rubrik['smart_city']['poin_per_dokumen'] ?? 0)
+            + $kompetensi['dimensi_tercakup']
+            * (float) ($rubrik['smart_city']['bonus_per_dimensi'] ?? 0);
 
         $poin = [
             'C1' => $poinPublikasi + $per[AktivitasDosen::JENIS_PENELITIAN],
             'C2' => $per[AktivitasDosen::JENIS_ABDIMAS],
             'C3' => $poinHki + $per[AktivitasDosen::JENIS_PRODUK],
             'C4' => $poinSmartCity,
-            'C5' => $per[AktivitasDosen::JENIS_KOLABORASI] + $per[AktivitasDosen::JENIS_KEPEMIMPINAN],
+            'C5' => $per[AktivitasDosen::JENIS_KOLABORASI]
+                + $per[AktivitasDosen::JENIS_KEPEMIMPINAN],
         ];
 
         $rincian = [
-            'C1' => ['publikasi' => $poinPublikasi, 'penelitian' => $per[AktivitasDosen::JENIS_PENELITIAN]],
+            'C1' => [
+                'publikasi' => $poinPublikasi,
+                'penelitian' => $per[AktivitasDosen::JENIS_PENELITIAN],
+            ],
             'C2' => ['abdimas' => $per[AktivitasDosen::JENIS_ABDIMAS]],
-            'C3' => ['hki' => $poinHki, 'produk' => $per[AktivitasDosen::JENIS_PRODUK]],
-            'C4' => ['dokumen_cocok' => $kompetensi['dokumen_cocok'], 'dimensi_tercakup' => $kompetensi['dimensi_tercakup']],
-            'C5' => ['kolaborasi' => $per[AktivitasDosen::JENIS_KOLABORASI], 'kepemimpinan' => $per[AktivitasDosen::JENIS_KEPEMIMPINAN]],
+            'C3' => [
+                'hki' => $poinHki,
+                'produk' => $per[AktivitasDosen::JENIS_PRODUK],
+            ],
+            'C4' => [
+                'dokumen_cocok' => $kompetensi['dokumen_cocok'],
+                'dimensi_tercakup' => $kompetensi['dimensi_tercakup'],
+            ],
+            'C5' => [
+                'kolaborasi' => $per[AktivitasDosen::JENIS_KOLABORASI],
+                'kepemimpinan' => $per[AktivitasDosen::JENIS_KEPEMIMPINAN],
+            ],
         ];
 
         return [
-            'poin' => array_map(fn ($nilai) => round((float) $nilai, 4), $poin),
+            'poin' => array_map(
+                fn ($nilai) => round((float) $nilai, 4),
+                $poin
+            ),
             'rincian' => array_map(
-                fn ($bagian) => array_map(fn ($nilai) => round((float) $nilai, 4), $bagian),
+                fn ($bagian) => array_map(
+                    fn ($nilai) => round((float) $nilai, 4),
+                    $bagian
+                ),
                 $rincian
             ),
             'kompetensi' => $kompetensi,
@@ -170,7 +201,9 @@ class KompetensiService
 
         foreach ($this->konfigurasi['bidang_smart_city'] ?? [] as $kunci => $dimensi) {
             foreach ($dimensi['kata_kunci'] ?? [] as $kata) {
-                $pola = '/(?<![\p{L}\p{N}])' . preg_quote(mb_strtolower((string) $kata), '/') . '/iu';
+                $pola = '/(?<![\p{L}\p{N}])'
+                    . preg_quote(mb_strtolower((string) $kata), '/')
+                    . '/iu';
 
                 if (preg_match($pola, $teks) === 1) {
                     $hasil[] = $kunci;
@@ -182,27 +215,39 @@ class KompetensiService
         return $hasil;
     }
 
-    private function petaKompetensi(array $publikasi, array $hki, array $aktivitas, string $profil): array
-    {
+    private function petaKompetensi(
+        array $publikasi,
+        array $hki,
+        array $aktivitas,
+        string $profil
+    ): array {
         $dimensiConf = $this->konfigurasi['bidang_smart_city'] ?? [];
         $jumlah = array_fill_keys(array_keys($dimensiConf), 0);
         $dariProfil = $this->deteksiDimensi($profil);
 
         $dokumen = [];
+
         foreach ($publikasi as $item) {
             $dokumen[] = [(string) ($item['judul'] ?? ''), null];
         }
+
         foreach ($hki as $item) {
             $dokumen[] = [(string) ($item['judul'] ?? ''), null];
         }
+
         foreach ($aktivitas as $item) {
             $dokumen[] = [
-                trim((string) ($item['judul'] ?? '') . ' ' . (string) ($item['mitra'] ?? '')),
+                trim(
+                    (string) ($item['judul'] ?? '')
+                    . ' '
+                    . (string) ($item['mitra'] ?? '')
+                ),
                 $item['bidang_smart_city'] ?? null,
             ];
         }
 
         $dokumenCocok = 0;
+
         foreach ($dokumen as [$teks, $tag]) {
             $dimensi = $this->deteksiDimensi($teks);
 
@@ -223,6 +268,7 @@ class KompetensiService
 
         $daftar = [];
         $tercakup = 0;
+
         foreach ($dimensiConf as $kunci => $dimensi) {
             $dariProfilIni = in_array($kunci, $dariProfil, true);
 
@@ -239,6 +285,7 @@ class KompetensiService
 
         $dominan = null;
         $terbanyak = 0;
+
         foreach ($jumlah as $kunci => $banyak) {
             if ($banyak > $terbanyak) {
                 $terbanyak = $banyak;
@@ -253,7 +300,9 @@ class KompetensiService
         return [
             'dimensi' => $daftar,
             'dominan' => $dominan,
-            'dominan_label' => $dominan !== null ? ($daftar[$dominan]['label'] ?? null) : null,
+            'dominan_label' => $dominan !== null
+                ? ($daftar[$dominan]['label'] ?? null)
+                : null,
             'dokumen_cocok' => $dokumenCocok,
             'dimensi_tercakup' => $tercakup,
         ];

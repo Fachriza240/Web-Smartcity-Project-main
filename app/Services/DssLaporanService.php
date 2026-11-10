@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\AktivitasDosen;
+use App\Models\DssAhp;
 use App\Models\DssHasil;
 use App\Models\DssKriteria;
 use App\Models\Hki;
@@ -81,8 +82,18 @@ class DssLaporanService
 
         $dosen = $this->hitung->dosenYangDinilai();
         $hasil = DssHasil::query()->get()->keyBy('user_id');
-        $dinilai = $dosen->pluck('id')->map(fn ($id) => (int) $id)->sort()->values()->all();
-        $tersimpan = $hasil->keys()->map(fn ($id) => (int) $id)->sort()->values()->all();
+
+        $dinilai = $dosen->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->sort()
+            ->values()
+            ->all();
+
+        $tersimpan = $hasil->keys()
+            ->map(fn ($id) => (int) $id)
+            ->sort()
+            ->values()
+            ->all();
 
         if ($dinilai !== $tersimpan) {
             return true;
@@ -95,20 +106,16 @@ class DssLaporanService
         }
 
         return $dosen->contains(
-            fn (User $user) => $this->sumberBerubah($user, $hasil->get($user->id))
+            fn (User $user) => $this->sumberBerubah(
+                $user,
+                $hasil->get($user->id)
+            )
         );
     }
 
     public function kedaluwarsaUntuk(User $user, DssHasil $hasil): bool
     {
-        if (! $hasil->dihitung_pada) {
-            return false;
-        }
-
-        $perubahan = $this->perubahanTerakhir($user);
-
-        return ($perubahan !== null && $perubahan->gt($hasil->dihitung_pada))
-            || $this->sumberBerubah($user, $hasil);
+        return ! $hasil->dihitung_pada || $this->kedaluwarsaGlobal();
     }
 
     private function sumberBerubah(User $user, DssHasil $hasil): bool
@@ -116,7 +123,13 @@ class DssLaporanService
         $aktual = $this->kompetensi->analisis($user);
         $tersimpan = (array) $hasil->kompetensi;
 
-        return (array) $hasil->poin_mentah != $aktual['poin']
+        return ($tersimpan['bobot_penilaian'] ?? null) != DssKriteria::bobotSaatIni()
+            || ($tersimpan['konfigurasi_hash'] ?? null) !== hash(
+                'sha256',
+                json_encode(config('dss'), JSON_THROW_ON_ERROR)
+            )
+            || (int) $hasil->ahp_id !== (int) DssAhp::terpakai()?->id
+            || (array) $hasil->poin_mentah != $aktual['poin']
             || ($tersimpan['rincian'] ?? []) != $aktual['rincian']
             || ($tersimpan['dimensi'] ?? []) != $aktual['kompetensi']['dimensi'];
     }
@@ -218,6 +231,18 @@ class DssLaporanService
     public function barisKriteria(DssHasil $hasil, ?array $maks = null): array
     {
         $baris = [];
+        $bobot = $hasil->kompetensi['bobot_penilaian'] ?? $hasil->ahp?->bobot;
+
+        if (! is_array($bobot)) {
+            $bobot = array_column(
+                (array) config('dss.kriteria', []),
+                'bobot_awal'
+            );
+            $bobot = array_combine(
+                array_keys((array) config('dss.kriteria', [])),
+                $bobot
+            );
+        }
 
         foreach (DssKriteria::daftar() as $item) {
             $normal = (float) ($hasil->skor_normal[$item->kode] ?? 0);
@@ -228,8 +253,11 @@ class DssLaporanService
                 'poin' => (float) ($hasil->poin_mentah[$item->kode] ?? 0),
                 'maks' => $maks[$item->kode] ?? null,
                 'normal' => $normal,
-                'bobot' => (float) $item->bobot,
-                'kontribusi' => round($normal * (float) $item->bobot, 2),
+                'bobot' => (float) ($bobot[$item->kode] ?? 0),
+                'kontribusi' => round(
+                    $normal * (float) ($bobot[$item->kode] ?? 0),
+                    2
+                ),
             ];
         }
 
@@ -244,7 +272,9 @@ class DssLaporanService
             foreach ($daftar as $kunci => $label) {
                 $hasilRincian[$kode][] = [
                     'label' => $label,
-                    'nilai' => (float) ($hasil->kompetensi['rincian'][$kode][$kunci] ?? 0),
+                    'nilai' => (float) (
+                        $hasil->kompetensi['rincian'][$kode][$kunci] ?? 0
+                    ),
                 ];
             }
         }

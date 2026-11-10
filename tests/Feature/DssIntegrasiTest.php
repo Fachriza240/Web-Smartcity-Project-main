@@ -140,7 +140,12 @@ class DssIntegrasiTest extends TestCase
     {
         $d = $this->siapkan();
 
-        foreach (['/admin/dss/hasil', '/admin/dss/hasil/' . $d['beta']->id, '/admin/dss/peta-kompetensi', '/admin/dss/hasil/ekspor'] as $url) {
+        foreach ([
+            '/admin/dss/hasil',
+            '/admin/dss/hasil/' . $d['beta']->id,
+            '/admin/dss/peta-kompetensi',
+            '/admin/dss/hasil/ekspor',
+        ] as $url) {
             $this->actingAs($d['alfa'])->get($url)->assertForbidden();
         }
     }
@@ -194,35 +199,50 @@ class DssIntegrasiTest extends TestCase
         $d = $this->siapkan();
         $id = $d['alfa']->id;
 
-        foreach (['/admin/dss/hasil', "/admin/dss/hasil/{$id}", '/admin/dss/peta-kompetensi', '/admin/dss/hasil/ekspor', '/admin/dss/bobot'] as $url) {
+        foreach ([
+            '/admin/dss/hasil',
+            "/admin/dss/hasil/{$id}",
+            '/admin/dss/peta-kompetensi',
+            '/admin/dss/hasil/ekspor',
+            '/admin/dss/bobot',
+        ] as $url) {
             $this->get($url)->assertRedirect(route('login'));
         }
 
-        foreach (['/dss/hasil', "/dss/hasil/{$id}", '/hasil-dss', '/profil-dosen/analisis'] as $url) {
+        foreach ([
+            '/dss/hasil',
+            "/dss/hasil/{$id}",
+            '/hasil-dss',
+            '/profil-dosen/analisis',
+        ] as $url) {
             $this->get($url)->assertNotFound();
         }
 
         $this->get('/profil-dosen')->assertRedirect(route('login'));
     }
 
-    public function test_kartu_dosen_kedaluwarsa_hanya_jika_data_miliknya_berubah(): void
+    public function test_kartu_dosen_kedaluwarsa_jika_data_populasi_penilaian_berubah(): void
     {
         $d = $this->siapkan();
 
-        $this->actingAs($d['alfa'])->get('/profil-dosen')->assertDontSee('Hasil kedaluwarsa');
+        $this->actingAs($d['alfa'])->get('/profil-dosen')
+            ->assertDontSee('Hasil kedaluwarsa');
 
         $this->travel(5)->minutes();
         $this->aktivitas($d['beta'], 'Kegiatan Beta Baru');
 
-        $this->actingAs($d['alfa'])->get('/profil-dosen')->assertDontSee('Hasil kedaluwarsa');
+        $this->actingAs($d['alfa'])->get('/profil-dosen')
+            ->assertSee('Hasil kedaluwarsa');
 
         $this->aktivitas($d['alfa'], 'Kegiatan Alfa Baru');
 
-        $this->actingAs($d['alfa'])->get('/profil-dosen')->assertSee('Hasil kedaluwarsa');
+        $this->actingAs($d['alfa'])->get('/profil-dosen')
+            ->assertSee('Hasil kedaluwarsa');
 
         $this->hitung();
 
-        $this->actingAs($d['alfa'])->get('/profil-dosen')->assertDontSee('Hasil kedaluwarsa');
+        $this->actingAs($d['alfa'])->get('/profil-dosen')
+            ->assertDontSee('Hasil kedaluwarsa');
     }
 
     public function test_perubahan_bobot_membuat_hasil_kedaluwarsa(): void
@@ -230,10 +250,15 @@ class DssIntegrasiTest extends TestCase
         $d = $this->siapkan();
 
         $this->travel(5)->minutes();
-        \App\Models\DssKriteria::where('kode', 'C1')->update(['bobot' => 0.35, 'updated_at' => now()]);
-        \App\Models\DssKriteria::where('kode', 'C2')->update(['bobot' => 0.20, 'updated_at' => now()]);
 
-        $this->actingAs($d['alfa'])->get('/profil-dosen')->assertSee('Hasil kedaluwarsa');
+        \App\Models\DssKriteria::where('kode', 'C1')
+            ->update(['bobot' => 0.35, 'updated_at' => now()]);
+
+        \App\Models\DssKriteria::where('kode', 'C2')
+            ->update(['bobot' => 0.20, 'updated_at' => now()]);
+
+        $this->actingAs($d['alfa'])->get('/profil-dosen')
+            ->assertSee('Hasil kedaluwarsa');
     }
 
     public function test_kegagalan_database_saat_hitung_ulang_memakai_pesan_khusus_dss(): void
@@ -243,8 +268,14 @@ class DssIntegrasiTest extends TestCase
 
         Schema::drop('dss_hasil');
 
-        $this->actingAs($admin)->from('/admin/dss/hasil')->post('/admin/dss/hasil/hitung')
+        $this->actingAs($admin)
+            ->from('/admin/dss/hasil')
+            ->post('/admin/dss/hasil/hitung')
             ->assertRedirect('/admin/dss/hasil')
-            ->assertSessionHas('error', fn ($pesan) => str_contains($pesan, 'Perhitungan ulang DSS gagal') && ! str_contains($pesan, 'SQLSTATE'));
+            ->assertSessionHas(
+                'error',
+                fn ($pesan) => str_contains($pesan, 'Perhitungan ulang DSS gagal')
+                    && ! str_contains($pesan, 'SQLSTATE')
+            );
     }
 }

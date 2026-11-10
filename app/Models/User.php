@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
@@ -43,6 +44,22 @@ class User extends Authenticatable
         'last_login_at' => 'datetime',
         'locked_until' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        static::updating(function (User $user) {
+            if ($user->isDirty('password')) {
+                LoginConfirmation::cancelPendingFor($user);
+                TrustedDevice::forgetFor($user);
+
+                if (config('session.driver') === 'database') {
+                    DB::table(config('session.table', 'sessions'))
+                        ->where('user_id', $user->id)
+                        ->delete();
+                }
+            }
+        });
+    }
 
     public function setPasswordAttribute($value)
     {
@@ -108,6 +125,8 @@ class User extends Authenticatable
         $days = (int) config('login.dormant_days', 90);
         $last = $this->lastActivityAt();
 
-        return $days > 0 && $last !== null && $last->lt(now()->subDays($days));
+        return $days > 0
+            && $last !== null
+            && $last->lt(now()->subDays($days));
     }
 }

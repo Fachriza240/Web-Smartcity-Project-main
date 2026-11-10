@@ -38,14 +38,20 @@ class DormantAccountController extends Controller
         $state = $request->session()->pull(self::SESSION_KEY);
 
         if (! $user->isActive()) {
-            return redirect()->route('login')->withErrors(['email' => User::INACTIVE_MESSAGE]);
+            return redirect()->route('login')
+                ->withErrors(['email' => User::INACTIVE_MESSAGE]);
         }
 
         if ($user->isLocked()) {
-            return redirect()->route('login')->withErrors(['email' => $user->lockMessage()]);
+            return redirect()->route('login')
+                ->withErrors(['email' => $user->lockMessage()]);
         }
 
-        return $this->proceedLogin($request, $user, (bool) ($state['remember'] ?? false));
+        return $this->proceedLogin(
+            $request,
+            $user,
+            (bool) ($state['remember'] ?? false)
+        );
     }
 
     public function cancel(Request $request)
@@ -59,17 +65,31 @@ class DormantAccountController extends Controller
     {
         $state = $request->session()->get(self::SESSION_KEY);
 
-        if (! is_array($state) || (int) ($state['expires_at'] ?? 0) < now()->timestamp) {
+        if (! is_array($state)
+            || (int) ($state['expires_at'] ?? 0) < now()->timestamp) {
             return null;
         }
 
-        return User::find($state['user_id'] ?? null);
+        $user = User::find($state['user_id'] ?? null);
+        $stamp = $state['credential_stamp'] ?? null;
+
+        if (! $user
+            || ! is_string($stamp)
+            || ! hash_equals(hash('sha256', $user->getAuthPassword()), $stamp)) {
+            return null;
+        }
+
+        return $user;
     }
 
     private function expired(Request $request)
     {
         $request->session()->forget(self::SESSION_KEY);
 
-        return redirect()->route('login')->with('warning', 'Waktu konfirmasi keaktifan akun telah habis. Silakan login kembali.');
+        return redirect()->route('login')
+            ->with(
+                'warning',
+                'Waktu konfirmasi keaktifan akun telah habis. Silakan login kembali.'
+            );
     }
 }
