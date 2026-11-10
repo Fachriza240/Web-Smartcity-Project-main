@@ -51,7 +51,7 @@
     }
 
     .news-search__input::placeholder {
-        color: #aaa;
+        color: var(--text-gray);
     }
 
     .news-search__select {

@@ -7,8 +7,8 @@
     --auth-input-radius: 11px;
     --auth-pad-x: 48px;
     --auth-pad-y: 44px;
-    --auth-primary: #4c8dc9;
-    --auth-primary-h: #3a7ab3;
+    --auth-primary: #3276b2;
+    --auth-primary-h: #28669d;
     --auth-text: #0f172a;
     --auth-muted: #64748b;
     --auth-border: #e2e8f0;
@@ -323,7 +323,7 @@ body.auth-body {
 }
 
 .auth-field input::placeholder {
-    color: #a3b1c2;
+    color: var(--auth-muted);
 }
 
 .auth-field input:focus {

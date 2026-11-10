@@ -21,6 +21,7 @@
                     try {
                         var theme = localStorage.getItem('adm-theme');
                         document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : '');
+                        document.documentElement.setAttribute('data-bs-theme', theme === 'dark' ? 'dark' : 'light');
                     } catch (e) {
                     }
                 })();

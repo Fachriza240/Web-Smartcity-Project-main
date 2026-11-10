@@ -66,7 +66,7 @@
                 var rgb = (css.getPropertyValue('--adm-primary-rgb') || '76, 141, 201').trim();
                 var teks = (css.getPropertyValue('--adm-text-2') || '#475569').trim();
                 var garis = (css.getPropertyValue('--adm-border') || '#e2e8f0').trim();
-                new Chart(document.getElementById('dssPeta'), {
+                var chart = new Chart(document.getElementById('dssPeta'), {
                     type: 'bar',
                     data: {
                         labels: data.labels,
@@ -90,7 +90,20 @@
                         }
                     }
                 });
-            })();
+                document.addEventListener('adm:appearance-change', function () {
+                var current = getComputedStyle(document.documentElement);
+                var color = current.getPropertyValue('--adm-text-2').trim();
+                var border = current.getPropertyValue('--adm-border').trim();
+                var accent = current.getPropertyValue('--adm-primary-rgb').trim();
+                var dataset = chart.data.datasets[0];
+                dataset.borderColor = 'rgb(' + accent + ')';
+                dataset.backgroundColor = 'rgba(' + accent + ', 0.75)';
+                chart.options.scales.x.ticks.color = color;
+                chart.options.scales.x.grid.color = border;
+                chart.options.scales.y.ticks.color = color;
+                chart.update('none');
+            });
+        })();
         </script>
     @endif
 

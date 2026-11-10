@@ -51,7 +51,7 @@
     }
 
     .pub-search__input::placeholder {
-        color: #aaa;
+        color: var(--text-gray);
     }
 
     .pub-search__select {

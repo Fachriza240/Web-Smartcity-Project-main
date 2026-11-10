@@ -1,6 +1,6 @@
 :root {
-    --primary-blue: #4c8dc9;
-    --primary-dark: #3a7ab3;
+    --primary-blue: #3276b2;
+    --primary-dark: #28669d;
     --primary-deep: #1f4e79;
     --primary-soft: #edf4fc;
     --sc-primary: #3a7ab3;
@@ -290,7 +290,7 @@ a {
 }
 
 .sc-search input::placeholder {
-    color: #8ea6c0;
+    color: #64748b;
 }
 
 .sc-btn {
@@ -351,7 +351,7 @@ a {
 }
 
 .sc-btn--ghost:hover {
-    border-color: #94a3b8;
+    border-color: var(--text-gray);
     color: var(--ink);
 }
 
@@ -589,13 +589,13 @@ a {
 
 .sc-notif__time {
     font-size: 11.5px;
-    color: #8ea6c0;
+    color: #64748b;
 }
 
 .sc-notif__empty {
     text-align: center;
     padding: 36px 16px;
-    color: #94a3b8;
+    color: var(--text-gray);
 }
 
 .sc-notif__empty i {
@@ -1281,7 +1281,7 @@ a {
 
 .dsn-quick__card span {
     font-size: 12.5px;
-    color: #8193a6;
+    color: #64748b;
 }
 
 .dsn-quick__card--primary {
@@ -1294,8 +1294,8 @@ a {
 }
 
 .dsn-quick__card--success {
-    background: #1f9d61;
-    border-color: #1f9d61;
+    background: #137349;
+    border-color: #137349;
 }
 
 .dsn-quick__card--success:hover {
@@ -2148,7 +2148,7 @@ a.sc-team-card:hover {
 
 .sc-panel__muted {
     margin: 0;
-    color: #8193a6;
+    color: #64748b;
 }
 
 .sc-chips {
@@ -2746,7 +2746,7 @@ a.sc-team-card:hover {
     display: block;
     margin-top: 2px;
     font-size: 12.5px;
-    color: #8193a6;
+    color: #64748b;
     overflow-wrap: anywhere;
 }
 
@@ -2767,7 +2767,7 @@ a.sc-team-card:hover {
 .dsn-readonly {
     font-size: 12px;
     font-weight: 600;
-    color: #8193a6;
+    color: #64748b;
     white-space: nowrap;
 }
 
@@ -2839,7 +2839,7 @@ a.sc-team-card:hover {
 .dsn-empty {
     padding: 48px 20px;
     text-align: center;
-    color: #94a3b8;
+    color: var(--text-gray);
 }
 
 .dsn-empty i {
@@ -2930,76 +2930,6 @@ a.sc-team-card:hover {
     object-fit: cover;
 }
 
-.tagify {
-    --tags-border-color: #d6e0ea;
-    --tags-hover-border-color: #b8c7d8;
-    --tags-focus-border-color: var(--primary-blue);
-    --tag-bg: #eff6ff;
-    --tag-hover: #dbeafe;
-    --tag-text-color: #1e3a8a;
-    --tag-remove-btn-color: #1e3a8a;
-    --tag-remove-btn-bg--hover: #bfdbfe;
-    width: 100%;
-    min-height: 44px;
-    border-radius: 10px;
-    background: #fff;
-    font-size: 14px;
-}
-
-.tagify__tag,
-.tagify__tag > div::before {
-    border-radius: 999px;
-}
-
-.dosen-dropdown {
-    border-radius: 10px;
-    border: 1px solid var(--line);
-    box-shadow: var(--shadow-md);
-    overflow: hidden;
-}
-
-.dosen-dropdown .tagify__dropdown__item {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    margin: 0;
-    padding: 10px 14px;
-    border-radius: 0;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.dosen-dropdown .tagify__dropdown__item--active {
-    background: #f8fafc;
-    color: inherit;
-}
-
-.dosen-info-title {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--ink);
-}
-
-.dosen-info-title i {
-    color: var(--primary-blue);
-}
-
-.dosen-info-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 12px;
-    font-size: 12px;
-    color: #64748b;
-}
-
-.dosen-info-meta span {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
-
 .prf-hero__actions {
     display: flex;
     flex-wrap: wrap;
@@ -3061,7 +2991,7 @@ a.sc-team-card:hover {
 .prf-info dt {
     font-size: 12.5px;
     font-weight: 700;
-    color: #8193a6;
+    color: #64748b;
 }
 
 .prf-info dd {
@@ -3126,7 +3056,7 @@ a.sc-team-card:hover {
         font-family: var(--font-nav);
         font-size: 12px;
         font-weight: 700;
-        color: #8193a6;
+        color: #64748b;
     }
 
     .dsn-table tbody tr:hover td {

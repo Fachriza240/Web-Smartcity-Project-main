@@ -1,4 +1,8 @@
 @props(['title' => null])
+@php
+    $dosenTheme = auth()->user()?->role === 'dosen'
+        && auth()->user()?->registration_status === \App\Models\User::STATUS_APPROVED;
+@endphp
 <!DOCTYPE html>
 <html lang="id">
 
@@ -21,6 +25,10 @@
     <link href="{{ asset('css/main.css') }}" rel="stylesheet">
     <link href="{{ asset('css/notifikasi.css') }}" rel="stylesheet">
     <link href="{{ asset('css/responsive.css') }}" rel="stylesheet">
+    @if ($dosenTheme)
+        <link href="{{ asset('css/dosen-theme.css') }}" rel="stylesheet">
+        <script src="{{ asset('js/dosen-theme.js') }}"></script>
+    @endif
 </head>
 
 <body>

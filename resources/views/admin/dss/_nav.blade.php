@@ -1,8 +1,8 @@
 <style>
     .dss-tabs { gap: 6px; flex-wrap: wrap; }
     .dss-tabs .nav-link { color: var(--adm-text-2); font-weight: 600; font-size: 14px; border-radius: var(--adm-radius-sm); padding: 8px 16px; }
-    .dss-tabs .nav-link:hover { background: var(--adm-primary-light); color: var(--adm-primary); }
-    .dss-tabs .nav-link.active { background: var(--adm-primary); color: #fff; }
+    .dss-tabs .nav-link:hover { background: var(--adm-primary-light); color: var(--adm-link); }
+    .dss-tabs .nav-link.active { background: var(--adm-primary); color: var(--adm-on-primary); }
     .dss-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; margin-bottom: 24px; }
     .dss-box { background: var(--adm-surface); border: 1px solid var(--adm-border); border-radius: var(--adm-radius-lg); padding: 16px 18px; }
     .dss-box__label { font-size: 12px; color: var(--adm-text-3); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; margin-bottom: 4px; }
@@ -14,8 +14,8 @@
     .dss-chart { position: relative; height: 320px; width: 100%; }
     .dss-note { background: var(--adm-surface-2); border: 1px solid var(--adm-border); border-radius: var(--adm-radius-md); padding: 14px 16px; font-size: 13px; color: var(--adm-text-2); }
     .dss-note summary { cursor: pointer; font-weight: 700; color: var(--adm-text-1); }
-    .dss-chip { display: inline-block; padding: 4px 10px; margin: 0 6px 6px 0; border-radius: 99px; background: var(--adm-primary-light); color: var(--adm-primary); font-size: 12px; font-weight: 600; text-decoration: none; }
-    a.dss-chip:hover { background: var(--adm-primary); color: #fff; }
+    .dss-chip { display: inline-block; padding: 4px 10px; margin: 0 6px 6px 0; border-radius: 99px; background: var(--adm-primary-light); color: var(--adm-link); font-size: 12px; font-weight: 600; text-decoration: none; }
+    a.dss-chip:hover { background: var(--adm-primary); color: var(--adm-on-primary); }
     .dss-muted { color: var(--adm-text-3); }
 </style>
 

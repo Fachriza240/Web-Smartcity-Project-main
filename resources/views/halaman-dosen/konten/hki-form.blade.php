@@ -106,6 +106,7 @@
     </div>
 
     <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet">
+    <link href="{{ asset('css/dosen-picker.css') }}" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
     <script>
         window.dosenWhitelist = @json($whitelist);

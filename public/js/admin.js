@@ -26,6 +26,7 @@
 
     function applyTheme(dark) {
         html.setAttribute('data-theme', dark ? 'dark' : '');
+        html.setAttribute('data-bs-theme', dark ? 'dark' : 'light');
         storageSet(THEME_KEY, dark ? 'dark' : 'light');
 
         var sw = document.getElementById('darkModeSwitch');
@@ -39,6 +40,7 @@
                 ? 'Mode gelap aktif. Matikan untuk kembali ke mode terang.'
                 : 'Aktifkan untuk tampilan gelap yang nyaman di malam hari.';
         }
+        document.dispatchEvent(new Event('adm:appearance-change'));
     }
 
     function hexToRgb(hex) {
@@ -61,6 +63,8 @@
 
         html.style.setProperty('--adm-primary', color);
         html.style.setProperty('--adm-primary-dark', dark);
+        html.style.setProperty('--adm-on-primary', readableText(color));
+        html.style.setProperty('--adm-on-primary-hover', readableText(dark));
         html.style.setProperty('--adm-primary-rgb', rgb.join(','));
         html.style.setProperty('--adm-primary-light', 'rgba(' + rgb.join(',') + ',0.1)');
         html.style.setProperty('--adm-brand-logo-bg', color);
@@ -68,6 +72,21 @@
         if (save) {
             storageSet(ACCENT_KEY, color);
         }
+        document.dispatchEvent(new Event('adm:appearance-change'));
+    }
+
+    function readableText(color) {
+        function luminance(rgb) {
+            return rgb.map(function (value) {
+                value /= 255;
+                return value <= 0.04045 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4);
+            }).reduce(function (sum, value, index) {
+                return sum + value * [0.2126, 0.7152, 0.0722][index];
+            }, 0);
+        }
+        var background = luminance(hexToRgb(color));
+        var ink = luminance([15, 23, 42]);
+        return (background + 0.05) / (ink + 0.05) >= 1.05 / (background + 0.05) ? '#0f172a' : '#ffffff';
     }
 
     function initTheme() {

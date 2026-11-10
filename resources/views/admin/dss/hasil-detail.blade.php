@@ -190,7 +190,7 @@
             var rgb = (css.getPropertyValue('--adm-primary-rgb') || '76, 141, 201').trim();
             var teks = (css.getPropertyValue('--adm-text-2') || '#475569').trim();
             var garis = (css.getPropertyValue('--adm-border') || '#e2e8f0').trim();
-            new Chart(document.getElementById('dssRadar'), {
+            var chart = new Chart(document.getElementById('dssRadar'), {
                 type: 'radar',
                 data: {
                     labels: data.labels,
@@ -218,6 +218,21 @@
                         }
                     }
                 }
+            });
+            document.addEventListener('adm:appearance-change', function () {
+                var current = getComputedStyle(document.documentElement);
+                var color = current.getPropertyValue('--adm-text-2').trim();
+                var border = current.getPropertyValue('--adm-border').trim();
+                var accent = current.getPropertyValue('--adm-primary-rgb').trim();
+                var dataset = chart.data.datasets[0];
+                dataset.borderColor = 'rgb(' + accent + ')';
+                dataset.backgroundColor = 'rgba(' + accent + ', 0.2)';
+                dataset.pointBackgroundColor = 'rgb(' + accent + ')';
+                chart.options.scales.r.ticks.color = color;
+                chart.options.scales.r.grid.color = border;
+                chart.options.scales.r.angleLines.color = border;
+                chart.options.scales.r.pointLabels.color = color;
+                chart.update('none');
             });
         })();
     </script>

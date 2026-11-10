@@ -6,7 +6,7 @@
 
 <div class="mb-3">
     <span class="form-label fw-semibold d-block">Tipe Pengusul <span class="text-danger">*</span></span>
-    <div class="d-flex gap-3">
+    <div class="d-flex flex-wrap gap-3">
         <div class="form-check">
             <input class="form-check-input" type="radio" name="submission_type" id="pubTypeMember"
                    value="member" @checked($isMember) data-switch>

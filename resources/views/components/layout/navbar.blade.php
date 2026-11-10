@@ -58,6 +58,10 @@
 
         <div class="sc-navbar__mobile-actions d-xl-none">
             @if ($isDosen)
+                <button type="button" class="sc-icon-btn sc-theme-toggle" data-dosen-theme-toggle aria-label="Aktifkan mode gelap" aria-pressed="false">
+                    <i class="bi bi-moon-stars sc-theme-icon--light" aria-hidden="true"></i>
+                    <i class="bi bi-sun sc-theme-icon--dark" aria-hidden="true"></i>
+                </button>
                 <a href="{{ route('dosen.notifications.index') }}" class="sc-icon-btn" data-notif-mobile
                     aria-label="Notifikasi{{ $unreadCount > 0 ? ', '.$unreadCount.' belum dibaca' : '' }}">
                     <i class="bi bi-bell" aria-hidden="true"></i>
@@ -97,6 +101,10 @@
                 </form>
 
                 @if ($isDosen)
+                    <button type="button" class="sc-icon-btn sc-theme-toggle d-none d-xl-inline-flex" data-dosen-theme-toggle aria-label="Aktifkan mode gelap" aria-pressed="false">
+                        <i class="bi bi-moon-stars sc-theme-icon--light" aria-hidden="true"></i>
+                        <i class="bi bi-sun sc-theme-icon--dark" aria-hidden="true"></i>
+                    </button>
                     <div class="dropdown sc-user-dropdown d-none d-xl-block">
                         <button type="button" class="sc-icon-btn" id="notifDropdown" data-bs-toggle="dropdown"
                             data-bs-auto-close="outside" aria-expanded="false"
