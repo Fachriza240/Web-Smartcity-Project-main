@@ -1,5 +1,5 @@
 :root {
-    --primary-blue: #3276b2;
+    --primary-blue: #2b6da7;
     --primary-dark: #28669d;
     --primary-deep: #1f4e79;
     --primary-soft: #edf4fc;
@@ -290,7 +290,7 @@ a {
 }
 
 .sc-search input::placeholder {
-    color: #64748b;
+    color: #5b6b80;
 }
 
 .sc-btn {
@@ -368,12 +368,12 @@ a {
 }
 
 .sc-btn--wa {
-    background: #1faa59;
+    background: #137349;
     color: #fff;
 }
 
 .sc-btn--wa:hover {
-    background: #178a48;
+    background: #105c3b;
     color: #fff;
 }
 
@@ -578,7 +578,7 @@ a {
 
 .sc-notif__text {
     font-size: 12.5px;
-    color: #64748b;
+    color: #5b6b80;
 }
 
 .sc-notif__title {
@@ -589,7 +589,7 @@ a {
 
 .sc-notif__time {
     font-size: 11.5px;
-    color: #64748b;
+    color: #5b6b80;
 }
 
 .sc-notif__empty {
@@ -1281,7 +1281,7 @@ a {
 
 .dsn-quick__card span {
     font-size: 12.5px;
-    color: #64748b;
+    color: #5b6b80;
 }
 
 .dsn-quick__card--primary {
@@ -1311,7 +1311,7 @@ a {
 
 .dsn-quick__card--primary span,
 .dsn-quick__card--success span {
-    color: rgba(255, 255, 255, 0.82);
+    color: #fff;
 }
 
 @media (max-width: 575.98px) {
@@ -1864,7 +1864,7 @@ a {
 }
 
 .sc-tab.active .sc-tab__count {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.15);
     color: #fff;
 }
 
@@ -2148,7 +2148,7 @@ a.sc-team-card:hover {
 
 .sc-panel__muted {
     margin: 0;
-    color: #64748b;
+    color: #5b6b80;
 }
 
 .sc-chips {
@@ -2186,7 +2186,7 @@ a.sc-team-card:hover {
 .sc-bio__stats dt {
     font-size: 13px;
     font-weight: 700;
-    color: #64748b;
+    color: #5b6b80;
 }
 
 .sc-bio__stats dd {
@@ -2309,7 +2309,7 @@ a.sc-team-card:hover {
     font-family: var(--font-nav);
     font-size: 13.5px;
     font-weight: 600;
-    color: #64748b;
+    color: #5b6b80;
 }
 
 .sc-breadcrumb a {
@@ -2351,7 +2351,7 @@ a.sc-team-card:hover {
     gap: 10px 16px;
     margin-bottom: 12px;
     font-size: 14px;
-    color: #64748b;
+    color: #5b6b80;
 }
 
 .sc-article__meta span {
@@ -2460,7 +2460,7 @@ a.sc-team-card:hover {
 
 .sc-related__date {
     font-size: 12.5px;
-    color: #64748b;
+    color: #5b6b80;
 }
 
 .sc-related__body h3 {
@@ -2518,7 +2518,7 @@ a.sc-team-card:hover {
 .sc-pub__facts dt {
     font-size: 12.5px;
     font-weight: 700;
-    color: #64748b;
+    color: #5b6b80;
 }
 
 .sc-pub__facts dd {
@@ -2658,7 +2658,7 @@ a.sc-team-card:hover {
     font-family: var(--font-nav);
     font-size: 14px;
     font-weight: 700;
-    color: #64748b;
+    color: #5b6b80;
     text-decoration: none;
     white-space: nowrap;
 }
@@ -2714,7 +2714,7 @@ a.sc-team-card:hover {
     font-family: var(--font-nav);
     font-size: 12px;
     font-weight: 700;
-    color: #64748b;
+    color: #5b6b80;
     text-align: left;
     white-space: nowrap;
 }
@@ -2746,7 +2746,7 @@ a.sc-team-card:hover {
     display: block;
     margin-top: 2px;
     font-size: 12.5px;
-    color: #64748b;
+    color: #5b6b80;
     overflow-wrap: anywhere;
 }
 
@@ -2767,7 +2767,7 @@ a.sc-team-card:hover {
 .dsn-readonly {
     font-size: 12px;
     font-weight: 600;
-    color: #64748b;
+    color: #5b6b80;
     white-space: nowrap;
 }
 
@@ -2787,7 +2787,7 @@ a.sc-team-card:hover {
     padding: 3px 10px;
     border-radius: 999px;
     background: #f1f5f9;
-    color: #64748b;
+    color: #5b6b80;
     font-size: 12px;
     font-weight: 700;
 }
@@ -2813,7 +2813,7 @@ a.sc-team-card:hover {
     border-radius: 9px;
     border: 1px solid #e2e8f0;
     background: #f8fafc;
-    color: #64748b;
+    color: #5b6b80;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -2991,7 +2991,7 @@ a.sc-team-card:hover {
 .prf-info dt {
     font-size: 12.5px;
     font-weight: 700;
-    color: #64748b;
+    color: #5b6b80;
 }
 
 .prf-info dd {
@@ -3056,7 +3056,7 @@ a.sc-team-card:hover {
         font-family: var(--font-nav);
         font-size: 12px;
         font-weight: 700;
-        color: #64748b;
+        color: #5b6b80;
     }
 
     .dsn-table tbody tr:hover td {

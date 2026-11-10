@@ -10,7 +10,7 @@
     --adm-border-light:   #f1f5f9;
     --adm-text-1:         #0f172a;
     --adm-text-2:         #475569;
-    --adm-text-3:         #64748b;
+    --adm-text-3:         #5b6b80;
     --adm-link:           #2563eb;
     --adm-on-primary:     #0f172a;
     --adm-on-primary-hover: #ffffff;
@@ -32,7 +32,7 @@
     --adm-badge-publish-bg:  #dcfce7;
     --adm-badge-publish-txt: #166534;
     --adm-badge-draft-bg:    #f1f5f9;
-    --adm-badge-draft-txt:   #64748b;
+    --adm-badge-draft-txt:   #5b6b80;
     --adm-badge-staff-bg:    #dbeafe;
     --adm-badge-staff-txt:   #1d4ed8;
     --adm-badge-intern-bg:   #e0f2fe;
@@ -146,7 +146,7 @@ body.adm-body {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
+    color: var(--adm-on-primary);
     font-weight: 800;
     font-size: 16px;
     flex-shrink: 0;
@@ -957,9 +957,8 @@ span.badge[class*="bg-info"] {
 
 .adm-profile-role {
     font-size: 12px;
-    color: var(--adm-text-3);
     background: var(--adm-primary-light);
-    color: var(--adm-primary);
+    color: var(--adm-text-1);
     padding: 2px 10px;
     border-radius: 20px;
     font-weight: 600;
@@ -1413,7 +1412,7 @@ span.badge[class*="bg-info"] {
 
 .adm-text-danger,
 .adm-text-danger i {
-    color: #ef4444;
+    color: #b91c1c;
 }
 
 .adm-settings-label {
@@ -1461,7 +1460,7 @@ span.badge[class*="bg-info"] {
 
 .adm-btn-soft--danger {
     background: #fef2f2;
-    color: #dc2626;
+    color: #b91c1c;
     border-color: #fecaca;
 }
 
@@ -1710,6 +1709,17 @@ span.badge[class*="bg-info"] {
     color: #166534;
 }
 
+.adm-body .btn-outline-secondary {
+    --bs-btn-color: var(--adm-text-2);
+    --bs-btn-border-color: var(--adm-text-3);
+    --bs-btn-hover-color: var(--adm-surface);
+    --bs-btn-hover-bg: var(--adm-text-2);
+    --bs-btn-hover-border-color: var(--adm-text-2);
+    --bs-btn-active-color: var(--adm-surface);
+    --bs-btn-active-bg: var(--adm-text-2);
+    --bs-btn-active-border-color: var(--adm-text-2);
+}
+
 .adm-body .adm-btn-soft--success:hover {
     color: #fff;
     background: #166534;
@@ -1717,6 +1727,10 @@ span.badge[class*="bg-info"] {
 
 [data-theme="dark"] .adm-body .text-danger {
     color: #fda4af !important;
+}
+
+[data-theme="dark"] :is(.adm-text-danger, .adm-text-danger i) {
+    color: #fda4af;
 }
 
 [data-theme="dark"] .adm-body .text-success {

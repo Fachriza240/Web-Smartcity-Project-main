@@ -81,9 +81,25 @@ html[data-theme="dark"] :is(.sc-navbar .nav-link, .sc-search input,
 html[data-theme="dark"] :is(.sc-notif__text, .sc-notif__time, .sc-notif__empty,
 .sc-panel__muted, .sc-bio__stats dt, .sc-breadcrumb, .sc-article__meta,
 .sc-related__date, .sc-pub__facts dt, .dsn-tabs__item, .dsn-table th,
-.dsn-table__sub, .dsn-readonly, .dsn-empty, .prf-info dt,
-.dsn-quick__card:not(.dsn-quick__card--primary):not(.dsn-quick__card--success) span) {
+.dsn-table__sub, .dsn-readonly, .dsn-empty, .prf-info dt) {
     color: var(--text-gray);
+}
+
+html[data-theme="dark"] .dsn-quick__card:not(.dsn-quick__card--primary):not(.dsn-quick__card--success) span {
+    color: var(--text-gray);
+}
+
+html[data-theme="dark"] :is(.sc-label, .sc-fakta__lbl, .about-desc__label,
+.text-blue, .prog-intro__stat-num,
+.mitra-section__label, .mitra-card__link, .prog-intro__label, .proj-section-label,
+.sc-tab__count, .sc-team-card__role, .sc-team-card__more, .sc-bio__stats dd,
+.sc-pub__authors, .sc-btn--outline, .sc-contact-card a:not(.sc-btn),
+.sc-result__type, .dsn-card a:not([class])) {
+    color: var(--dsn-link);
+}
+
+html[data-theme="dark"] .sc-tab.active .sc-tab__count {
+    color: #fff;
 }
 
 html[data-theme="dark"] .dsn-table td::before {
@@ -195,7 +211,8 @@ html[data-theme="dark"] .sc-navbar .navbar-brand img {
     background: #fff;
 }
 
-html[data-theme="dark"] :is(.sc-hero__photo-placeholder, .proj-carousel-placeholder) {
+html[data-theme="dark"] :is(.sc-hero__photo-placeholder, .proj-carousel-placeholder,
+.sc-team-card__photo) {
     background: linear-gradient(135deg, #23354e, #172033);
     color: var(--dsn-link);
 }
