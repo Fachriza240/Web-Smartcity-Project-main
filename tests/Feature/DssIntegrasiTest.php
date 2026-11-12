@@ -132,6 +132,8 @@ class DssIntegrasiTest extends TestCase
         $this->actingAs($admin)
             ->get('/admin/dss/peta-kompetensi')
             ->assertOk()
+            ->assertViewHas('jumlahPerSdg', fn ($jumlah) => count($jumlah) === 17 && $jumlah[11] === 1 && $jumlah[13] === 1 && $jumlah[17] === 0)
+            ->assertSee('Jumlah Dosen per SDG')
             ->assertSee('SDG terkait')
             ->assertSee('Pilar dan SDG per Dosen')
             ->assertSee('Penanganan Perubahan Iklim');

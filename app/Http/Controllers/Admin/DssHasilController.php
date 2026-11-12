@@ -100,9 +100,24 @@ class DssHasilController extends Controller
 
         $semua = DssHasil::query()->with('user:id,fullname')->get();
         $peta = $this->laporan->petaDimensi($semua);
+        $jumlahPerSdg = array_fill_keys(array_keys(config('sdg')), 0);
+
+        foreach ($semua->unique('user_id') as $hasil) {
+            foreach (array_unique($hasil->kompetensi['sdgs'] ?? []) as $nomor) {
+                if (isset($jumlahPerSdg[$nomor])) {
+                    $jumlahPerSdg[$nomor]++;
+                }
+            }
+        }
 
         return view('admin.dss.peta', [
             'peta' => $peta,
+            'jumlahPerSdg' => $jumlahPerSdg,
+            'grafikSdg' => [
+                'labels' => array_map(fn ($nomor) => 'SDG ' . $nomor, array_keys($jumlahPerSdg)),
+                'nilai' => array_values($jumlahPerSdg),
+                'nama' => array_values(config('sdg')),
+            ],
             'dosenPerDimensi' => $semua->sortBy('user.fullname'),
             'totalDosen' => $semua->count(),
             'grafik' => [
