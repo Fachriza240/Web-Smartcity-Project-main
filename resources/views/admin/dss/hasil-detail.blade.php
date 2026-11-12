@@ -134,7 +134,7 @@
                     <div class="mb-3">
                         @php $adaDimensi = false; @endphp
                         @foreach ($dimensi as $kunci => $info)
-                            @if (($info['jumlah'] ?? 0) > 0 || ! empty($info['dari_profil']))
+                            @if (($info['jumlah'] ?? 0) > 0)
                                 @php $adaDimensi = true; @endphp
                                 <span class="dss-chip">
                                     {{ $info['label'] ?? $kunci }}

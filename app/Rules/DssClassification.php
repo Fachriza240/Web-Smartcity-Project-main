@@ -16,9 +16,9 @@ final class DssClassification
     public static function rules(): array
     {
         return [
-            'sdgs' => ['nullable', 'array', 'list', 'max:2'],
+            'sdgs' => ['required_without:smart_city_pillars', 'nullable', 'array', 'list', 'max:2'],
             'sdgs.*' => ['required', 'integer', 'distinct', Rule::in(array_keys(config('sdg')))],
-            'smart_city_pillars' => ['nullable', 'array', 'list', 'max:2'],
+            'smart_city_pillars' => ['required_without:sdgs', 'nullable', 'array', 'list', 'max:2'],
             'smart_city_pillars.*' => ['required', 'string', 'distinct', Rule::in(array_keys(config('dss.bidang_smart_city')))],
         ];
     }

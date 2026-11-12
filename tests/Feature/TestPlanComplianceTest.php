@@ -256,6 +256,7 @@ class TestPlanComplianceTest extends TestCase
     {
         return array_merge([
             'judul' => 'Judul Publikasi Valid',
+            'sdgs' => [11],
             'penulis' => 'Budi Santoso',
             'tahun' => 2024,
             'abstrak' => str_repeat('b', 30),

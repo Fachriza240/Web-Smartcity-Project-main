@@ -310,6 +310,8 @@ class SeederLengkapTest extends TestCase
                 'tgl_terbit' => $item->tgl_terbit->format('Y-m-d'),
                 'judul_sertifikat' => $item->judul_sertifikat,
                 'jenis_sertifikat' => $item->jenis_sertifikat,
+                'sdgs' => $item->sdgs,
+                'smart_city_pillars' => $item->smart_city_pillars,
                 'pencipta' => $item->pencipta,
                 'submission_type' => $item->submission_type,
                 'user_id' => $item->user_id,
@@ -320,7 +322,7 @@ class SeederLengkapTest extends TestCase
 
         foreach (Publication::all() as $item) {
             $this->put("/admin/publications/{$item->id}", array_filter($item->only([
-                'submission_type', 'user_id', 'recommended_by', 'judul', 'penulis', 'tahun', 'abstrak', 'kategori', 'penerbit', 'doi', 'status',
+                'submission_type', 'user_id', 'recommended_by', 'judul', 'penulis', 'tahun', 'abstrak', 'kategori', 'penerbit', 'doi', 'status', 'sdgs', 'smart_city_pillars',
             ]), fn ($nilai) => $nilai !== null))->assertSessionHasNoErrors()->assertSessionHas('success');
         }
 

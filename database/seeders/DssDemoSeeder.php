@@ -45,6 +45,8 @@ class DssDemoSeeder extends Seeder
             foreach ($d['publikasi'] as [$judul, $kategori, $selisih]) {
                 Publication::create([
                     'user_id' => $user->id,
+                    'sdgs' => $d['sdgs'],
+                    'smart_city_pillars' => [$d['pilar']],
                     'submission_type' => 'member',
                     'judul' => $judul,
                     'penulis' => $user->fullname,
@@ -66,6 +68,8 @@ class DssDemoSeeder extends Seeder
                     'jenis_sertifikat' => $jenis,
                     'pencipta' => $user->fullname,
                     'user_id' => $user->id,
+                    'sdgs' => $d['sdgs'],
+                    'smart_city_pillars' => [$d['pilar']],
                     'submission_type' => 'member',
                     'status' => Hki::STATUS_PUBLISH,
                 ]);
@@ -74,13 +78,14 @@ class DssDemoSeeder extends Seeder
             foreach ($d['aktivitas'] as $a) {
                 AktivitasDosen::create([
                     'user_id' => $user->id,
+                    'sdgs' => $d['sdgs'],
+                    'smart_city_pillars' => [$a['bidang'] ?? $d['pilar']],
                     'jenis' => $a['jenis'],
                     'judul' => $a['judul'],
                     'tahun' => $tahun - ($a['selisih'] ?? 0),
                     'skala' => $a['skala'] ?? null,
                     'peran' => $a['peran'] ?? 'anggota',
                     'sub_jenis' => $a['sub'] ?? null,
-                    'bidang_smart_city' => $a['bidang'] ?? null,
                     'mitra' => $a['mitra'] ?? null,
                     'berkelanjutan' => $a['lanjut'] ?? false,
                     'status' => AktivitasDosen::STATUS_PUBLISH,
@@ -117,6 +122,8 @@ class DssDemoSeeder extends Seeder
         return [
             [
                 'slug' => 'rina.maharani',
+                'sdgs' => [11, 13],
+                'pilar' => 'smart_environment',
                 'nama' => 'Rina Maharani',
                 'prodi' => 'Teknik Lingkungan',
                 'bio' => 'Peneliti kualitas udara dan energi terbarukan untuk kota.',
@@ -138,6 +145,8 @@ class DssDemoSeeder extends Seeder
             ],
             [
                 'slug' => 'bagas.wicaksono',
+                'sdgs' => [4, 8],
+                'pilar' => 'smart_people',
                 'nama' => 'Bagas Wicaksono',
                 'prodi' => 'Sistem Informasi',
                 'bio' => 'Pelaksana abdimas literasi digital dan pemberdayaan UMKM desa.',
@@ -157,6 +166,8 @@ class DssDemoSeeder extends Seeder
             ],
             [
                 'slug' => 'sinta.kusuma',
+                'sdgs' => [9, 11],
+                'pilar' => 'smart_living',
                 'nama' => 'Sinta Kusuma',
                 'prodi' => 'Teknik Informatika',
                 'bio' => 'Pengembang produk IoT dan kecerdasan buatan untuk layanan kota.',
@@ -179,6 +190,8 @@ class DssDemoSeeder extends Seeder
             ],
             [
                 'slug' => 'dimas.prakoso',
+                'sdgs' => [8, 17],
+                'pilar' => 'smart_economy',
                 'nama' => 'Dimas Prakoso',
                 'prodi' => 'Manajemen Bisnis',
                 'bio' => 'Penggerak kemitraan industri dan pemerintah untuk hilirisasi riset.',
@@ -199,6 +212,8 @@ class DssDemoSeeder extends Seeder
             ],
             [
                 'slug' => 'laila.nurhaliza',
+                'sdgs' => [9, 11],
+                'pilar' => 'smart_mobility',
                 'nama' => 'Laila Nurhaliza',
                 'prodi' => 'Teknik Transportasi',
                 'bio' => 'Peneliti manajemen lalu lintas dan mobilitas perkotaan.',
@@ -216,6 +231,8 @@ class DssDemoSeeder extends Seeder
             ],
             [
                 'slug' => 'hendra.gunawan',
+                'sdgs' => [7, 9],
+                'pilar' => 'smart_environment',
                 'nama' => 'Hendra Gunawan',
                 'prodi' => 'Teknik Elektro',
                 'bio' => 'Dosen teknik elektro dengan kegiatan riset dan abdimas seimbang.',
@@ -233,6 +250,8 @@ class DssDemoSeeder extends Seeder
             ],
             [
                 'slug' => 'maya.anggraini',
+                'sdgs' => [4],
+                'pilar' => 'smart_people',
                 'nama' => 'Maya Anggraini',
                 'prodi' => 'Pendidikan Teknologi',
                 'bio' => 'Peneliti pembelajaran digital dan pelatihan kompetensi digital.',
@@ -250,6 +269,8 @@ class DssDemoSeeder extends Seeder
             ],
             [
                 'slug' => 'fajar.setiawan',
+                'sdgs' => [9],
+                'pilar' => 'smart_living',
                 'nama' => 'Fajar Setiawan',
                 'prodi' => 'Teknik Informatika',
                 'bio' => 'Dosen muda dengan aktivitas riset yang masih berkembang.',
@@ -264,6 +285,8 @@ class DssDemoSeeder extends Seeder
             ],
             [
                 'slug' => 'citra.dewanti',
+                'sdgs' => [11, 16],
+                'pilar' => 'smart_governance',
                 'nama' => 'Citra Dewanti',
                 'prodi' => 'Administrasi Publik',
                 'bio' => 'Peneliti tata kelola pemerintahan digital dan layanan publik.',
@@ -282,6 +305,8 @@ class DssDemoSeeder extends Seeder
             ],
             [
                 'slug' => 'yoga.pratama',
+                'sdgs' => [9, 11],
+                'pilar' => 'smart_governance',
                 'nama' => 'Yoga Pratama',
                 'prodi' => 'Teknik Informatika',
                 'bio' => 'Pengembang aplikasi dan sistem informasi untuk layanan kampus dan kota.',
@@ -300,6 +325,8 @@ class DssDemoSeeder extends Seeder
             ],
             [
                 'slug' => 'nadia.safitri',
+                'sdgs' => [8, 9],
+                'pilar' => 'smart_economy',
                 'nama' => 'Nadia Safitri',
                 'prodi' => 'Sistem Informasi',
                 'bio' => 'Dosen baru yang mulai membangun rekam jejak penelitian.',
@@ -314,6 +341,8 @@ class DssDemoSeeder extends Seeder
             ],
             [
                 'slug' => 'arif.budiman',
+                'sdgs' => [],
+                'pilar' => null,
                 'nama' => 'Arif Budiman',
                 'prodi' => 'Teknik Elektro',
                 'bio' => 'Dosen yang belum memiliki data aktivitas (kasus uji data kosong).',

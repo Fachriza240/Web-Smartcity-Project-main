@@ -384,6 +384,8 @@ class KontenSeeder extends Seeder
         $daftar = [
             [
                 'judul' => 'Pengembangan Sistem Smart City Berbasis IoT',
+                'sdgs' => [9, 11],
+                'smart_city_pillars' => ['smart_governance'],
                 'pemilik' => $dosenA,
                 'penulis' => 'Dosen A Pengirim',
                 'tahun' => 2024,
@@ -395,6 +397,8 @@ class KontenSeeder extends Seeder
             ],
             [
                 'judul' => 'Analisis Keamanan Jaringan Sensor Nirkabel',
+                'sdgs' => [9, 16],
+                'smart_city_pillars' => ['smart_living'],
                 'pemilik' => $dosenA,
                 'penulis' => 'Dosen A Pengirim',
                 'tahun' => 2025,
@@ -406,6 +410,8 @@ class KontenSeeder extends Seeder
             ],
             [
                 'judul' => 'Studi Implementasi Smart City di Indonesia',
+                'sdgs' => [11, 16],
+                'smart_city_pillars' => ['smart_governance'],
                 'pemilik' => null,
                 'pengusul' => 'Prof. Eksternal Universitas Lain',
                 'penulis' => 'Prof. Eksternal Universitas Lain',
@@ -418,6 +424,8 @@ class KontenSeeder extends Seeder
             ],
             [
                 'judul' => 'Model Prediksi Kemacetan Menggunakan Data Sensor Lalu Lintas',
+                'sdgs' => [9, 11],
+                'smart_city_pillars' => ['smart_mobility'],
                 'pemilik' => $dosenA,
                 'penulis' => 'Dosen A Pengirim, Dosen B Penerima',
                 'tahun' => 2026,
@@ -429,6 +437,8 @@ class KontenSeeder extends Seeder
             ],
             [
                 'judul' => 'Rancang Bangun Dasbor Kualitas Udara Berbasis Web',
+                'sdgs' => [11, 13],
+                'smart_city_pillars' => ['smart_environment'],
                 'pemilik' => $dosenB,
                 'penulis' => 'Dosen B Penerima',
                 'tahun' => 2025,
@@ -440,6 +450,8 @@ class KontenSeeder extends Seeder
             ],
             [
                 'judul' => 'Pemetaan Fasilitas Publik dengan Sistem Informasi Geografis',
+                'sdgs' => [11, 16],
+                'smart_city_pillars' => ['smart_governance'],
                 'pemilik' => $dosenB,
                 'penulis' => 'Dosen B Penerima',
                 'tahun' => 2024,
@@ -451,6 +463,8 @@ class KontenSeeder extends Seeder
             ],
             [
                 'judul' => 'Buku Ajar Dasar-Dasar Kota Cerdas',
+                'sdgs' => [4, 11],
+                'smart_city_pillars' => ['smart_people'],
                 'pemilik' => $dosenA,
                 'penulis' => 'Dosen A Pengirim, Dosen B Penerima',
                 'tahun' => 2023,
@@ -462,6 +476,8 @@ class KontenSeeder extends Seeder
             ],
             [
                 'judul' => 'Purwarupa Penerangan Jalan Adaptif Hemat Energi',
+                'sdgs' => [7, 11],
+                'smart_city_pillars' => ['smart_environment'],
                 'pemilik' => $dosenA,
                 'penulis' => 'Dosen A Pengirim',
                 'tahun' => 2025,
@@ -473,6 +489,8 @@ class KontenSeeder extends Seeder
             ],
             [
                 'judul' => 'Evaluasi Layanan Aduan Warga Berbasis Aplikasi Seluler',
+                'sdgs' => [11, 16],
+                'smart_city_pillars' => ['smart_governance'],
                 'pemilik' => null,
                 'pengusul' => 'Rina Kusumawati',
                 'penulis' => 'Rina Kusumawati, Agus Setiawan',
@@ -485,6 +503,8 @@ class KontenSeeder extends Seeder
             ],
             [
                 'judul' => 'Kerangka Tata Kelola Data Terbuka Pemerintah Daerah',
+                'sdgs' => [16],
+                'smart_city_pillars' => ['smart_governance'],
                 'pemilik' => null,
                 'pengusul' => 'Hendra Saputra',
                 'penulis' => 'Hendra Saputra',
@@ -497,6 +517,8 @@ class KontenSeeder extends Seeder
             ],
             [
                 'judul' => 'Optimasi Rute Pengangkutan Sampah Kota',
+                'sdgs' => [11, 12],
+                'smart_city_pillars' => ['smart_environment'],
                 'pemilik' => $dosenB,
                 'penulis' => 'Dosen B Penerima',
                 'tahun' => 2026,
@@ -508,6 +530,8 @@ class KontenSeeder extends Seeder
             ],
             [
                 'judul' => 'Sistem Rekomendasi Rute Transportasi Publik',
+                'sdgs' => [11],
+                'smart_city_pillars' => ['smart_mobility'],
                 'pemilik' => null,
                 'pengusul' => 'Dinas Perhubungan Kota',
                 'penulis' => 'Tim Riset Dinas Perhubungan',
@@ -525,6 +549,8 @@ class KontenSeeder extends Seeder
             $pemilik = $item['pemilik'];
 
             Publication::updateOrCreate(['judul' => $item['judul']], [
+                'sdgs' => $item['sdgs'],
+                'smart_city_pillars' => $item['smart_city_pillars'],
                 'user_id' => $pemilik?->id,
                 'submission_type' => $pemilik ? 'member' : 'non_member',
                 'recommended_by' => $pemilik ? null : $item['pengusul'],
@@ -561,6 +587,8 @@ class KontenSeeder extends Seeder
                 'nomor' => 'HKI-2024-001',
                 'tanggal' => '2024-01-15',
                 'judul' => 'Hak Cipta Perangkat Lunak SmartCity Monitoring',
+                'sdgs' => [9, 11],
+                'smart_city_pillars' => ['smart_governance'],
                 'jenis' => 'Hak Cipta',
                 'pencipta' => 'Dosen A Pengirim, Dosen B Penerima',
                 'pemilik' => $dosenA,
@@ -570,6 +598,8 @@ class KontenSeeder extends Seeder
                 'nomor' => 'HKI-2024-002',
                 'tanggal' => '2024-06-01',
                 'judul' => 'Paten Sederhana Alat Monitoring Kualitas Udara',
+                'sdgs' => [11, 13],
+                'smart_city_pillars' => ['smart_environment'],
                 'jenis' => 'Paten Sederhana',
                 'pencipta' => 'Tim Eksternal Riset Kota',
                 'pemilik' => null,
@@ -580,6 +610,8 @@ class KontenSeeder extends Seeder
                 'nomor' => 'EC00202512345',
                 'tanggal' => '2025-03-10',
                 'judul' => 'Aplikasi Pelaporan Warga Terpadu',
+                'sdgs' => [11, 16],
+                'smart_city_pillars' => ['smart_governance'],
                 'jenis' => 'Hak Cipta',
                 'pencipta' => 'Dosen B Penerima, Dosen A Pengirim',
                 'pemilik' => $dosenB,
@@ -589,6 +621,8 @@ class KontenSeeder extends Seeder
                 'nomor' => 'IDS000012345',
                 'tanggal' => '2025-08-21',
                 'judul' => 'Sistem Penerangan Jalan Adaptif Berbasis Sensor Cahaya',
+                'sdgs' => [7, 11],
+                'smart_city_pillars' => ['smart_environment'],
                 'jenis' => 'Paten',
                 'pencipta' => 'Dosen A Pengirim',
                 'pemilik' => $dosenA,
@@ -598,6 +632,8 @@ class KontenSeeder extends Seeder
                 'nomor' => 'IDM000987654',
                 'tanggal' => '2023-11-02',
                 'judul' => 'Merek SmartCity Lab',
+                'sdgs' => [8, 9],
+                'smart_city_pillars' => ['smart_economy'],
                 'jenis' => 'Merek',
                 'pencipta' => 'Dosen A Pengirim, Dosen B Penerima',
                 'pemilik' => $dosenA,
@@ -607,6 +643,8 @@ class KontenSeeder extends Seeder
                 'nomor' => 'IDD000045678',
                 'tanggal' => '2026-02-14',
                 'judul' => 'Desain Tiang Sensor Lingkungan Modular',
+                'sdgs' => [9, 13],
+                'smart_city_pillars' => ['smart_environment'],
                 'jenis' => 'Desain Industri',
                 'pencipta' => 'Dosen B Penerima',
                 'pemilik' => $dosenB,
@@ -616,6 +654,8 @@ class KontenSeeder extends Seeder
                 'nomor' => 'EC00202398765',
                 'tanggal' => '2023-05-19',
                 'judul' => 'Basis Data Peta Fasilitas Publik Kota',
+                'sdgs' => [11, 16],
+                'smart_city_pillars' => ['smart_governance'],
                 'jenis' => 'Hak Cipta',
                 'pencipta' => 'Rina Kusumawati, Agus Setiawan',
                 'pemilik' => null,
@@ -626,6 +666,8 @@ class KontenSeeder extends Seeder
                 'nomor' => 'EC00202600111',
                 'tanggal' => '2026-09-01',
                 'judul' => 'Modul Pembelajaran Kota Cerdas',
+                'sdgs' => [4, 11],
+                'smart_city_pillars' => ['smart_people'],
                 'jenis' => 'Hak Cipta',
                 'pencipta' => 'Dosen B Penerima',
                 'pemilik' => $dosenB,
@@ -641,6 +683,8 @@ class KontenSeeder extends Seeder
             $hki = Hki::updateOrCreate(['nomor_sertifikat' => $item['nomor']], [
                 'tgl_terbit' => $item['tanggal'],
                 'judul_sertifikat' => $item['judul'],
+                'sdgs' => $item['sdgs'],
+                'smart_city_pillars' => $item['smart_city_pillars'],
                 'jenis_sertifikat' => $item['jenis'],
                 'pencipta' => $item['pencipta'],
                 'user_id' => $pemilik?->id,

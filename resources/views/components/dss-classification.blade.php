@@ -1,6 +1,7 @@
 @props(['record'])
 
 <input type="hidden" name="dss_classification_form" value="1">
+<p class="form-text">Pilih minimal satu SDG atau satu pilar Smart City.</p>
 <div class="row g-3 mb-3">
     @foreach (['sdgs' => ['Tujuan Pembangunan Berkelanjutan (SDG)', config('sdg')], 'smart_city_pillars' => ['Pilar Smart City', \App\Models\AktivitasDosen::bidangSmartCityList()]] as $field => [$label, $options])
         @php
@@ -9,7 +10,7 @@
         @endphp
         <fieldset class="col-md-6" data-dss-limit>
             <legend class="form-label fs-6">{{ $label }}</legend>
-            <p class="form-text mt-0">Opsional, maksimal 2 pilihan.</p>
+            <p class="form-text mt-0">Maksimal 2 pilihan.</p>
             <div class="border rounded p-2 overflow-auto" style="max-height: 13rem">
                 @foreach ($options as $key => $name)
                     <label class="d-flex align-items-start gap-2 mb-1">

@@ -77,7 +77,7 @@
                             @foreach ($dosenPerDimensi as $hasil)
                                 @php
                                     $pilar = collect($hasil->kompetensi['dimensi'] ?? [])
-                                        ->filter(fn ($item) => ($item['jumlah'] ?? 0) > 0 || !empty($item['dari_profil']));
+                                        ->filter(fn ($item) => ($item['jumlah'] ?? 0) > 0);
                                 @endphp
                                 <tr>
                                     <td><a class="dss-chip" href="{{ route('admin.dss.hasil.show', $hasil->user_id) }}">{{ $hasil->user?->fullname ?? '—' }}</a></td>

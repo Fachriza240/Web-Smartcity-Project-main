@@ -37,6 +37,7 @@ class NotifikasiHkiTest extends TestCase
             'tgl_terbit' => '2024-05-01',
             'judul_sertifikat' => 'Aplikasi Pemantau Banjir Kota',
             'jenis_sertifikat' => 'Hak Cipta',
+            'sdgs' => [11],
             'pencipta' => 'Dosen A, Dosen B',
         ], $override);
     }
@@ -264,6 +265,7 @@ class NotifikasiHkiTest extends TestCase
             'tahun' => 2024,
             'abstrak' => 'Ringkasan penelitian sistem parkir cerdas.',
             'kategori' => Publication::CATEGORY_JOURNAL,
+            'sdgs' => [11],
             'status' => 'Draft',
             'pdf' => UploadedFile::fake()->create('makalah.pdf', 20, 'application/pdf'),
         ])->assertRedirect(route('dosen.publikasi.index'))
@@ -317,6 +319,7 @@ class NotifikasiHkiTest extends TestCase
             'tahun' => 2024,
             'abstrak' => 'Ringkasan penelitian sistem parkir cerdas.',
             'kategori' => Publication::CATEGORY_JOURNAL,
+            'sdgs' => [11],
             'status' => 'Draft',
             'pdf' => UploadedFile::fake()->create('makalah.pdf', 20, 'application/pdf'),
         ];

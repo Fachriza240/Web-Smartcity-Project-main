@@ -82,9 +82,9 @@ class DssIntegrasiTest extends TestCase
         $beta = $this->buatUser('Dosen Beta Rahasia');
         $kosong = $this->buatUser('Dosen Kosong');
 
-        $this->publikasi($alfa, 'Pemantauan Lalu Lintas Kota');
-        $this->publikasi($alfa, 'Model Banjir dan Lingkungan');
-        $this->aktivitas($beta, 'Pelatihan Warga Desa');
+        $this->publikasi($alfa, 'Pemantauan Lalu Lintas Kota')->update(['smart_city_pillars' => ['smart_mobility']]);
+        $this->publikasi($alfa, 'Model Banjir dan Lingkungan')->update(['smart_city_pillars' => ['smart_environment']]);
+        $this->aktivitas($beta, 'Pelatihan Warga Desa')->update(['smart_city_pillars' => ['smart_people']]);
 
         $this->hitung();
 
@@ -109,6 +109,11 @@ class DssIntegrasiTest extends TestCase
             ->get(route('dosen.aktivitas.create'))
             ->assertOk()
             ->assertSee('Kemitraan untuk Mencapai Tujuan');
+
+        $this->postJson(route('dosen.aktivitas.store'), array_replace($data, [
+            'sdgs' => [],
+            'smart_city_pillars' => [],
+        ]))->assertUnprocessable()->assertJsonValidationErrors(['sdgs', 'smart_city_pillars']);
 
         $this->postJson(route('dosen.aktivitas.store'), array_replace($data, [
             'sdgs' => [11, 13, 17],

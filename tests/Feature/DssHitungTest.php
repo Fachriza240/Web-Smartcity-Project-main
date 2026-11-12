@@ -244,7 +244,7 @@ class DssHitungTest extends TestCase
     public function test_kompetensi_smart_city_tersimpan_beserta_rincian(): void
     {
         $dosen = $this->buatUser('Dosen Uji Zeta');
-        $this->publikasi($dosen, 'Jurnal', 0, ['judul' => 'Pemantauan Lalu Lintas Kota']);
+        $this->publikasi($dosen, 'Jurnal', 0, ['judul' => 'Pemantauan Lalu Lintas Kota', 'smart_city_pillars' => ['smart_mobility']]);
 
         $this->hitung();
 

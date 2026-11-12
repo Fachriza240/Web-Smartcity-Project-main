@@ -102,7 +102,7 @@ class DssConfigTest extends TestCase
         $this->assertTrue(isset($rubrik['peran']['ketua'], $rubrik['peran']['anggota']));
     }
 
-    public function test_enam_dimensi_smart_city_memiliki_kata_kunci(): void
+    public function test_enam_dimensi_smart_city_memiliki_label(): void
     {
         $dimensi = $this->konfigurasi['bidang_smart_city'];
 
@@ -110,7 +110,6 @@ class DssConfigTest extends TestCase
 
         foreach ($dimensi as $kunci => $item) {
             $this->assertTrue($item['label'] !== '', "label dimensi {$kunci} kosong");
-            $this->assertTrue(count($item['kata_kunci']) > 0, "dimensi {$kunci} belum memiliki kata kunci");
         }
     }
 

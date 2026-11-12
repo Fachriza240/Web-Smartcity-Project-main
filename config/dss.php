@@ -186,27 +186,21 @@ return [
     'bidang_smart_city' => [
         'smart_governance' => [
             'label' => 'Smart Governance',
-            'kata_kunci' => ['pemerintah', 'tata kelola', 'e-government', 'egovernment', 'layanan publik', 'kebijakan', 'birokrasi', 'open data', 'governance', 'administrasi'],
         ],
         'smart_environment' => [
             'label' => 'Smart Environment',
-            'kata_kunci' => ['lingkungan', 'energi', 'sampah', 'polusi', 'kualitas udara', 'kualitas air', 'banjir', 'iklim', 'hijau', 'pertanian', 'agriculture', 'environment'],
         ],
         'smart_mobility' => [
             'label' => 'Smart Mobility',
-            'kata_kunci' => ['transportasi', 'lalu lintas', 'mobilitas', 'kendaraan', 'kereta', 'parkir', 'traffic', 'transport', 'logistik', 'jalan raya'],
         ],
         'smart_economy' => [
             'label' => 'Smart Economy',
-            'kata_kunci' => ['ekonomi', 'umkm', 'bisnis', 'industri', 'e-commerce', 'keuangan', 'fintech', 'startup', 'pariwisata', 'wirausaha', 'perdagangan'],
         ],
         'smart_living' => [
             'label' => 'Smart Living',
-            'kata_kunci' => ['kesehatan', 'keamanan', 'keselamatan', 'bencana', 'perumahan', 'rumah pintar', 'smart home', 'cctv', 'kualitas hidup', 'telemedicine'],
         ],
         'smart_people' => [
             'label' => 'Smart People',
-            'kata_kunci' => ['pendidikan', 'pembelajaran', 'literasi', 'sdm', 'pelatihan', 'pemberdayaan', 'kompetensi digital', 'e-learning', 'siswa', 'mahasiswa'],
         ],
     ],
 

@@ -126,11 +126,11 @@ class KompetensiServiceTest extends TestCase
         }
     }
 
-    public function test_kesesuaian_smart_city_dari_kata_kunci_dan_tag(): void
+    public function test_kesesuaian_smart_city_dari_pilihan_manual(): void
     {
         $hasil = $this->service()->hitungPoin([
-            'publikasi' => [['judul' => 'Pemantauan Kualitas Udara Perkotaan', 'kategori' => 'Jurnal']],
-            'hki' => [['judul' => 'Optimasi Lalu Lintas Kota', 'jenis' => 'Hak Cipta']],
+            'publikasi' => [['judul' => 'Pemantauan Kualitas Udara Perkotaan', 'smart_city_pillars' => ['smart_environment'], 'kategori' => 'Jurnal']],
+            'hki' => [['judul' => 'Optimasi Lalu Lintas Kota', 'smart_city_pillars' => ['smart_mobility'], 'jenis' => 'Hak Cipta']],
             'aktivitas' => [
                 $this->aktivitas('abdimas', ['judul' => 'Kegiatan Netral', 'skala' => 'institusi', 'bidang_smart_city' => 'smart_people']),
                 $this->aktivitas('abdimas', ['judul' => 'Kegiatan Tanpa Kaitan', 'skala' => 'institusi']),
@@ -154,53 +154,33 @@ class KompetensiServiceTest extends TestCase
     public function test_dimensi_dominan_adalah_yang_paling_banyak_dokumennya(): void
     {
         $hasil = $this->service()->hitungPoin(['publikasi' => [
-            ['judul' => 'Analisis Transportasi Publik', 'kategori' => 'Jurnal'],
-            ['judul' => 'Model Parkir Cerdas', 'kategori' => 'Jurnal'],
-            ['judul' => 'Sensor Polusi Udara dan Energi', 'kategori' => 'Jurnal'],
+            ['judul' => 'Analisis Transportasi Publik', 'smart_city_pillars' => ['smart_mobility'], 'kategori' => 'Jurnal'],
+            ['judul' => 'Model Parkir Cerdas', 'smart_city_pillars' => ['smart_mobility'], 'kategori' => 'Jurnal'],
+            ['judul' => 'Sensor Polusi Udara dan Energi', 'smart_city_pillars' => ['smart_environment'], 'kategori' => 'Jurnal'],
         ]]);
 
         $this->assertSame('smart_mobility', $hasil['kompetensi']['dominan']);
         $this->assertSame(2, $hasil['kompetensi']['dimensi']['smart_mobility']['jumlah']);
     }
 
-    public function test_bidang_penelitian_pada_profil_menambah_cakupan_dimensi(): void
+    public function test_teks_tidak_menentukan_pilar(): void
     {
-        $hasil = $this->service()->hitungPoin(['bidang_penelitian' => 'Pendidikan Digital, E-Learning']);
-        $kompetensi = $hasil['kompetensi'];
+        $hasil = $this->service()->hitungPoin([
+            'bidang_penelitian' => 'Pendidikan Digital',
+            'publikasi' => [['judul' => 'Kualitas Udara', 'kategori' => 'Jurnal', 'sdgs' => [13]]],
+            'aktivitas' => [$this->aktivitas('kolaborasi', ['mitra' => 'Dinas Lingkungan Hidup'])],
+        ]);
 
-        $this->assertSame(0, $kompetensi['dokumen_cocok']);
-        $this->assertSame(1, $kompetensi['dimensi_tercakup']);
-        $this->assertTrue($kompetensi['dimensi']['smart_people']['dari_profil']);
-        $this->assertSame('smart_people', $kompetensi['dominan']);
-        $this->assertEqualsWithDelta(3.0, $hasil['poin']['C4'], 1e-9);
-    }
-
-    public function test_mitra_pada_aktivitas_ikut_dicocokkan(): void
-    {
-        $hasil = $this->service()->hitungPoin(['aktivitas' => [
-            $this->aktivitas('kolaborasi', ['judul' => 'Kerja Sama Uji', 'sub_jenis' => 'pemerintah', 'mitra' => 'Dinas Lingkungan Hidup']),
-        ]]);
-
-        $this->assertSame(1, $hasil['kompetensi']['dimensi']['smart_environment']['jumlah']);
-        $this->assertSame(1, $hasil['kompetensi']['dokumen_cocok']);
-    }
-
-    public function test_kata_kunci_dicocokkan_di_awal_kata(): void
-    {
-        $service = $this->service();
-
-        $this->assertSame([], $service->deteksiDimensi('Xindustri Baru'));
-        $this->assertSame([], $service->deteksiDimensi('Ksdmx'));
-        $this->assertSame(['smart_economy'], $service->deteksiDimensi('Industrial Internet'));
-        $this->assertSame(['smart_people'], $service->deteksiDimensi('Pelatihan SDM Kampus'));
-        $this->assertSame(['smart_governance'], $service->deteksiDimensi('Sistem E-Government Daerah'));
-        $this->assertSame([], $service->deteksiDimensi('   '));
+        $this->assertSame(0, $hasil['kompetensi']['dokumen_cocok']);
+        $this->assertSame(0, $hasil['kompetensi']['dimensi_tercakup']);
+        $this->assertSame([13], $hasil['kompetensi']['sdgs']);
+        $this->assertNull($hasil['kompetensi']['dominan']);
     }
 
     public function test_dokumen_dengan_dua_dimensi_dihitung_satu_dokumen_dan_dua_dimensi(): void
     {
         $hasil = $this->service()->hitungPoin(['publikasi' => [
-            ['judul' => 'Transportasi dan Energi Hijau', 'kategori' => 'Jurnal'],
+            ['judul' => 'Transportasi dan Energi Hijau', 'smart_city_pillars' => ['smart_mobility', 'smart_environment'], 'kategori' => 'Jurnal'],
         ]]);
 
         $this->assertSame(1, $hasil['kompetensi']['dokumen_cocok']);

@@ -209,7 +209,7 @@ class DssLaporanService
                     continue;
                 }
 
-                if ((int) ($info['jumlah'] ?? 0) > 0 || ! empty($info['dari_profil'])) {
+                if ((int) ($info['jumlah'] ?? 0) > 0) {
                     $peta[$kunci]['jumlah_dosen']++;
                     $peta[$kunci]['sdgs'] = array_unique(array_merge($peta[$kunci]['sdgs'], $info['sdgs'] ?? []));
                     $peta[$kunci]['jumlah_dokumen'] += (int) ($info['jumlah'] ?? 0);
@@ -295,7 +295,7 @@ class DssLaporanService
         $daftar = [];
 
         foreach ((array) ($hasil->kompetensi['dimensi'] ?? []) as $kunci => $info) {
-            if ((int) ($info['jumlah'] ?? 0) > 0 || ! empty($info['dari_profil'])) {
+            if ((int) ($info['jumlah'] ?? 0) > 0) {
                 $daftar[$kunci] = (string) ($info['label'] ?? $kunci);
             }
         }

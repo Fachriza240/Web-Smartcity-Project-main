@@ -73,7 +73,6 @@ class KompetensiService
             'publikasi' => $publikasi,
             'hki' => $hki,
             'aktivitas' => $aktivitas,
-            'bidang_penelitian' => (string) $user->bidang_penelitian,
         ];
     }
 
@@ -83,7 +82,6 @@ class KompetensiService
         $publikasi = $data['publikasi'] ?? [];
         $hki = $data['hki'] ?? [];
         $aktivitas = $data['aktivitas'] ?? [];
-        $profil = (string) ($data['bidang_penelitian'] ?? '');
 
         $poinPublikasi = 0.0;
 
@@ -143,7 +141,7 @@ class KompetensiService
             }
         }
 
-        $kompetensi = $this->petaKompetensi($publikasi, $hki, $aktivitas, $profil);
+        $kompetensi = $this->petaKompetensi($publikasi, $hki, $aktivitas);
 
         $poinSmartCity = $kompetensi['dokumen_cocok']
             * (float) ($rubrik['smart_city']['poin_per_dokumen'] ?? 0)
@@ -195,83 +193,26 @@ class KompetensiService
         ];
     }
 
-    public function deteksiDimensi(string $teks): array
-    {
-        $teks = trim($teks);
-
-        if ($teks === '') {
-            return [];
-        }
-
-        $hasil = [];
-
-        foreach ($this->konfigurasi['bidang_smart_city'] ?? [] as $kunci => $dimensi) {
-            foreach ($dimensi['kata_kunci'] ?? [] as $kata) {
-                $pola = '/(?<![\p{L}\p{N}])'
-                    . preg_quote(mb_strtolower((string) $kata), '/')
-                    . '/iu';
-
-                if (preg_match($pola, $teks) === 1) {
-                    $hasil[] = $kunci;
-                    break;
-                }
-            }
-        }
-
-        return $hasil;
-    }
-
     private function petaKompetensi(
         array $publikasi,
         array $hki,
-        array $aktivitas,
-        string $profil
+        array $aktivitas
     ): array {
         $dimensiConf = $this->konfigurasi['bidang_smart_city'] ?? [];
         $jumlah = array_fill_keys(array_keys($dimensiConf), 0);
-        $dariProfil = $this->deteksiDimensi($profil);
 
-        $dokumen = [];
-
-        foreach ($publikasi as $item) {
-            $dokumen[] = [(string) ($item['judul'] ?? ''), $item['smart_city_pillars'] ?? [], null, $item['sdgs'] ?? []];
-        }
-
-        foreach ($hki as $item) {
-            $dokumen[] = [(string) ($item['judul'] ?? ''), $item['smart_city_pillars'] ?? [], null, $item['sdgs'] ?? []];
-        }
-
-        foreach ($aktivitas as $item) {
-            $dokumen[] = [
-                trim(
-                    (string) ($item['judul'] ?? '')
-                    . ' '
-                    . (string) ($item['mitra'] ?? '')
-                ),
-                $item['smart_city_pillars'] ?? [],
-                ($item['smart_city_pillars'] ?? null) === null ? ($item['bidang_smart_city'] ?? null) : null,
-                $item['sdgs'] ?? [],
-            ];
-        }
+        $dokumen = array_merge($publikasi, $hki, $aktivitas);
 
         $dokumenCocok = 0;
 
         $sdgs = [];
         $sdgPerDimensi = [];
 
-        foreach ($dokumen as [$teks, $pilihan, $tag, $tujuan]) {
+        foreach ($dokumen as $item) {
+            $tujuan = $item['sdgs'] ?? [];
             $sdgs = array_merge($sdgs, $tujuan);
-            $dimensi = array_values(array_intersect($pilihan, array_keys($jumlah)));
-
-            if ($dimensi === []) {
-                $dimensi = $this->deteksiDimensi($teks);
-
-                if ($tag && isset($jumlah[$tag])) {
-                    $dimensi[] = $tag;
-                }
-            }
-
-            $dimensi = array_values(array_unique($dimensi));
+            $pilihan = $item['smart_city_pillars'] ?? (array) ($item['bidang_smart_city'] ?? []);
+            $dimensi = array_unique(array_intersect($pilihan, array_keys($jumlah)));
 
             if ($dimensi !== []) {
                 $dokumenCocok++;
@@ -287,16 +228,13 @@ class KompetensiService
         $tercakup = 0;
 
         foreach ($dimensiConf as $kunci => $dimensi) {
-            $dariProfilIni = in_array($kunci, $dariProfil, true);
-
-            if ($jumlah[$kunci] > 0 || $dariProfilIni) {
+            if ($jumlah[$kunci] > 0) {
                 $tercakup++;
             }
 
             $daftar[$kunci] = [
                 'label' => (string) ($dimensi['label'] ?? $kunci),
                 'jumlah' => $jumlah[$kunci],
-                'dari_profil' => $dariProfilIni,
                 'sdgs' => array_values(array_unique($sdgPerDimensi[$kunci] ?? [])),
             ];
         }
@@ -309,10 +247,6 @@ class KompetensiService
                 $terbanyak = $banyak;
                 $dominan = $kunci;
             }
-        }
-
-        if ($dominan === null && $dariProfil !== []) {
-            $dominan = $dariProfil[0];
         }
 
         return [
