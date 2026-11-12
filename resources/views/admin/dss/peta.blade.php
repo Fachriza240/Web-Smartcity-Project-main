@@ -3,7 +3,7 @@
     <div class="content-header">
         <div>
             <h2 class="mb-1">Peta Kompetensi Smart City</h2>
-            <p class="mb-0">Jumlah dosen pada setiap dimensi Smart City, berdasarkan kata kunci pada publikasi, HKI, aktivitas, dan bidang penelitian.</p>
+            <p class="mb-0">Sebaran pilar Smart City dan SDG berdasarkan publikasi, HKI, dan aktivitas dosen.</p>
         </div>
     </div>
 
@@ -34,6 +34,7 @@
                                 <th>Jumlah Dosen</th>
                                 <th>Jumlah Dokumen</th>
                                 <th>Dosen</th>
+                                <th>SDG terkait</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -47,6 +48,51 @@
                                             <a href="{{ route('admin.dss.hasil.show', $orang['id']) }}" class="dss-chip">{{ $orang['nama'] }}</a>
                                         @empty
                                             <span class="text-muted">-</span>
+                                        @endforelse
+                                    </td>
+                                    <td>
+                                        @forelse ($item['sdgs'] as $sdg)
+                                            <span class="dss-chip">SDG {{ $sdg }} · {{ config('sdg.' . $sdg) }}</span>
+                                        @empty
+                                            <span class="text-muted">—</span>
+                                        @endforelse
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-admin mt-4">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Pilar dan SDG per Dosen</h5>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Dosen</th><th>Pilar Smart City</th><th>SDG</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($dosenPerDimensi as $hasil)
+                                @php
+                                    $pilar = collect($hasil->kompetensi['dimensi'] ?? [])
+                                        ->filter(fn ($item) => ($item['jumlah'] ?? 0) > 0 || !empty($item['dari_profil']));
+                                @endphp
+                                <tr>
+                                    <td><a class="dss-chip" href="{{ route('admin.dss.hasil.show', $hasil->user_id) }}">{{ $hasil->user?->fullname ?? '—' }}</a></td>
+                                    <td>
+                                        @forelse ($pilar as $item)
+                                            <span class="dss-chip">{{ $item['label'] }}</span>
+                                        @empty
+                                            —
+                                        @endforelse
+                                    </td>
+                                    <td>
+                                        @forelse ($hasil->kompetensi['sdgs'] ?? [] as $sdg)
+                                            <span class="dss-chip">SDG {{ $sdg }} · {{ config('sdg.' . $sdg) }}</span>
+                                        @empty
+                                            —
                                         @endforelse
                                     </td>
                                 </tr>

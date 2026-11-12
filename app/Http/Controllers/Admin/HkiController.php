@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Hki;
 use App\Models\User;
 use App\Rules\PersonName;
+use App\Rules\DssClassification;
 use App\Rules\SafeText;
 use App\Services\HkiNotifier;
 use App\Services\PublicFileService;
@@ -116,7 +117,9 @@ class HkiController extends Controller
 
     private function validatedData(Request $request, ?Hki $hki = null): array
     {
+        DssClassification::prepare($request);
         $data = $request->validate([
+            ...DssClassification::rules(),
             'nomor_sertifikat' => [
                 'required',
                 'string',

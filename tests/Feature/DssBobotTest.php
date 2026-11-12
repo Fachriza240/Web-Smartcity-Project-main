@@ -88,6 +88,23 @@ class DssBobotTest extends TestCase
         $this->assertEqualsWithDelta(0.30, DssKriteria::bobotSaatIni()['C1'], 1e-9);
     }
 
+    public function test_pratinjau_konsistensi_memberi_saran_tanpa_menyimpan(): void
+    {
+        $this->actingAs($this->makeUser('admin'))
+            ->postJson('/admin/dss/bobot/hitung', ['perbandingan' => $this->perbandinganAcak()])
+            ->assertOk()
+            ->assertJsonPath('konsisten', false)
+            ->assertJsonStructure(['cr', 'ambang_cr', 'saran'])
+            ->assertJsonFragment(['ambang_cr' => 0.1]);
+
+        $this->postJson('/admin/dss/bobot/hitung', ['perbandingan' => $this->perbandinganValid()])
+            ->assertOk()
+            ->assertJsonPath('konsisten', true)
+            ->assertJsonPath('saran', null);
+
+        $this->assertSame(0, DssAhp::count());
+    }
+
     public function test_simpan_matriks_konsisten_memperbarui_bobot_kriteria(): void
     {
         $admin = $this->makeUser('admin');

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Publication;
 use App\Models\User;
 use App\Rules\PersonName;
+use App\Rules\DssClassification;
 use App\Rules\SafeText;
 use App\Services\PublicFileService;
 use Illuminate\Http\Request;
@@ -133,7 +134,9 @@ class PublicationController extends Controller
 
     private function validatedData(Request $request, ?Publication $publication = null): array
     {
+        DssClassification::prepare($request);
         $data = $request->validate([
+            ...DssClassification::rules(),
             'submission_type' => ['required', 'in:member,non_member'],
             'user_id' => [
                 'nullable',

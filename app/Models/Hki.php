@@ -26,6 +26,8 @@ class Hki extends Model
     ];
 
     protected $fillable = [
+        'sdgs',
+        'smart_city_pillars',
         'nomor_sertifikat',
         'tgl_terbit',
         'judul_sertifikat',
@@ -39,6 +41,8 @@ class Hki extends Model
     ];
 
     protected $casts = [
+        'sdgs' => 'array',
+        'smart_city_pillars' => 'array',
         'tgl_terbit' => 'date',
     ];
 

@@ -49,7 +49,45 @@ class DssBobotController extends Controller
 
         ['nilai' => $nilai, 'catatan' => $catatan] = $this->validasiPerbandingan($request, $kriteria);
 
-        return $this->tampilkan($kriteria, $nilai, $this->hitungDariNilai($kriteria, $nilai), $catatan);
+        $hasil = $this->hitungDariNilai($kriteria, $nilai);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'konsisten' => $hasil['konsisten'],
+                'cr' => $hasil['cr'],
+                'ambang_cr' => $hasil['ambang_cr'],
+                'saran' => $hasil['konsisten'] ? null : $this->saranPerbandingan($kriteria, $hasil['matriks']),
+            ]);
+        }
+
+        return $this->tampilkan($kriteria, $nilai, $hasil, $catatan);
+    }
+
+    private function saranPerbandingan(Collection $kriteria, array $matriks): string
+    {
+        $nama = $kriteria->pluck('nama')->values();
+        $selisihTerbesar = -1;
+        $saran = '';
+
+        for ($i = 0; $i < $nama->count(); $i++) {
+            for ($j = $i + 1; $j < $nama->count(); $j++) {
+                for ($k = $j + 1; $k < $nama->count(); $k++) {
+                    $perkiraan = $matriks[$i][$j] * $matriks[$j][$k];
+                    $langsung = $matriks[$i][$k];
+                    $selisih = abs(log($perkiraan / $langsung));
+
+                    if ($selisih > $selisihTerbesar) {
+                        $selisihTerbesar = $selisih;
+                        $saran = "Tinjau tiga pasangan antara {$nama[$i]}, {$nama[$j]}, dan {$nama[$k]}. "
+                            . "Perbandingan langsung {$nama[$i]} terhadap {$nama[$k]} bernilai "
+                            . $this->angka($langsung, 2) . ', sedangkan dari dua pasangan lainnya diperkirakan '
+                            . $this->angka($perkiraan, 2) . '. Sesuaikan penilaian pada ketiga pasangan sesuai prioritas CoE.';
+                    }
+                }
+            }
+        }
+
+        return $saran;
     }
 
     public function simpan(Request $request)

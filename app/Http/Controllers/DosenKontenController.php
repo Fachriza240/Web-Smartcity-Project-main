@@ -6,6 +6,7 @@ use App\Models\Hki;
 use App\Models\Publication;
 use App\Models\User;
 use App\Rules\PersonName;
+use App\Rules\DssClassification;
 use App\Rules\SafeText;
 use App\Services\HkiNotifier;
 use App\Services\PublicFileService;
@@ -187,7 +188,9 @@ class DosenKontenController extends Controller
 
     private function validatePublication(Request $request, ?Publication $pub = null): array
     {
+        DssClassification::prepare($request);
         return $request->validate([
+            ...DssClassification::rules(),
             'judul' => ['required', 'string', 'min:5', 'max:200', new SafeText],
             'penulis' => ['required', 'string', 'min:3', 'max:255', new PersonName],
             'tahun' => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
@@ -202,7 +205,9 @@ class DosenKontenController extends Controller
 
     private function validateHki(Request $request, ?Hki $hki = null): array
     {
+        DssClassification::prepare($request);
         return $request->validate([
+            ...DssClassification::rules(),
             'nomor_sertifikat' => [
                 'required',
                 'string',

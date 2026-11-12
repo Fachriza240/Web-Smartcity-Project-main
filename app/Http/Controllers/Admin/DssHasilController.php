@@ -103,6 +103,7 @@ class DssHasilController extends Controller
 
         return view('admin.dss.peta', [
             'peta' => $peta,
+            'dosenPerDimensi' => $semua->sortBy('user.fullname'),
             'totalDosen' => $semua->count(),
             'grafik' => [
                 'labels' => array_values(array_map(fn ($item) => $item['label'], $peta)),

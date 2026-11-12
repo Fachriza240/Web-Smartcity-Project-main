@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Concerns;
 
 use App\Models\AktivitasDosen;
+use App\Rules\DssClassification;
 use App\Rules\SafeText;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -32,6 +33,7 @@ trait ValidatesAktivitasDosen
         $tahunInput = (int) $request->input('tahun');
 
         $aturan = array_merge([
+            ...DssClassification::rules(),
             'jenis' => ['required', Rule::in(AktivitasDosen::jenisKeys())],
             'judul' => [
                 'required', 'string', 'min:5', 'max:255', new SafeText,
@@ -53,6 +55,8 @@ trait ValidatesAktivitasDosen
             'mitra' => [$butuhMitra ? 'required' : 'nullable', 'string', 'min:2', 'max:150', new SafeText],
             'keterangan' => ['nullable', 'string', 'max:1000', new SafeText],
         ], $aturanTambahan);
+
+        DssClassification::prepare($request);
 
         $data = $request->validate($aturan, [
             'judul.unique' => 'Aktivitas dengan judul, jenis, dan tahun yang sama sudah tercatat.',

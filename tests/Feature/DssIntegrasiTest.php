@@ -91,6 +91,47 @@ class DssIntegrasiTest extends TestCase
         return compact('alfa', 'beta', 'kosong');
     }
 
+    public function test_klasifikasi_aktivitas_dibatasi_dan_muncul_di_peta(): void
+    {
+        $dosen = $this->buatUser('Dosen Klasifikasi Uji');
+        $admin = $this->buatUser('Admin Klasifikasi Uji', 'admin');
+        $data = [
+            'jenis' => 'penelitian',
+            'judul' => 'Riset transportasi perkotaan',
+            'tahun' => now()->year,
+            'skala' => 'nasional',
+            'peran' => 'ketua',
+            'sdgs' => [11, 13],
+            'smart_city_pillars' => ['smart_environment', 'smart_governance'],
+        ];
+
+        $this->actingAs($dosen)
+            ->get(route('dosen.aktivitas.create'))
+            ->assertOk()
+            ->assertSee('Kemitraan untuk Mencapai Tujuan');
+
+        $this->postJson(route('dosen.aktivitas.store'), array_replace($data, [
+            'sdgs' => [11, 13, 17],
+            'smart_city_pillars' => ['smart_environment', 'smart_governance', 'smart_living'],
+        ]))->assertUnprocessable()->assertJsonValidationErrors(['sdgs', 'smart_city_pillars']);
+
+        $this->post(route('dosen.aktivitas.store'), $data)
+            ->assertRedirect(route('dosen.aktivitas.index'));
+
+        $this->hitung();
+        $hasil = DssHasil::where('user_id', $dosen->id)->firstOrFail();
+        $this->assertSame([11, 13], $hasil->kompetensi['sdgs']);
+        $this->assertSame(1, $hasil->kompetensi['dimensi']['smart_environment']['jumlah']);
+        $this->assertSame(0, $hasil->kompetensi['dimensi']['smart_mobility']['jumlah']);
+
+        $this->actingAs($admin)
+            ->get('/admin/dss/peta-kompetensi')
+            ->assertOk()
+            ->assertSee('SDG terkait')
+            ->assertSee('Pilar dan SDG per Dosen')
+            ->assertSee('Penanganan Perubahan Iklim');
+    }
+
     public function test_dosen_melihat_kartu_analisis_miliknya_sendiri(): void
     {
         $d = $this->siapkan();

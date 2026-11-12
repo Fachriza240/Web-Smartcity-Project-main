@@ -28,8 +28,10 @@ class KompetensiService
         $publikasi = Publication::published()
             ->forDosen($user)
             ->whereBetween('tahun', [$mulai, now()->year])
-            ->get(['judul', 'kategori', 'tahun'])
+            ->get(['judul', 'kategori', 'tahun', 'sdgs', 'smart_city_pillars'])
             ->map(fn ($p) => [
+                'sdgs' => $p->sdgs ?? [],
+                'smart_city_pillars' => $p->smart_city_pillars,
                 'judul' => (string) $p->judul,
                 'kategori' => (string) $p->kategori,
                 'tahun' => (int) $p->tahun,
@@ -39,8 +41,10 @@ class KompetensiService
             ->forDosen($user)
             ->whereDate('tgl_terbit', '>=', $mulai . '-01-01')
             ->whereDate('tgl_terbit', '<=', now()->toDateString())
-            ->get(['judul_sertifikat', 'jenis_sertifikat', 'tgl_terbit'])
+            ->get(['judul_sertifikat', 'jenis_sertifikat', 'tgl_terbit', 'sdgs', 'smart_city_pillars'])
             ->map(fn ($h) => [
+                'sdgs' => $h->sdgs ?? [],
+                'smart_city_pillars' => $h->smart_city_pillars,
                 'judul' => (string) $h->judul_sertifikat,
                 'jenis' => (string) $h->jenis_sertifikat,
                 'tahun' => (int) $h->tgl_terbit?->year,
@@ -52,6 +56,8 @@ class KompetensiService
             ->where('tahun', '<=', now()->year)
             ->get()
             ->map(fn ($a) => [
+                'sdgs' => $a->sdgs ?? [],
+                'smart_city_pillars' => $a->smart_city_pillars,
                 'jenis' => (string) $a->jenis,
                 'judul' => (string) $a->judul,
                 'tahun' => (int) $a->tahun,
@@ -228,11 +234,11 @@ class KompetensiService
         $dokumen = [];
 
         foreach ($publikasi as $item) {
-            $dokumen[] = [(string) ($item['judul'] ?? ''), null];
+            $dokumen[] = [(string) ($item['judul'] ?? ''), $item['smart_city_pillars'] ?? [], null, $item['sdgs'] ?? []];
         }
 
         foreach ($hki as $item) {
-            $dokumen[] = [(string) ($item['judul'] ?? ''), null];
+            $dokumen[] = [(string) ($item['judul'] ?? ''), $item['smart_city_pillars'] ?? [], null, $item['sdgs'] ?? []];
         }
 
         foreach ($aktivitas as $item) {
@@ -242,17 +248,27 @@ class KompetensiService
                     . ' '
                     . (string) ($item['mitra'] ?? '')
                 ),
-                $item['bidang_smart_city'] ?? null,
+                $item['smart_city_pillars'] ?? [],
+                ($item['smart_city_pillars'] ?? null) === null ? ($item['bidang_smart_city'] ?? null) : null,
+                $item['sdgs'] ?? [],
             ];
         }
 
         $dokumenCocok = 0;
 
-        foreach ($dokumen as [$teks, $tag]) {
-            $dimensi = $this->deteksiDimensi($teks);
+        $sdgs = [];
+        $sdgPerDimensi = [];
 
-            if ($tag && isset($jumlah[$tag])) {
-                $dimensi[] = $tag;
+        foreach ($dokumen as [$teks, $pilihan, $tag, $tujuan]) {
+            $sdgs = array_merge($sdgs, $tujuan);
+            $dimensi = array_values(array_intersect($pilihan, array_keys($jumlah)));
+
+            if ($dimensi === []) {
+                $dimensi = $this->deteksiDimensi($teks);
+
+                if ($tag && isset($jumlah[$tag])) {
+                    $dimensi[] = $tag;
+                }
             }
 
             $dimensi = array_values(array_unique($dimensi));
@@ -262,6 +278,7 @@ class KompetensiService
 
                 foreach ($dimensi as $kunci) {
                     $jumlah[$kunci]++;
+                    $sdgPerDimensi[$kunci] = array_merge($sdgPerDimensi[$kunci] ?? [], $tujuan);
                 }
             }
         }
@@ -280,6 +297,7 @@ class KompetensiService
                 'label' => (string) ($dimensi['label'] ?? $kunci),
                 'jumlah' => $jumlah[$kunci],
                 'dari_profil' => $dariProfilIni,
+                'sdgs' => array_values(array_unique($sdgPerDimensi[$kunci] ?? [])),
             ];
         }
 
@@ -299,6 +317,7 @@ class KompetensiService
 
         return [
             'dimensi' => $daftar,
+            'sdgs' => array_values(array_unique($sdgs)),
             'dominan' => $dominan,
             'dominan_label' => $dominan !== null
                 ? ($daftar[$dominan]['label'] ?? null)

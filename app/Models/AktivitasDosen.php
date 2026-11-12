@@ -19,6 +19,8 @@ class AktivitasDosen extends Model
     protected $table = 'aktivitas_dosen';
 
     protected $fillable = [
+        'sdgs',
+        'smart_city_pillars',
         'user_id',
         'jenis',
         'judul',
@@ -34,6 +36,8 @@ class AktivitasDosen extends Model
     ];
 
     protected $casts = [
+        'sdgs' => 'array',
+        'smart_city_pillars' => 'array',
         'tahun' => 'integer',
         'berkelanjutan' => 'boolean',
     ];

@@ -20,7 +20,14 @@ class Publication extends Model
     public const STATUS_DRAFT = 'Draft';
     public const STATUS_PUBLISH = 'Publish';
 
+    protected $casts = [
+        'sdgs' => 'array',
+        'smart_city_pillars' => 'array',
+    ];
+
     protected $fillable = [
+        'sdgs',
+        'smart_city_pillars',
         'user_id',
         'recommended_by',
         'submission_type',

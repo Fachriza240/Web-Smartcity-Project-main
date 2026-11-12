@@ -155,6 +155,7 @@
     </div>
 </div>
 
+<x-dss-classification :record="$publication" />
 <div class="d-flex gap-2">
     <button type="submit" class="btn btn-success"
             data-confirm-submit="{{ $publication->exists ? 'Apakah Anda yakin ingin menyimpan perubahan?' : 'Apakah data yang diinputkan sudah benar?' }}">

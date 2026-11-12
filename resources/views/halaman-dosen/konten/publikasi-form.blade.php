@@ -117,6 +117,7 @@
                 </div>
             </div>
 
+            <x-dss-classification :record="$publication" />
             <div class="dsn-form-actions">
                 <button type="submit" class="sc-btn sc-btn--primary"
                         data-confirm-submit="{{ $isCreate ? 'Apakah Anda yakin ingin menyimpan publikasi ini?' : 'Apakah Anda yakin ingin menyimpan perubahan?' }}">

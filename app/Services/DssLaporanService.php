@@ -131,6 +131,7 @@ class DssLaporanService
             || (int) $hasil->ahp_id !== (int) DssAhp::terpakai()?->id
             || (array) $hasil->poin_mentah != $aktual['poin']
             || ($tersimpan['rincian'] ?? []) != $aktual['rincian']
+            || ($tersimpan['sdgs'] ?? []) != $aktual['kompetensi']['sdgs']
             || ($tersimpan['dimensi'] ?? []) != $aktual['kompetensi']['dimensi'];
     }
 
@@ -197,6 +198,7 @@ class DssLaporanService
                 'label' => (string) ($dimensi['label'] ?? $kunci),
                 'jumlah_dosen' => 0,
                 'jumlah_dokumen' => 0,
+                'sdgs' => [],
                 'dosen' => [],
             ];
         }
@@ -209,6 +211,7 @@ class DssLaporanService
 
                 if ((int) ($info['jumlah'] ?? 0) > 0 || ! empty($info['dari_profil'])) {
                     $peta[$kunci]['jumlah_dosen']++;
+                    $peta[$kunci]['sdgs'] = array_unique(array_merge($peta[$kunci]['sdgs'], $info['sdgs'] ?? []));
                     $peta[$kunci]['jumlah_dokumen'] += (int) ($info['jumlah'] ?? 0);
                     $peta[$kunci]['dosen'][] = [
                         'id' => (int) $hasil->user_id,

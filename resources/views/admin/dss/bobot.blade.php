@@ -148,7 +148,7 @@
                     </div>
 
                     <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" id="btnHitung" class="btn btn-primary" disabled>
                             <i class="bi bi-calculator me-1" aria-hidden="true"></i> Hitung
                         </button>
                         <button type="submit" id="btnSimpan" class="btn btn-success"
@@ -164,6 +164,7 @@
                             @endif
                         </span>
                     </div>
+                    <p id="ahpFeedback" class="small mt-3 mb-0" role="status" aria-live="polite"></p>
                 </form>
             </div>
         </div>
@@ -311,17 +312,59 @@
                 if (!form) { return; }
 
                 var simpan = document.getElementById('btnSimpan');
+                var hitung = document.getElementById('btnHitung');
                 var hint = document.getElementById('hintHitung');
+                var feedback = document.getElementById('ahpFeedback');
+                var pending;
+
+                async function cekKonsistensi() {
+                    if (pending) { pending.abort(); }
+                    var pemeriksaan = new AbortController();
+                    pending = pemeriksaan;
+                    hitung.disabled = true;
+                    feedback.classList.remove('text-danger');
+                    feedback.textContent = 'Memeriksa konsistensi…';
+
+                    try {
+                        var respons = await fetch(form.action, {
+                            method: 'POST',
+                            headers: { Accept: 'application/json' },
+                            body: new FormData(form),
+                            signal: pemeriksaan.signal
+                        });
+                        if (!respons.ok) { throw new Error('Pemeriksaan gagal'); }
+                        var hasil = await respons.json();
+                        if (pending !== pemeriksaan) { return; }
+
+                        hitung.disabled = !hasil.konsisten;
+                        feedback.classList.toggle('text-danger', !hasil.konsisten);
+                        var cr = Number(hasil.cr).toLocaleString('id-ID', { maximumFractionDigits: 4 });
+                        feedback.textContent = hasil.konsisten
+                            ? 'Konsisten. CR ' + cr + '. Klik Hitung untuk melihat bobot.'
+                            : 'Tidak konsisten. CR ' + cr + ' melebihi batas '
+                                + Number(hasil.ambang_cr).toLocaleString('id-ID') + '. ' + hasil.saran;
+                    } catch (error) {
+                        if (pending !== pemeriksaan || error.name === 'AbortError') { return; }
+                        feedback.classList.add('text-danger');
+                        feedback.textContent = 'Pemeriksaan gagal. Ubah pilihan untuk mencoba lagi atau muat ulang halaman.';
+                    }
+                }
 
                 form.querySelectorAll('.pasangan-select').forEach(function (pilihan) {
                     pilihan.addEventListener('change', function () {
-                        if (simpan) { simpan.disabled = true; }
-                        if (hint) {
-                            hint.hidden = false;
-                            hint.textContent = 'Nilai berubah. Klik Hitung ulang sebelum menyimpan.';
-                        }
+                        simpan.disabled = true;
+                        hint.hidden = true;
+                        cekKonsistensi();
                     });
                 });
+
+                form.addEventListener('submit', function (event) {
+                    if (event.submitter !== simpan && hitung.disabled) {
+                        event.preventDefault();
+                    }
+                });
+
+                cekKonsistensi();
 
                 if (simpan) {
                     simpan.addEventListener('click', function (event) {

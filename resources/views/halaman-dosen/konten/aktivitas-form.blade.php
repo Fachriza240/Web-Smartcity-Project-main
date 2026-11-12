@@ -120,19 +120,6 @@
                     <div class="field-error" data-error-for="mitra">@error('mitra'){{ $message }}@enderror</div>
                 </div>
 
-                <div class="col-md-6" data-field>
-                    <label for="bidang_smart_city" class="form-label">Bidang Smart City</label>
-                    <select id="bidang_smart_city" name="bidang_smart_city" class="form-select @error('bidang_smart_city') is-invalid @enderror"
-                        data-label="Bidang Smart City">
-                        <option value="">Tidak ditentukan</option>
-                        @foreach (AktivitasDosen::bidangSmartCityList() as $key => $label)
-                            <option value="{{ $key }}" @selected(old('bidang_smart_city', $aktivitas->bidang_smart_city) === $key)>{{ $label }}</option>
-                        @endforeach
-                    </select>
-                    <div class="form-text">Opsional. Jika dikosongkan, sistem mengenali bidang dari kata kunci pada judul.</div>
-                    <div class="field-error" data-error-for="bidang_smart_city">@error('bidang_smart_city'){{ $message }}@enderror</div>
-                </div>
-
                 <div class="col-md-6" data-show-for="abdimas" hidden>
                     <span class="form-label d-block">Keberlanjutan</span>
                     <div class="form-check">
@@ -149,6 +136,7 @@
                 </div>
             </div>
 
+            <x-dss-classification :record="$aktivitas" />
             <div class="dsn-form-actions">
                 <button type="submit" class="sc-btn sc-btn--primary"
                         data-confirm-submit="{{ $isCreate ? 'Apakah Anda yakin ingin menyimpan data aktivitas ini?' : 'Apakah Anda yakin ingin menyimpan perubahan?' }}">

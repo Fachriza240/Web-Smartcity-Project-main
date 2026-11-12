@@ -1762,3 +1762,31 @@ span.badge[class*="bg-info"] {
     color: #fff;
     background: #b91c1c;
 }
+
+
+html:not([data-theme="dark"]) .sidebar {
+    --adm-sidebar-bg: #fff;
+    --adm-sidebar-text: #475569;
+    --adm-sidebar-hover: #f1f5f9;
+    --adm-sidebar-active-bg: #e8f2fb;
+    --adm-sidebar-active-txt: #1e40af;
+    --adm-sidebar-cat: #475569;
+    border-right: 1px solid var(--adm-border);
+    box-shadow: 2px 0 12px rgba(15, 23, 42, .05);
+}
+
+html:not([data-theme="dark"]) .sidebar :is(.brand h4, .adm-sidebar-close) {
+    color: var(--adm-text-1);
+}
+
+html:not([data-theme="dark"]) .sidebar .sidebar-inner {
+    scrollbar-color: #94a3b8 transparent;
+}
+
+html:not([data-theme="dark"]) .sidebar .sidebar-inner::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+}
+
+html:not([data-theme="dark"]) .sidebar .nav-item .nav-link:hover:not(.active) {
+    color: var(--adm-text-1) !important;
+}
